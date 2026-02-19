@@ -1,5 +1,3 @@
-# EECS3311_SBCP
-Group #8, EECS3311 Project repo
 
 # 📌 Service Booking & Consulting Platform
 Group #8, EECS 3311 – Software Design
