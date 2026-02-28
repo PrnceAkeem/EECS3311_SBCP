@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synergy Consulting: Client</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="../images/logo.png" type="image/png">
+  <link rel="stylesheet" href="../global.css">
+  <link rel="stylesheet" href="browse.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark border-bottom border-body" data-bs-theme="dark">
+
+    <div class="container-fluid">
+      <h1 class="navbar-brand d-flex align-items-center mb-0">
+        <img src="../images/logo.png" alt="Logo" width="45" height="45" class="d-inline-block align-text-top">
+        Synergy Consulting
+      </h1>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="browse.html">Browsing Consulting Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">My Bookings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Payments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Pay Methods</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="heading">
+    <h1>Browse Consulting Services</h1>
+    <h2>Explore our available services and request a booking with our experts to assist you</h2>
+  </div>
+
+
+  <div class="container mt-5">
+  <div class="row g-4">
+
+    <!-- Service 1 -->
+    <div class="col-md-4">
+      <div class="card bg-dark text-light border-0 rounded-4 h-100 shadow">
+        <div class="card-body">
+          <h6 class="card-title">TECH</h6>
+          <h5 class="card-title">Software Architecture Review</h5>
+          <p class="card-text text-secondary">
+            Deep technical evaluation of your system architecture.
+          </p>
+          <h6 class="fw-bold">$150</h6>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <button 
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal"
+            onclick="setService('Software Architecture Review', '$150')">
+            Book
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service 2 -->
+    <div class="col-md-4">
+      <div class="card bg-dark text-light border-0 rounded-4 h-100 shadow">
+        <div class="card-body">
+           <h6 class="card-title">TECH</h6>
+          <h5 class="card-title">Cloud Migration Consulting</h5>
+          <p class="card-text text-secondary">
+            Guidance for secure and scalable cloud adoption.
+          </p>
+          <h6 class="fw-bold">$200</h6>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <button 
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal">
+             Book
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service 3 -->
+    <div class="col-md-4">
+      <div class="card bg-dark text-light border-0 rounded-4 h-100 shadow">
+        <div class="card-body">
+           <h6 class="card-title">CAREER</h6>
+          <h5 class="card-title">Career Path Consulting</h5>
+          <p class="card-text text-secondary">
+            Guidance for choose the right career path based on interests and experience.
+          </p>
+          <h6 class="fw-bold">$50</h6>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <button 
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal">
+             Book
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+     <!-- Service 4 -->
+    <div class="col-md-4">
+      <div class="card bg-dark text-light border-0 rounded-4 h-100 shadow">
+        <div class="card-body">
+           <h6 class="card-title">CAREER</h6>
+          <h5 class="card-title">Technical Interview Prep</h5>
+          <p class="card-text text-secondary">
+            Ace your technical interviews with personalized coaching, mock sessions and step-by-step problem solving strategies
+          </p>
+          <h6 class="fw-bold">$100</h6>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <button 
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal">
+             Book
+          </button>
+        </div>
+      </div>
+    </div>
+
+     <!-- Service 5 -->
+    <div class="col-md-4">
+      <div class="card bg-dark text-light border-0 rounded-4 h-100 shadow">
+        <div class="card-body">
+           <h6 class="card-title">BUSINESS</h6>
+          <h5 class="card-title">Startup Strategy Session</h5>
+          <p class="card-text text-secondary">
+            Strategic guidance to help early-stage startups validate ideas and transforming them to scalable ventures
+          </p>
+          <h6 class="fw-bold">$200</h6>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <button 
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal">
+             Book
+          </button>
+        </div>
+      </div>
+    </div>
+
+     <!-- Service 6 -->
+    <div class="col-md-4">
+      <div class="card bg-dark text-light border-0 rounded-4 h-100 shadow">
+        <div class="card-body">
+           <h6 class="card-title">TECH</h6>
+          <h5 class="card-title">Code Review & Mentorship</h5>
+          <p class="card-text text-secondary">
+            Personalized code reviews and 1-on-1 mentorship to elevate your technical skills
+          </p>
+          <h6 class="fw-bold">$60</h6>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <button 
+            class="btn btn-light"
+            data-bs-toggle="modal"
+            data-bs-target="#bookingModal">
+             Book
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
