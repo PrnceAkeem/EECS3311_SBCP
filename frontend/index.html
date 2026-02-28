@@ -1,11 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synergy Consulting Login</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" href="./images/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
 </head>
+
 <body>
+  <div class="container">
+    <div class="heading">
+      <h1> <img src="./images/logo.png" alt="Synergy Consulting Logo">Synergy Consulting</h1>
+      <h2>Service Booking & Consulting Platform</h2>
+    </div>
+    <div class="about">
+      At Synergy Consulting, we help our clients optimize IT systems and solve technical challenges with tailored
+      solutions
+    </div>
+    <div class="system_actors">
+      <!-- When user clicks goes to client dashboard -->
+      <div class="client">
+        <div>
+          <h1>🧑</h1>
+          <h2>Client</h2>
+        </div>
+        <p>Browse services, book sessions, manage payments</p>
+      </div>
+       <!-- When user clicks goes to consultant dashboard -->
+      <div class="consultant">
+        <div>
+          <h1>🧑‍💼</h1>
+          <h2>Consultant</h2>
+        </div>
+        <p>Manage availability, accept or reject bookings</p>
+      </div>
+       <!-- When user clicks goes to admin dashboard -->
+      <div class="admin">
+        <div>
+          <h1>🛡️</h1>
+          <h2>Admin</h2>
+        </div>
+        <p>Approve consultant registration and define system policies</p>
+      </div>
+    </div>
+   <br>
+    <form action="#" method="post">
+      <h2>Select your role from above</h2>
+      <label for="email">EMAIL</label>
+      <input type="email" name="email" id="signin-email" placeholder="you@example.com" />
+
+      <label for="password">PASSWORD</label>
+      <input type="password" name="password" id="signin-password" placeholder="***********" />
+
+      <p>Demo: enter any email + any password</p>
+
+      <button type="button">Sign In</button>
+    </form>
     
+  </div>
+
 </body>
 </html>
