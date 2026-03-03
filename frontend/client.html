@@ -177,26 +177,37 @@
           <h5 class="modal-title" id="bookingModalLabel">Book Service</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
         <div class="modal-body">
           <p><strong>Service:</strong> <span id="serviceName">--</span></p>
           <p><strong>Price:</strong> <span id="servicePrice">--</span></p>
           <form>
+
             <div class="mb-3">
               <label for="clientName" class="form-label">Your Name</label>
               <input type="text" class="form-control" id="clientName" placeholder="Enter your name">
             </div>
+
             <div class="mb-3">
               <label for="clientEmail" class="form-label">Email</label>
               <input type="email" class="form-control" id="clientEmail" placeholder="Enter your email">
             </div>
+
             <div class="mb-3">
               <label for="consultantName" class="form-label">Consultant Name</label>
-              <input type="text" class="form-control" id="consultantName" readonly value="John Smith">
+              <select class="form-select" id="consultantName" name="consultantName">
+                <option value="" selected disabled>Select a consultant</option>
+                <option value="John Smith">John Smith</option>
+                <option value="Angela Fox">Angela Fox</option>
+                <option value="Brian Flys">Brian Flys</option>
+              </select>
             </div>
+
             <div class="mb-3">
               <label for="bookingDate" class="form-label">Preferred Date</label>
               <input type="date" class="form-control" id="bookingDate">
             </div>
+
             <div class="mb-3">
               <label class="form-label">Select Time Slot</label>
               <div id="timeSlots" class="d-flex flex-wrap gap-2">
