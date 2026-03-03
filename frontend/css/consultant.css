@@ -1,15 +1,6 @@
-body {
-  background:
-    radial-gradient(1200px 600px at 12% -10%, rgba(60, 207, 207, 0.18), transparent 70%),
-    radial-gradient(900px 500px at 85% 0%, rgba(62, 120, 255, 0.16), transparent 65%),
-    linear-gradient(180deg, #0a0f16 0%, #06090f 100%);
-  min-height: 100vh;
-  color: var(--text);
-}
-
 .management-page {
   width: min(1240px, 95%);
-  margin: 3rem auto;
+  margin: 1.4rem auto 3rem;
 }
 
 .page-head {
@@ -25,22 +16,6 @@ body {
   color: var(--muted);
 }
 
-.page-links {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.page-links a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.page-links a:hover {
-  opacity: 0.85;
-}
-
 .page-message {
   min-height: 1.5rem;
   color: var(--muted);
@@ -53,51 +28,7 @@ body {
   border-radius: var(--radius);
   padding: 1rem;
   overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border-bottom: 1px solid var(--border);
-  text-align: left;
-  padding: 0.75rem 0.6rem;
-  font-size: 0.92rem;
-}
-
-th {
-  color: var(--text);
-  font-weight: 600;
-}
-
-td {
-  color: var(--muted);
-}
-
-.status-pill {
-  display: inline-block;
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.status-requested {
-  background: rgba(240, 183, 106, 0.2);
-  color: var(--warn);
-}
-
-.status-completed {
-  background: rgba(63, 212, 134, 0.2);
-  color: var(--good);
-}
-
-.status-cancelled {
-  background: rgba(240, 113, 113, 0.2);
-  color: var(--bad);
+  box-shadow: var(--shadow);
 }
 
 .status-actions {

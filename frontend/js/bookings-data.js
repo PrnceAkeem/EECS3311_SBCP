@@ -1,85 +1,100 @@
 (function () {
-  const STORAGE_KEY = "synergy_bookings_v1";
-  const VALID_STATUSES = ["Requested", "Completed", "Cancelled"];
+  const VALID_STATUSES = new Set(["Requested", "Completed", "Cancelled"]);
 
-  function readBookings() {
-    const rawData = localStorage.getItem(STORAGE_KEY);
-    if (!rawData) {
-      return [];
+  async function apiRequest(path, options) {
+    const response = await fetch(path, {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      ...options
+    });
+
+    if (!response.ok) {
+      let message = "Request failed.";
+      try {
+        const errorPayload = await response.json();
+        if (errorPayload && errorPayload.error) {
+          message = errorPayload.error;
+        }
+      } catch (_error) {
+        message = `Request failed with status ${response.status}.`;
+      }
+      throw new Error(message);
     }
 
-    try {
-      const parsedData = JSON.parse(rawData);
-      return Array.isArray(parsedData) ? parsedData : [];
-    } catch (_error) {
-      return [];
-    }
-  }
-
-  function writeBookings(bookings) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-  }
-
-  function getNextBookingId(bookings) {
-    if (!bookings.length) {
-      return 1;
-    }
-    const maxId = bookings.reduce((currentMax, booking) => {
-      const bookingId = Number(booking.id) || 0;
-      return bookingId > currentMax ? bookingId : currentMax;
-    }, 0);
-    return maxId + 1;
-  }
-
-  function normalizeStatus(status) {
-    return VALID_STATUSES.includes(status) ? status : "Requested";
-  }
-
-  function getBookings() {
-    return readBookings();
-  }
-
-  function addBooking(bookingData) {
-    const bookings = readBookings();
-    const timestamp = new Date().toISOString();
-    const newBooking = {
-      id: getNextBookingId(bookings),
-      service: bookingData.service || "",
-      price: bookingData.price || "",
-      clientName: bookingData.clientName || "",
-      clientEmail: bookingData.clientEmail || "",
-      consultantName: bookingData.consultantName || "",
-      bookingDate: bookingData.bookingDate || "",
-      bookingTime: bookingData.bookingTime || "",
-      status: "Requested",
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      updatedBy: "client"
-    };
-
-    bookings.push(newBooking);
-    writeBookings(bookings);
-    return newBooking;
-  }
-
-  function updateBookingStatus(bookingId, nextStatus, actor) {
-    const bookings = readBookings();
-    const targetId = Number(bookingId);
-    const bookingIndex = bookings.findIndex((booking) => Number(booking.id) === targetId);
-    if (bookingIndex === -1) {
+    if (response.status === 204) {
       return null;
     }
+    return response.json();
+  }
 
-    bookings[bookingIndex].status = normalizeStatus(nextStatus);
-    bookings[bookingIndex].updatedAt = new Date().toISOString();
-    bookings[bookingIndex].updatedBy = actor || "system";
-    writeBookings(bookings);
-    return bookings[bookingIndex];
+  function sanitizeStatus(status) {
+    if (VALID_STATUSES.has(status)) {
+      return status;
+    }
+    return "Requested";
+  }
+
+  async function getBookings() {
+    return apiRequest("/api/bookings");
+  }
+
+  async function addBooking(bookingData) {
+    return apiRequest("/api/bookings", {
+      method: "POST",
+      body: JSON.stringify(bookingData || {})
+    });
+  }
+
+  async function updateBookingStatus(bookingId, nextStatus, actor) {
+    return apiRequest(`/api/bookings/${bookingId}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        status: sanitizeStatus(nextStatus),
+        actor: actor || "system"
+      })
+    });
+  }
+
+  function subscribe(listener) {
+    if (typeof listener !== "function") {
+      return function unsubscribeNoop() {};
+    }
+
+    if (!("EventSource" in window)) {
+      const pollTimer = setInterval(() => {
+        listener({ type: "poll" });
+      }, 3000);
+
+      return function unsubscribePolling() {
+        clearInterval(pollTimer);
+      };
+    }
+
+    const stream = new EventSource("/api/bookings/stream");
+
+    stream.addEventListener("booking", (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        listener(payload);
+      } catch (_error) {
+        listener({ type: "unknown" });
+      }
+    });
+
+    stream.onerror = function onError() {
+      // EventSource auto-reconnects. Keeping handler prevents noisy uncaught errors.
+    };
+
+    return function unsubscribeSse() {
+      stream.close();
+    };
   }
 
   window.BookingStore = {
     getBookings: getBookings,
     addBooking: addBooking,
-    updateBookingStatus: updateBookingStatus
+    updateBookingStatus: updateBookingStatus,
+    subscribe: subscribe
   };
 })();

@@ -14,15 +14,23 @@
 </head>
 
 <body>
+  <header class="topbar">
+    <a class="brand-link" href="./admin.html">
+      <img src="./images/logo.png" alt="Synergy Consulting logo">
+      <span>Synergy Consulting</span>
+    </a>
+    <a class="logout-btn" href="./index.html">Logout</a>
+  </header>
+
+  <nav class="subnav" aria-label="Admin navigation">
+    <a class="subnav-link active" href="./admin.html">Admin Dashboard</a>
+    <a class="subnav-link" href="./booking.html">Client Bookings View</a>
+  </nav>
+
   <main class="management-page">
     <div class="page-head">
       <h1>🛡️ Admin Dashboard</h1>
       <p>Review and update booking requests.</p>
-    </div>
-
-    <div class="page-links">
-      <a href="./booking.html">View Client Bookings</a>
-      <a href="./index.html">Logout</a>
     </div>
 
     <p id="adminMessage" class="page-message" aria-live="polite"></p>

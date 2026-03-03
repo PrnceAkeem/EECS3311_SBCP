@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  let unsubscribe = null;
+
   function getStatusClass(status) {
     if (status === "Completed") {
       return "status-completed";
@@ -29,6 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return row;
   }
 
+  function createErrorRow(message) {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="8" class="empty-bookings">${escapeHtml(message)}</td>`;
+    return row;
+  }
+
   function createBookingRow(booking) {
     const row = document.createElement("tr");
     row.innerHTML = `
@@ -44,19 +52,33 @@ document.addEventListener("DOMContentLoaded", () => {
     return row;
   }
 
-  function renderBookings() {
-    const bookings = window.BookingStore.getBookings();
+  async function renderBookings() {
     bookingsTableBody.innerHTML = "";
 
-    if (!bookings.length) {
-      bookingsTableBody.appendChild(createEmptyRow());
-      return;
-    }
+    try {
+      const bookings = await window.BookingStore.getBookings();
+      if (!bookings.length) {
+        bookingsTableBody.appendChild(createEmptyRow());
+        return;
+      }
 
-    bookings.forEach((booking) => {
-      bookingsTableBody.appendChild(createBookingRow(booking));
-    });
+      bookings.forEach((booking) => {
+        bookingsTableBody.appendChild(createBookingRow(booking));
+      });
+    } catch (error) {
+      bookingsTableBody.appendChild(createErrorRow(error.message || "Failed to load bookings."));
+    }
   }
+
+  unsubscribe = window.BookingStore.subscribe(() => {
+    renderBookings();
+  });
+
+  window.addEventListener("beforeunload", () => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
+  });
 
   renderBookings();
 });

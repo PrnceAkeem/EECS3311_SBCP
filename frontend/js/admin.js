@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("adminBookingsBody");
   const messageElement = document.getElementById("adminMessage");
   const STATUS_OPTIONS = ["Requested", "Completed", "Cancelled"];
+  let unsubscribe = null;
 
   if (!tableBody || !window.BookingStore) {
     return;
@@ -61,21 +62,27 @@ document.addEventListener("DOMContentLoaded", () => {
     return row;
   }
 
-  function renderBookings() {
-    const bookings = window.BookingStore.getBookings();
+  async function renderBookings() {
     tableBody.innerHTML = "";
 
-    if (!bookings.length) {
-      tableBody.appendChild(createEmptyRow());
-      return;
-    }
+    try {
+      const bookings = await window.BookingStore.getBookings();
+      if (!bookings.length) {
+        tableBody.appendChild(createEmptyRow());
+        return;
+      }
 
-    bookings.forEach((booking) => {
-      tableBody.appendChild(createBookingRow(booking));
-    });
+      bookings.forEach((booking) => {
+        tableBody.appendChild(createBookingRow(booking));
+      });
+    } catch (error) {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td colspan="8" class="empty-row">${escapeHtml(error.message || "Failed to load bookings.")}</td>`;
+      tableBody.appendChild(row);
+    }
   }
 
-  tableBody.addEventListener("click", (event) => {
+  tableBody.addEventListener("click", async (event) => {
     const saveButton = event.target.closest('button[data-role="status-save"]');
     if (!saveButton) {
       return;
@@ -89,19 +96,30 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const updatedBooking = window.BookingStore.updateBookingStatus(
-      bookingId,
-      selectElement.value,
-      "admin"
-    );
-
-    if (!updatedBooking) {
-      messageElement.innerText = "Could not update booking status.";
-      return;
+    saveButton.disabled = true;
+    try {
+      const updatedBooking = await window.BookingStore.updateBookingStatus(
+        bookingId,
+        selectElement.value,
+        "admin"
+      );
+      messageElement.innerText = `Booking #${bookingId} updated to ${updatedBooking.status}.`;
+      renderBookings();
+    } catch (error) {
+      messageElement.innerText = error.message || "Could not update booking status.";
+    } finally {
+      saveButton.disabled = false;
     }
+  });
 
-    messageElement.innerText = `Booking #${bookingId} updated to ${updatedBooking.status}.`;
+  unsubscribe = window.BookingStore.subscribe(() => {
     renderBookings();
+  });
+
+  window.addEventListener("beforeunload", () => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
   });
 
   renderBookings();

@@ -51,3 +51,38 @@ Complete bookings
 3️⃣ Admin
 Approve consultant registrations
 Configure policies (cancellation, pricing, notifications)
+
+# 🐳 Run With Docker
+
+This project now runs with 2 containers:
+- `synergy-app` (Node + Express API + static frontend)
+- `synergy-db` (PostgreSQL database)
+
+### Start
+
+```bash
+docker compose up --build
+```
+
+Then open:
+- App: `http://localhost:3000`
+- Health: `http://localhost:3000/health`
+
+### Stop
+
+```bash
+docker compose down
+```
+
+To remove DB volume data too:
+
+```bash
+docker compose down -v
+```
+
+# 🔄 Shared Real-Time Booking Flow
+
+- Client booking requests are stored in PostgreSQL, not browser storage.
+- Admin and Consultant dashboards read from the same shared DB.
+- Status updates (`Requested`, `Completed`, `Cancelled`) are pushed to connected pages using Server-Sent Events.
+- Multi-user testing works by opening different browsers/devices against `http://localhost:3000`.
