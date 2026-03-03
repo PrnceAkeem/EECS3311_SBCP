@@ -5,12 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Synergy Consulting: Client</title>
+  <link rel="icon" href="./images/logo.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="icon" href="../images/logo.png" type="image/png">
-  <link rel="stylesheet" href="../global.css">
-  <link rel="stylesheet" href="browse.css">
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./global.css">
+  <link rel="stylesheet" href="./client.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
@@ -18,10 +18,9 @@
 <body>
   <!-- Nav bar -->
   <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark border-bottom border-body" data-bs-theme="dark">
-
     <div class="container-fluid">
       <h1 class="navbar-brand d-flex align-items-center mb-0">
-        <img src="../images/logo.png" alt="Logo" width="45" height="45" class="d-inline-block align-text-top">
+        <img src="./images/logo.png" alt="Logo" width="45" height="45" class="d-inline-block align-text-top">
         Synergy Consulting
       </h1>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -31,7 +30,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="browse.html">Browsing Consulting Services</a>
+            <a class="nav-link active" aria-current="page" href="client.html">Browsing Consulting Services</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="booking.html">My Bookings</a>
@@ -43,7 +42,7 @@
             <a class="nav-link" href="methods.html">Pay Methods</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="../index.html">Logout</a>
+            <a class="nav-link" href="./index.html">Logout</a>
           </li>
         </ul>
       </div>
@@ -54,7 +53,6 @@
     <h1>Browse Consulting Services</h1>
     <h2>Explore our available services and request a booking with our experts to assist you</h2>
   </div>
-
 
   <div class="container mt-5">
     <div class="row g-4">
@@ -71,10 +69,8 @@
             <h6 class="fw-bold">$150</h6>
           </div>
           <div class="card-footer bg-transparent border-0">
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#bookingModal"
-            onclick="setService('Software Architecture Review', '$150')">
-              Book
-            </button>
+            <button class="btn btn-light service-book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal"
+              data-service="Software Architecture Review" data-price="$150">Book</button>
           </div>
         </div>
       </div>
@@ -91,8 +87,8 @@
             <h6 class="fw-bold">$200</h6>
           </div>
           <div class="card-footer bg-transparent border-0">
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#bookingModal"
-             onclick="setService('Cloud Migration Consulting', '$200')">Book</button>
+            <button class="btn btn-light service-book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal"
+              data-service="Cloud Migration Consulting" data-price="$200">Book</button>
           </div>
         </div>
       </div>
@@ -104,17 +100,16 @@
             <h6 class="card-title">CAREER</h6>
             <h5 class="card-title">Career Path Consulting</h5>
             <p class="card-text text-secondary">
-              Guidance for choose the right career path based on interests and experience.
+              Guidance for choosing the right career path based on interests and experience.
             </p>
             <h6 class="fw-bold">$50</h6>
           </div>
           <div class="card-footer bg-transparent border-0">
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#bookingModal"
-            onclick="setService('Career Path Consulting', '$50')">Book</button>
+            <button class="btn btn-light service-book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal"
+              data-service="Career Path Consulting" data-price="$50">Book</button>
           </div>
         </div>
       </div>
-
 
       <!-- Service 4 -->
       <div class="col-md-4">
@@ -123,14 +118,13 @@
             <h6 class="card-title">CAREER</h6>
             <h5 class="card-title">Technical Interview Prep</h5>
             <p class="card-text text-secondary">
-              Ace your technical interviews with personalized coaching, mock sessions and step-by-step problem solving
-              strategies
+              Ace your technical interviews with personalized coaching, mock sessions and step-by-step problem solving strategies.
             </p>
             <h6 class="fw-bold">$100</h6>
           </div>
           <div class="card-footer bg-transparent border-0">
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#bookingModal"
-             onclick="setService('Technical Interview Prep', '$100')">Book</button>
+            <button class="btn btn-light service-book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal"
+              data-service="Technical Interview Prep" data-price="$100">Book</button>
           </div>
         </div>
       </div>
@@ -142,15 +136,13 @@
             <h6 class="card-title">BUSINESS</h6>
             <h5 class="card-title">Startup Strategy Session</h5>
             <p class="card-text text-secondary">
-              Strategic guidance to help early-stage startups validate ideas and transforming them to scalable ventures
+              Strategic guidance to help early-stage startups validate ideas and transform them into scalable ventures.
             </p>
             <h6 class="fw-bold">$200</h6>
           </div>
           <div class="card-footer bg-transparent border-0">
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#bookingModal"
-            onclick="setService('Startup Strategy Session', '$200')">
-              Book
-            </button>
+            <button class="btn btn-light service-book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal"
+              data-service="Startup Strategy Session" data-price="$200">Book</button>
           </div>
         </div>
       </div>
@@ -162,13 +154,13 @@
             <h6 class="card-title">TECH</h6>
             <h5 class="card-title">Code Review & Mentorship</h5>
             <p class="card-text text-secondary">
-              Personalized code reviews and 1-on-1 mentorship to elevate your technical skills
+              Personalized code reviews and 1-on-1 mentorship to elevate your technical skills.
             </p>
             <h6 class="fw-bold">$60</h6>
           </div>
           <div class="card-footer bg-transparent border-0">
-            <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#bookingModal"
-            onclick="setService('Code Review & Mentorship', '$60')">Book<button>               
+            <button class="btn btn-light service-book-btn" data-bs-toggle="modal" data-bs-target="#bookingModal"
+              data-service="Code Review & Mentorship" data-price="$60">Book</button>
           </div>
         </div>
       </div>
@@ -177,61 +169,57 @@
   </div>
   <br><br>
 
- <!-- Booking Modal -->
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-light rounded-4">
-      <div class="modal-header border-0">
-        <h5 class="modal-title" id="bookingModalLabel">Book Service</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <p><strong>Service:</strong> <span id="serviceName">--</span></p>
-        <p><strong>Price:</strong> <span id="servicePrice">--</span></p>
-
-        <form>
-          <div class="mb-3">
-            <label for="clientName" class="form-label">Your Name</label>
-            <input type="text" class="form-control" id="clientName" placeholder="Enter your name">
-          </div>
-          <div class="mb-3">
-            <label for="clientEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="clientEmail" placeholder="Enter your email">
-          </div>
-          <div class="mb-3">
-            <label for="consultantName" class="form-label">Consultant Name</label>
-            <input type="text" class="form-control" id="consultantName" readonly value="John Smith">
-          </div>
-          <div class="mb-3">
-            <label for="bookingDate" class="form-label">Preferred Date</label>
-            <input type="date" class="form-control" id="bookingDate">
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Select Time Slot</label>
-            <div id="timeSlots" class="d-flex flex-wrap gap-2">
-              <!-- Example time slots -->
-              <button type="button" class="btn btn-outline-light rounded-pill" onclick="selectTime(this)">09:00 AM</button>
-              <button type="button" class="btn btn-outline-light rounded-pill" onclick="selectTime(this)">10:00 AM</button>
-              <button type="button" class="btn btn-outline-light rounded-pill" onclick="selectTime(this)">11:00 AM</button>
-              <button type="button" class="btn btn-outline-light rounded-pill" onclick="selectTime(this)">01:00 PM</button>
-              <button type="button" class="btn btn-outline-light rounded-pill" onclick="selectTime(this)">02:00 PM</button>
-              <button type="button" class="btn btn-outline-light rounded-pill" onclick="selectTime(this)">03:00 PM</button>
+  <!-- Booking Modal -->
+  <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light rounded-4">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="bookingModalLabel">Book Service</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Service:</strong> <span id="serviceName">--</span></p>
+          <p><strong>Price:</strong> <span id="servicePrice">--</span></p>
+          <form>
+            <div class="mb-3">
+              <label for="clientName" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="clientName" placeholder="Enter your name">
             </div>
-            <input type="hidden" id="bookingTime" name="bookingTime">
-          </div>
-
-        </form>
-      </div>
-      <div class="modal-footer border-0">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-light">Confirm Booking</button>
+            <div class="mb-3">
+              <label for="clientEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="clientEmail" placeholder="Enter your email">
+            </div>
+            <div class="mb-3">
+              <label for="consultantName" class="form-label">Consultant Name</label>
+              <input type="text" class="form-control" id="consultantName" readonly value="John Smith">
+            </div>
+            <div class="mb-3">
+              <label for="bookingDate" class="form-label">Preferred Date</label>
+              <input type="date" class="form-control" id="bookingDate">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Select Time Slot</label>
+              <div id="timeSlots" class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-light rounded-pill time-slot-btn">09:00 AM</button>
+                <button type="button" class="btn btn-outline-light rounded-pill time-slot-btn">10:00 AM</button>
+                <button type="button" class="btn btn-outline-light rounded-pill time-slot-btn">11:00 AM</button>
+                <button type="button" class="btn btn-outline-light rounded-pill time-slot-btn">01:00 PM</button>
+                <button type="button" class="btn btn-outline-light rounded-pill time-slot-btn">02:00 PM</button>
+                <button type="button" class="btn btn-outline-light rounded-pill time-slot-btn">03:00 PM</button>
+              </div>
+              <input type="hidden" id="bookingTime" name="bookingTime">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-light">Confirm Booking</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-  <script src="browse.js"></script>
+  <script src="./client.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"></script>

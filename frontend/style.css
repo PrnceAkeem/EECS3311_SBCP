@@ -1,8 +1,19 @@
+/* ================================================================
+   SYNERGY CONSULTING — Landing Page Styles  (index.html only)
+   Design tokens (colors, fonts, spacing) live in global.css
+   ================================================================ */
 
 
+/* ---- PAGE BACKGROUND ----------------------------------------- */
+/* Deep navy base with two soft glowing "light blobs" (radial gradients)
+   to give it depth. background-attachment: fixed keeps it still while
+   content scrolls. */
 body {
-  background: linear-gradient(to bottom, #000000 0%, #1a1a1a 50%, #333333 100%);
-  color: #fff;
+  background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(60, 207, 207, 0.18), transparent 70%),
+    radial-gradient(900px 500px at 85%   0%, rgba(62, 120, 255, 0.16), transparent 65%),
+    linear-gradient(180deg, #0a0f16 0%, #06090f 100%);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -11,172 +22,212 @@ body {
   overflow-x: hidden;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 2rem;
-  padding: 1rem;
+/* ---- AMBIENT TEXTURE OVERLAY ---------------------------------- */
+/* A very faint grid pattern layered on top of the background.
+   pointer-events: none means it won't block any clicks. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(500px 500px at 20% 20%, rgba(255, 255, 255, 0.04), transparent 70%),
+    radial-gradient(600px 600px at 80% 15%, rgba(255, 255, 255, 0.02), transparent 70%),
+    repeating-linear-gradient(135deg,
+      rgba(255, 255, 255, 0.015) 0,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 4px);
+  opacity: 0.45;
+  z-index: 0;
 }
 
-/* Heading */
-.container .heading {
-  padding: 10px 0 10px 0;
+
+/* ---- MAIN LAYOUT CONTAINER ------------------------------------ */
+/* Stacks everything vertically and centres it on the page.
+   z-index: 1 lifts it above the body::before overlay. */
+.container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+
+/* ---- PAGE HEADING (title + subtitle) -------------------------- */
+.heading {
+  padding: 10px 0;
   text-align: center;
-  font-weight: 600;
-  font-size: 50px;
 }
 
 .heading h1 {
-  font-size: 50px;
-  margin-bottom: 10px;
+  font-size: 48px;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   justify-content: center;
+  color: var(--text);
+  margin-bottom: 10px;
 }
 
+.heading h2 {
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--muted);      /* muted blue-grey from global.css */
+  letter-spacing: 0.02em;
+}
+
+
+/* ---- LOGO IMAGE ----------------------------------------------- */
 img {
   width: 80px;
   height: 80px;
   object-fit: contain;
 }
 
-.heading h2 {
-  font-size: 40px;
-  color: #8f8f8f;
-}
 
+/* ---- ABOUT / DESCRIPTION TEXT --------------------------------- */
 .about {
-  color: #8f8f8f;
-  font-weight: 300;
-  font-size: 20px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--muted);
   text-align: center;
+  max-width: 520px;
+  line-height: 1.6;
 }
 
-/* System actors */
 
+/* ---- ROLE CARDS (Client / Consultant / Admin) ----------------- */
+/* Each card uses a frosted-glass style: semi-transparent background
+   with a blur effect so the gradient behind shows through. */
 .system_actors {
   display: flex;
-  gap: 30px;
+  gap: 20px;
   justify-content: center;
-  margin-top: 40px;
-}
-
-.system_actors {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-  margin-top: 40px;
-  flex-wrap: wrap;
+  margin-top: 20px;
+  flex-wrap: wrap;   /* wraps to next line on small screens */
 }
 
 .system_actors > div {
-  background: #1f1f1f;
-  color: white;
-  padding: 30px;
-  width: 320px;
-  min-height: 180px;
-  border-radius: 16px;
+  background: var(--glass);               /* rgba white overlay */
+  border: 1px solid var(--border);        /* very subtle white border */
+  backdrop-filter: blur(14px);            /* frosted glass blur */
+  box-shadow: var(--shadow);
+  padding: 28px 24px;
+  width: 280px;
+  min-height: 160px;
+  border-radius: var(--radius);           /* 14px, from global.css */
   display: flex;
   flex-direction: column;
   justify-content: center;
-
-  box-shadow:
-    0 12px 25px rgba(255, 255, 255, 0.04),
-    0 6px 10px rgba(0, 0, 0, 0.4);
-  transform: perspective(1000px) rotateX(5deg);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  gap: 10px;
+  transition: all 0.2s ease;             /* smooth hover animation */
 }
 
+/* ---- ROLE CARD — HOVER STATE ---------------------------------- */
+/* Card lifts up and gets a cyan glow on the border. */
 .system_actors > div:hover {
-  transform: perspective(1000px) rotateX(0deg) translateY(-10px);
-  box-shadow:
-    0 25px 35px rgba(0, 0, 0, 0.7),
-    0 12px 15px rgba(0, 0, 0, 0.5);
+  border-color: rgba(60, 207, 207, 0.4);
+  box-shadow: var(--shadow), 0 0 20px rgba(60, 207, 207, 0.15);
+  transform: translateY(-6px);
   cursor: pointer;
 }
 
+/* Text inside each role card */
+.system_actors h1 { font-size: 28px; margin: 0; }
+
 .system_actors h2 {
-  font-size: 22px;
-  margin-bottom: 10px;
+  font-size: 18px;
   font-weight: 600;
+  color: var(--text);
+  margin: 0;
 }
 
 .system_actors p {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.5;
-  font-weight: 500;
+  color: var(--muted);
 }
 
-/* Sign in form */
 
+/* ---- SIGN-IN FORM PANEL --------------------------------------- */
+/* Same frosted-glass style as the cards. */
 form {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 36px 40px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  padding: 32px 36px;
   width: 100%;
   max-width: 420px;
-  position: relative;
   margin-bottom: 50px;
 }
 
+/* Small grey hint text at the top of the form */
 form h2 {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 24px;
+  color: var(--muted);
+  margin-bottom: 20px;
 }
 
+/* Uppercase labels above each input (EMAIL, PASSWORD) */
 form label {
   display: block;
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(243, 246, 251, 0.4);
   margin: 16px 0 6px;
-  text-align: left;
 }
 
+/* ---- TEXT INPUTS ---------------------------------------------- */
 form input {
   width: 100%;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  background: rgba(10, 15, 22, 0.7);    /* slightly dark field */
+  border: 1px solid var(--border);
   border-radius: 10px;
-  color: #fff;
-  font-size: 15px;
+  color: var(--text);
+  font-size: 14px;
   outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
+/* Input focused state — subtle white border, no color change */
 form input:focus {
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
 }
 
+/* Small helper / demo note below inputs */
 form p {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.25);
-  margin: 16px 0;
+  color: rgba(149, 162, 184, 0.5);
+  margin: 14px 0;
 }
 
+/* ---- SIGN IN BUTTON ------------------------------------------- */
+/* Filled cyan button — the main action color in this design. */
 form button {
   width: 100%;
-  padding: 13px;
-  background: #fff;
-  color: #111;
+  padding: 12px;
+  background: var(--accent);   /* cyan #3ccfcf */
+  color: #041316;              /* very dark text for contrast */
   border: none;
   border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
+/* Slightly dims the button on hover to signal it's clickable */
 form button:hover {
-  background: #e8e8e8;
+  opacity: 0.88;
 }

@@ -7,8 +7,8 @@
     <title>Synergy Consulting: Client</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" href="../images/logo.png" type="image/png">
-    <link rel="stylesheet" href="../global.css">
+    <link rel="icon" href="./images/logo.png" type="image/png">
+    <link rel="stylesheet" href="./global.css">
     <link rel="stylesheet" href="booking.css">
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -21,7 +21,7 @@
 
         <div class="container-fluid">
             <h1 class="navbar-brand d-flex align-items-center mb-0">
-                <img src="../images/logo.png" alt="Logo" width="45" height="45" class="d-inline-block align-text-top">
+                <img src="./images/logo.png" alt="Logo" width="45" height="45" class="d-inline-block align-text-top">
                 Synergy Consulting
             </h1>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -31,19 +31,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="browse.html">Browsing Consulting Services</a>
+                        <a class="nav-link" href="client.html">Browsing Consulting Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="booking.html">My Bookings</a>
+                        <a class="nav-link active" aria-current="page" href="booking.html">My Bookings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="history.html">Payments</a>
+                        <a class="nav-link" href="history.html">Payments</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="methods.html">Pay Methods</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html">Logout</a>
+                        <a class="nav-link" href="./index.html">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -51,8 +51,8 @@
     </nav>
 
     <div class="heading">
-        <h1>Payment History</h1>
-        <h2>All your transactions in one place</h2>
+        <h1>My Booking</h1>
+        <h2>Track your booking history and status</h2>
     </div>
 
     <!-- Table -->
@@ -60,15 +60,19 @@
         <thead>
     <tr>
       <th scope="col" class="bg-dark" style="color: #fff;">ID</th>
-      <th scope="col" class="bg-dark" style="color: #fff;">Method</th>
-      <th scope="col" class="bg-dark" style="color: #fff;">Amount</th>
+      <th scope="col" class="bg-dark" style="color: #fff;">Service</th>
+      <th scope="col" class="bg-dark" style="color: #fff;">Consultant</th>
       <th scope="col" class="bg-dark" style="color: #fff;">Date</th>
       <th scope="col" class="bg-dark" style="color: #fff;">Status</th>
+      <th scope="col" class="bg-dark" style="color: #fff;">Price</th>
+      <th scope="col" class="bg-dark" style="color: #fff;">Actions</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th scope="row">1</th>
+      <td></td>
+      <td></td>
       <td></td>
       <td></td>
       <td></td>
@@ -80,9 +84,13 @@
       <td></td>
       <td></td>
       <td></td>
+      <td></td>
+      <td></td>
     </tr>
     <tr>
       <th scope="row">3</th>
+      <td></td>
+      <td></td>
       <td></td>
       <td></td>
       <td></td>

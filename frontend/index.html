@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" href="./images/logo.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="./index.js" defer></script>
 </head>
 
 <body>
@@ -24,7 +25,7 @@
       solutions
     </div>
     <div class="system_actors">
-      <!-- When user clicks goes to client dashboard -->
+    
       <div class="client">
         <div>
           <h1>🧑</h1>
@@ -32,7 +33,7 @@
         </div>
         <p>Browse services, book sessions, manage payments</p>
       </div>
-       <!-- When user clicks goes to consultant dashboard -->
+      
       <div class="consultant">
         <div>
           <h1>🧑‍💼</h1>
@@ -40,7 +41,7 @@
         </div>
         <p>Manage availability, accept or reject bookings</p>
       </div>
-       <!-- When user clicks goes to admin dashboard -->
+      
       <div class="admin">
         <div>
           <h1>🛡️</h1>
@@ -52,19 +53,18 @@
    <br>
     <form action="#" method="post">
       <h2>Select your role from above</h2>
-      
+
       <label for="email">EMAIL</label>
       <input type="email" name="email" id="signin-email" placeholder="you@example.com" />
 
       <label for="password">PASSWORD</label>
       <input type="password" name="password" id="signin-password" placeholder="***********" />
 
-      <p>Demo: enter any email + any password</p>
+      <p>Demo credentials — password: <strong>pass12345</strong></p>
 
-      <button type="button">Sign In</button>
+      <button type="button" id="login-button">Sign In</button>
     </form>
     
   </div>
-
 </body>
 </html>
