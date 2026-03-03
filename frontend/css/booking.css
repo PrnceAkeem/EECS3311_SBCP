@@ -1,0 +1,54 @@
+body {
+  min-height: 100vh;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+.heading {
+  margin-top: 4rem;
+  padding: 25px;
+  text-align: center;
+}
+
+.heading h1 {
+  font-size: 50px;
+}
+
+.heading h2 {
+  font-size: 20px;
+  color: var(--muted);
+}
+
+.table-wrap {
+  width: min(1200px, 95%);
+  margin: 0 auto 3rem;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-requested {
+  background: rgba(240, 183, 106, 0.2);
+  color: var(--warn);
+}
+
+.status-completed {
+  background: rgba(63, 212, 134, 0.2);
+  color: var(--good);
+}
+
+.status-cancelled {
+  background: rgba(240, 113, 113, 0.2);
+  color: var(--bad);
+}
+
+.empty-bookings {
+  text-align: center;
+  padding: 2rem;
+  color: var(--muted);
+}

@@ -1,0 +1,108 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const serviceNameElement = document.getElementById("serviceName");
+  const servicePriceElement = document.getElementById("servicePrice");
+  const bookingForm = document.getElementById("bookingForm");
+  const bookingModal = document.getElementById("bookingModal");
+  const confirmBookingButton = document.getElementById("confirmBookingButton");
+  const clientNameInput = document.getElementById("clientName");
+  const clientEmailInput = document.getElementById("clientEmail");
+  const consultantNameSelect = document.getElementById("consultantName");
+  const bookingDateInput = document.getElementById("bookingDate");
+  const bookingTimeInput = document.getElementById("bookingTime");
+  const serviceButtons = document.querySelectorAll(".service-book-btn");
+  const timeSlotButtons = document.querySelectorAll(".time-slot-btn");
+
+  if (bookingDateInput) {
+    bookingDateInput.min = new Date().toISOString().split("T")[0];
+  }
+
+  function resetBookingForm() {
+    if (bookingForm) {
+      bookingForm.reset();
+    }
+    bookingTimeInput.value = "";
+    timeSlotButtons.forEach((slotButton) => {
+      slotButton.classList.remove("active");
+    });
+    serviceNameElement.innerText = "--";
+    servicePriceElement.innerText = "--";
+  }
+
+  function closeBookingModal() {
+    if (!window.bootstrap || !bookingModal) {
+      return;
+    }
+    const modalInstance = window.bootstrap.Modal.getOrCreateInstance(bookingModal);
+    modalInstance.hide();
+  }
+
+  function validateBookingForm() {
+    if (serviceNameElement.innerText === "--") {
+      alert("Select a service first.");
+      return false;
+    }
+    if (!clientNameInput.value.trim()) {
+      alert("Enter your name.");
+      return false;
+    }
+    if (!clientEmailInput.value.trim()) {
+      alert("Enter your email.");
+      return false;
+    }
+    if (!consultantNameSelect.value) {
+      alert("Select a consultant.");
+      return false;
+    }
+    if (!bookingDateInput.value) {
+      alert("Select your preferred date.");
+      return false;
+    }
+    if (!bookingTimeInput.value) {
+      alert("Select a time slot.");
+      return false;
+    }
+    return true;
+  }
+
+  serviceButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      serviceNameElement.innerText = button.dataset.service || "--";
+      servicePriceElement.innerText = button.dataset.price || "--";
+    });
+  });
+
+  timeSlotButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      timeSlotButtons.forEach((slotButton) => {
+        slotButton.classList.remove("active");
+      });
+      button.classList.add("active");
+      bookingTimeInput.value = button.innerText.trim();
+    });
+  });
+
+  confirmBookingButton.addEventListener("click", () => {
+    if (!validateBookingForm()) {
+      return;
+    }
+
+    const booking = window.BookingStore.addBooking({
+      service: serviceNameElement.innerText.trim(),
+      price: servicePriceElement.innerText.trim(),
+      clientName: clientNameInput.value.trim(),
+      clientEmail: clientEmailInput.value.trim(),
+      consultantName: consultantNameSelect.value,
+      bookingDate: bookingDateInput.value,
+      bookingTime: bookingTimeInput.value
+    });
+
+    alert("Booking submitted successfully. Status: Requested.");
+    closeBookingModal();
+    resetBookingForm();
+    window.location.href = "booking.html";
+  });
+
+  if (bookingModal) {
+    bookingModal.addEventListener("hidden.bs.modal", resetBookingForm);
+  }
+});
