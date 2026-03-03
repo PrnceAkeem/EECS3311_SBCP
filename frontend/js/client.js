@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const servicePriceElement = document.getElementById("servicePrice");
   const bookingForm = document.getElementById("bookingForm");
   const bookingModal = document.getElementById("bookingModal");
+  const closeBookingModalButton = document.getElementById("closeBookingModal");
+  const cancelBookingButton = document.getElementById("cancelBookingButton");
   const confirmBookingButton = document.getElementById("confirmBookingButton");
   const clientNameInput = document.getElementById("clientName");
   const clientEmailInput = document.getElementById("clientEmail");
@@ -14,6 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (bookingDateInput) {
     bookingDateInput.min = new Date().toISOString().split("T")[0];
+  }
+
+  function openBookingModal() {
+    bookingModal.hidden = false;
+    document.body.style.overflow = "hidden";
   }
 
   function resetBookingForm() {
@@ -29,11 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function closeBookingModal() {
-    if (!window.bootstrap || !bookingModal) {
-      return;
-    }
-    const modalInstance = window.bootstrap.Modal.getOrCreateInstance(bookingModal);
-    modalInstance.hide();
+    bookingModal.hidden = true;
+    document.body.style.overflow = "";
   }
 
   function validateBookingForm() {
@@ -68,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     button.addEventListener("click", () => {
       serviceNameElement.innerText = button.dataset.service || "--";
       servicePriceElement.innerText = button.dataset.price || "--";
+      openBookingModal();
     });
   });
 
@@ -81,28 +86,55 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  confirmBookingButton.addEventListener("click", () => {
+  confirmBookingButton.addEventListener("click", async () => {
     if (!validateBookingForm()) {
       return;
     }
 
-    const booking = window.BookingStore.addBooking({
-      service: serviceNameElement.innerText.trim(),
-      price: servicePriceElement.innerText.trim(),
-      clientName: clientNameInput.value.trim(),
-      clientEmail: clientEmailInput.value.trim(),
-      consultantName: consultantNameSelect.value,
-      bookingDate: bookingDateInput.value,
-      bookingTime: bookingTimeInput.value
-    });
+    confirmBookingButton.disabled = true;
+    try {
+      await window.BookingStore.addBooking({
+        service: serviceNameElement.innerText.trim(),
+        price: servicePriceElement.innerText.trim(),
+        clientName: clientNameInput.value.trim(),
+        clientEmail: clientEmailInput.value.trim(),
+        consultantName: consultantNameSelect.value,
+        bookingDate: bookingDateInput.value,
+        bookingTime: bookingTimeInput.value
+      });
 
-    alert("Booking submitted successfully. Status: Requested.");
-    closeBookingModal();
-    resetBookingForm();
-    window.location.href = "booking.html";
+      alert("Booking submitted successfully. Status: Requested.");
+      closeBookingModal();
+      resetBookingForm();
+      window.location.href = "booking.html";
+    } catch (error) {
+      alert(error.message || "Failed to submit booking.");
+    } finally {
+      confirmBookingButton.disabled = false;
+    }
   });
 
-  if (bookingModal) {
-    bookingModal.addEventListener("hidden.bs.modal", resetBookingForm);
-  }
+  closeBookingModalButton.addEventListener("click", () => {
+    closeBookingModal();
+    resetBookingForm();
+  });
+
+  cancelBookingButton.addEventListener("click", () => {
+    closeBookingModal();
+    resetBookingForm();
+  });
+
+  bookingModal.addEventListener("click", (event) => {
+    if (event.target === bookingModal) {
+      closeBookingModal();
+      resetBookingForm();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !bookingModal.hidden) {
+      closeBookingModal();
+      resetBookingForm();
+    }
+  });
 });

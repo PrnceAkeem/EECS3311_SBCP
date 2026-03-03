@@ -23,3 +23,247 @@
   margin: 0;
   font-family: var(--font);
 }
+
+body {
+  background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(60, 207, 207, 0.18), transparent 70%),
+    radial-gradient(900px 500px at 85% 0%, rgba(62, 120, 255, 0.16), transparent 65%),
+    linear-gradient(180deg, #0a0f16 0%, #06090f 100%);
+  color: var(--text);
+  min-height: 100vh;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  width: min(1240px, 95%);
+  margin: 0 auto 2.5rem;
+}
+
+.topbar {
+  width: min(1240px, 95%);
+  margin: 1rem auto 0;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.brand-link img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(240, 113, 113, 0.14);
+  color: #ffb8b8;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.logout-btn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.subnav {
+  width: min(1240px, 95%);
+  margin: 0.8rem auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.subnav-link {
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.subnav-link:hover {
+  border-color: rgba(60, 207, 207, 0.45);
+  color: var(--text);
+}
+
+.subnav-link.active {
+  color: #041316;
+  border-color: transparent;
+  background: var(--accent);
+  font-weight: 600;
+}
+
+.heading {
+  margin-top: 2.6rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+.heading h1 {
+  font-size: clamp(2rem, 3.6vw, 3.1rem);
+}
+
+.heading h2 {
+  margin-top: 0.55rem;
+  font-size: 1.05rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.panel {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+
+.action-btn {
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #041316;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.action-btn.secondary {
+  background: rgba(149, 162, 184, 0.2);
+  color: var(--text);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.input-field {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(10, 15, 22, 0.82);
+  color: var(--text);
+  padding: 0.58rem 0.75rem;
+  font-size: 0.92rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.table-wrap {
+  width: min(1240px, 95%);
+  margin: 0 auto 2rem;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 0.6rem;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+th {
+  color: var(--text);
+  font-weight: 600;
+  background: rgba(10, 15, 22, 0.9);
+}
+
+td {
+  color: var(--muted);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.2rem 0.72rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.status-requested {
+  background: rgba(240, 183, 106, 0.2);
+  color: var(--warn);
+}
+
+.status-completed {
+  background: rgba(63, 212, 134, 0.2);
+  color: var(--good);
+}
+
+.status-cancelled {
+  background: rgba(240, 113, 113, 0.2);
+  color: var(--bad);
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    padding: 0.7rem 0.8rem;
+  }
+
+  .brand-link {
+    font-size: 1rem;
+  }
+
+  .brand-link img {
+    width: 38px;
+    height: 38px;
+  }
+
+  th,
+  td {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.45rem;
+  }
+}
