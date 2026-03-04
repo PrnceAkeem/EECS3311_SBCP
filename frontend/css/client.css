@@ -1,6 +1,7 @@
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 290px));
+  justify-content: center;
   gap: 1rem;
   width: min(1240px, 95%);
   margin: 0 auto 2rem;

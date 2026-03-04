@@ -8,7 +8,16 @@ const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://synergy_user:synergy_pass@localhost:5432/synergy";
 
-const VALID_STATUSES = new Set(["Requested", "Completed", "Cancelled"]);
+const STATUS_VALUES = [
+  "Requested",
+  "Confirmed",
+  "Rejected",
+  "Cancelled",
+  "Paid",
+  "Completed"
+];
+const STATUS_SQL = STATUS_VALUES.map((status) => `'${status}'`).join(", ");
+const VALID_STATUSES = new Set(STATUS_VALUES);
 const VALID_ACTORS = new Set(["client", "consultant", "admin", "system"]);
 
 const pool = new Pool({ connectionString: DATABASE_URL });
@@ -27,6 +36,11 @@ function mapBookingRow(row) {
     return null;
   }
 
+  const bookingDateValue =
+    row.booking_date instanceof Date
+      ? row.booking_date.toISOString().slice(0, 10)
+      : String(row.booking_date || "");
+
   return {
     id: row.id,
     service: row.service,
@@ -34,7 +48,7 @@ function mapBookingRow(row) {
     clientName: row.client_name,
     clientEmail: row.client_email,
     consultantName: row.consultant_name,
-    bookingDate: row.booking_date,
+    bookingDate: bookingDateValue,
     bookingTime: row.booking_time,
     status: row.status,
     createdAt: row.created_at,
@@ -55,6 +69,50 @@ function sanitizeActor(actor) {
     return actor;
   }
   return "system";
+}
+
+async function ensureSchema() {
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS bookings (
+       id SERIAL PRIMARY KEY,
+       service TEXT NOT NULL,
+       price TEXT NOT NULL,
+       client_name TEXT NOT NULL,
+       client_email TEXT NOT NULL,
+       consultant_name TEXT NOT NULL,
+       booking_date DATE NOT NULL,
+       booking_time TEXT NOT NULL,
+       status TEXT NOT NULL DEFAULT 'Requested',
+       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+       updated_by TEXT NOT NULL DEFAULT 'client'
+     )`
+  );
+
+  await pool.query(
+    `DO $$
+     BEGIN
+       IF EXISTS (
+         SELECT 1
+         FROM pg_constraint
+         WHERE conname = 'bookings_status_check'
+           AND conrelid = 'bookings'::regclass
+       ) THEN
+         ALTER TABLE bookings DROP CONSTRAINT bookings_status_check;
+       END IF;
+     END $$;`
+  );
+
+  await pool.query(
+    `ALTER TABLE bookings
+     ADD CONSTRAINT bookings_status_check
+     CHECK (status IN (${STATUS_SQL}))`
+  );
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_bookings_created_at
+     ON bookings(created_at DESC)`
+  );
 }
 
 async function withDbRetries(maxRetries, retryDelayMs, fn) {
@@ -104,7 +162,7 @@ app.get("/api/bookings", async (_request, response) => {
          client_name,
          client_email,
          consultant_name,
-         booking_date,
+         booking_date::text AS booking_date,
          booking_time,
          status,
          created_at,
@@ -167,7 +225,7 @@ app.post("/api/bookings", async (request, response) => {
          client_name,
          client_email,
          consultant_name,
-         booking_date,
+         booking_date::text AS booking_date,
          booking_time,
          status,
          created_at,
@@ -219,7 +277,7 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
          client_name,
          client_email,
          consultant_name,
-         booking_date,
+         booking_date::text AS booking_date,
          booking_time,
          status,
          created_at,
@@ -268,6 +326,7 @@ async function startServer() {
   await withDbRetries(30, 2000, async () => {
     await pool.query("SELECT 1");
   });
+  await ensureSchema();
 
   app.listen(PORT, () => {
     // eslint-disable-next-line no-console

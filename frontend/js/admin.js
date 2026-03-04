@@ -1,7 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("adminBookingsBody");
   const messageElement = document.getElementById("adminMessage");
-  const STATUS_OPTIONS = ["Requested", "Completed", "Cancelled"];
+  const STATUS_OPTIONS = [
+    "Requested",
+    "Confirmed",
+    "Rejected",
+    "Cancelled",
+    "Paid",
+    "Completed"
+  ];
   let unsubscribe = null;
 
   if (!tableBody || !window.BookingStore) {
@@ -9,6 +16,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getStatusClass(status) {
+    if (status === "Confirmed") {
+      return "status-confirmed";
+    }
+    if (status === "Rejected") {
+      return "status-rejected";
+    }
+    if (status === "Paid") {
+      return "status-paid";
+    }
     if (status === "Completed") {
       return "status-completed";
     }
@@ -25,7 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function createStatusOptions(selectedStatus) {
-    return STATUS_OPTIONS.map((status) => {
+    const optionList = [selectedStatus, ...STATUS_OPTIONS].filter(Boolean);
+    const uniqueOptions = [...new Set(optionList)];
+
+    return uniqueOptions.map((status) => {
       const selectedAttribute = selectedStatus === status ? "selected" : "";
       return `<option value="${status}" ${selectedAttribute}>${status}</option>`;
     }).join("");

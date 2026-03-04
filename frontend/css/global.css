@@ -53,8 +53,8 @@ a {
   background: var(--glass);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow);
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 1rem;
 }
@@ -67,6 +67,8 @@ a {
   color: var(--text);
   font-size: 1.15rem;
   font-weight: 700;
+  grid-column: 2;
+  justify-self: center;
 }
 
 .brand-link img {
@@ -88,6 +90,8 @@ a {
   font-size: 0.92rem;
   font-weight: 600;
   transition: opacity 0.2s ease, transform 0.2s ease;
+  grid-column: 3;
+  justify-self: end;
 }
 
 .logout-btn:hover {
@@ -100,6 +104,7 @@ a {
   margin: 0.8rem auto 0;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.55rem;
 }
 
@@ -237,14 +242,29 @@ td {
   color: var(--warn);
 }
 
-.status-completed {
+.status-confirmed {
   background: rgba(63, 212, 134, 0.2);
-  color: var(--good);
+  color: #4ef09a;
+}
+
+.status-completed {
+  background: rgba(39, 199, 112, 0.22);
+  color: #46de87;
 }
 
 .status-cancelled {
+  background: rgba(149, 162, 184, 0.22);
+  color: #c2cbda;
+}
+
+.status-rejected {
   background: rgba(240, 113, 113, 0.2);
-  color: var(--bad);
+  color: #ff738f;
+}
+
+.status-paid {
+  background: rgba(100, 117, 255, 0.22);
+  color: #8f9eff;
 }
 
 @media (max-width: 760px) {

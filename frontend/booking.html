@@ -10,7 +10,7 @@
   <link rel="icon" href="./images/logo.png" type="image/png">
   <link rel="stylesheet" href="./css/global.css">
   <link rel="stylesheet" href="./css/booking.css">
- <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -34,20 +34,34 @@
       <h1>My Bookings</h1>
       <h2>Track your booking history and status</h2>
     </div>
+
+    <section class="booking-metrics" aria-label="Booking summary">
+      <article class="metric-card">
+        <p class="metric-value" id="totalBookingsCount">0</p>
+        <p class="metric-label">Total Bookings</p>
+      </article>
+      <article class="metric-card">
+        <p class="metric-value" id="upcomingBookingsCount">0</p>
+        <p class="metric-label">Upcoming Bookings</p>
+      </article>
+      <article class="metric-card">
+        <p class="metric-value" id="completedBookingsCount">0</p>
+        <p class="metric-label">Completed Bookings</p>
+      </article>
+    </section>
   </main>
 
   <div class="table-wrap">
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Booking ID</th>
           <th>Service</th>
           <th>Consultant</th>
           <th>Date</th>
-          <th>Time</th>
           <th>Status</th>
           <th>Price</th>
-          <th>Updated By</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="bookingsTableBody"></tbody>

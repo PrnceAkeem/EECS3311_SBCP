@@ -1,5 +1,12 @@
 (function () {
-  const VALID_STATUSES = new Set(["Requested", "Completed", "Cancelled"]);
+  const VALID_STATUSES = new Set([
+    "Requested",
+    "Confirmed",
+    "Rejected",
+    "Cancelled",
+    "Paid",
+    "Completed"
+  ]);
 
   async function apiRequest(path, options) {
     const response = await fetch(path, {
