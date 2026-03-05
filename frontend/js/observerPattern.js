@@ -60,6 +60,7 @@ class NotificationManager extends Subject {
     
     getNotificationHistory() {
         return this.notificationHistory;
+
     }
 }
 
@@ -68,4 +69,5 @@ module.exports = {
     SMSNotifier,
     PushNotifier,
     NotificationManager
+
 };
