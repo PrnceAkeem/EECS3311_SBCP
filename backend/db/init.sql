@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   consultant_name TEXT NOT NULL,
   booking_date DATE NOT NULL,
   booking_time TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'Requested' CHECK (status IN ('Requested', 'Confirmed', 'Rejected', 'Cancelled', 'Paid', 'Completed')),
+  status TEXT NOT NULL DEFAULT 'Requested' CHECK (status IN ('Requested', 'Confirmed', 'Pending Payment', 'Rejected', 'Cancelled', 'Paid', 'Completed')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_by TEXT NOT NULL DEFAULT 'client'

@@ -86,6 +86,240 @@
   justify-content: flex-end;
 }
 
+/* ============================================================
+   "Pending Payment" status pill colour
+   ============================================================ */
+.status-pending {
+  background: rgba(255, 196, 80, 0.18);
+  color: #ffd166;
+  border: 1px solid rgba(255, 196, 80, 0.35);
+}
+
+/* ============================================================
+   Payment modal overlay + card
+   ============================================================ */
+.pay-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.pay-modal {
+  position: relative;
+  background: #121a24;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  width: min(480px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.pay-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0.25rem;
+  transition: color 0.15s;
+}
+.pay-modal-close:hover { color: var(--text); }
+
+.pay-modal-header {
+  padding: 1.6rem 1.8rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.pay-modal-header h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.pay-modal-sub {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.pay-modal-body {
+  padding: 1.4rem 1.8rem;
+  flex: 1;
+}
+
+.pay-modal-footer {
+  padding: 1rem 1.8rem 1.6rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Loading text */
+.pay-modal-loading { color: var(--muted); }
+
+/* No payment methods state */
+.pay-modal-empty {
+  text-align: center;
+  padding: 1rem 0;
+  color: var(--muted);
+}
+.pay-modal-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+.pay-modal-link:hover { text-decoration: underline; }
+
+/* Hint text above radio list */
+.pay-modal-hint {
+  margin: 0 0 0.9rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Payment method radio items */
+.pay-method-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.pay-method-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pay-method-item:hover {
+  border-color: rgba(60, 207, 207, 0.4);
+  background: rgba(60, 207, 207, 0.05);
+}
+.pay-method-item input[type="radio"] {
+  accent-color: var(--accent);
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+.pay-method-icon { font-size: 1.4rem; }
+.pay-method-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+}
+.pay-method-info strong { font-weight: 600; }
+.pay-method-info span   { color: var(--muted); font-size: 0.82rem; }
+
+/* Processing spinner */
+.pay-processing {
+  text-align: center;
+  padding: 1.4rem 0;
+}
+.pay-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(60, 207, 207, 0.2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.pay-processing-sub {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Success state */
+.pay-success {
+  text-align: center;
+  padding: 1.4rem 0;
+}
+.pay-success-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(63, 212, 134, 0.2);
+  border: 2px solid rgba(63, 212, 134, 0.5);
+  color: #63f0a5;
+  font-size: 1.6rem;
+  line-height: 52px;
+  margin: 0 auto 0.9rem;
+}
+
+/* Error state */
+.pay-error {
+  text-align: center;
+  color: #ff94a8;
+  padding: 1rem 0;
+}
+
+/* ============================================================
+   Add payment method form (used in methods.html modal)
+   ============================================================ */
+.add-method-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-select,
+.form-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  padding: 0.6rem 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.form-select:focus,
+.form-input:focus {
+  border-color: rgba(60, 207, 207, 0.4);
+}
+.form-select option { background: #121a24; }
+
+.form-error {
+  color: #ff94a8;
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
 @media (max-width: 700px) {
   .booking-metrics {
     grid-template-columns: 1fr;
@@ -94,4 +328,6 @@
   .metric-value {
     font-size: 2rem;
   }
+
+  .pay-modal { border-radius: 12px; }
 }

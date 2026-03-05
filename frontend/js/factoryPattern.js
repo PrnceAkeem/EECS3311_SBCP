@@ -50,7 +50,7 @@ class Admin extends User {
     }
 }
 
-// UserFactory class responsible for creating user objects
+// UserFactory class responsible for creating user objects 
 
 class UserFactory {
     createUser(type, id, name, email, additionalInfo = {}) {
@@ -62,7 +62,7 @@ class UserFactory {
             case 'admin':
                 return new Admin(id, name, email);
             default:
-                throw new Error(`Invalid user type: ${type}`);
+                throw new Error(`Invalid user type: ${type}`); 
         }
     }
 }

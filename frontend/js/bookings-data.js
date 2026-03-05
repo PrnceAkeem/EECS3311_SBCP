@@ -1,12 +1,42 @@
 (function () {
+  // Interaction map:
+  // - client.js/admin.js/consultant.js/booking.js call into BookingStore.
+  // - BookingStore talks to server.js REST + SSE endpoints.
+  // - server.js validates transitions using the backend State Pattern.
+  // - server.js applies Strategy/Observer/Factory behaviors as needed.
   const VALID_STATUSES = new Set([
     "Requested",
     "Confirmed",
+    "Pending Payment",
     "Rejected",
     "Cancelled",
     "Paid",
     "Completed"
   ]);
+
+  // ==========================================================================
+  // Valid Transitions — mirrors the backend State Pattern
+  // This tells us which status changes are allowed from each current status.
+  // Same rules as BookingStateMachine.js on the server.
+  // ==========================================================================
+  const VALID_TRANSITIONS = {
+    "Requested":       ["Confirmed", "Rejected", "Cancelled"],
+    "Confirmed":       ["Pending Payment", "Cancelled"],
+    "Pending Payment": ["Paid", "Cancelled"],
+    "Paid":            ["Completed", "Cancelled"],
+    "Completed":       [],
+    "Rejected":        [],
+    "Cancelled":       []
+  };
+
+  // Returns true if moving from currentStatus → nextStatus is allowed.
+  function canTransition(currentStatus, nextStatus) {
+    const allowed = VALID_TRANSITIONS[currentStatus];
+    if (!allowed) {
+      return false;
+    }
+    return allowed.includes(nextStatus);
+  }
 
   async function apiRequest(path, options) {
     const response = await fetch(path, {
@@ -53,13 +83,29 @@
     });
   }
 
-  async function updateBookingStatus(bookingId, nextStatus, actor) {
+  // metadata is optional and currently used by booking.js when client pays.
+  // It forwards payment method info so backend Strategy can process payment.
+  async function updateBookingStatus(bookingId, nextStatus, actor, metadata) {
+    const payload = {
+      status: sanitizeStatus(nextStatus),
+      actor: actor || "system"
+    };
+
+    if (metadata && typeof metadata === "object") {
+      if (metadata.paymentMethodId) {
+        payload.paymentMethodId = metadata.paymentMethodId;
+      }
+      if (metadata.paymentMethodType) {
+        payload.paymentMethodType = metadata.paymentMethodType;
+      }
+      if (metadata.paymentMethodLabel) {
+        payload.paymentMethodLabel = metadata.paymentMethodLabel;
+      }
+    }
+
     return apiRequest(`/api/bookings/${bookingId}/status`, {
       method: "PATCH",
-      body: JSON.stringify({
-        status: sanitizeStatus(nextStatus),
-        actor: actor || "system"
-      })
+      body: JSON.stringify(payload)
     });
   }
 
@@ -102,6 +148,7 @@
     getBookings: getBookings,
     addBooking: addBooking,
     updateBookingStatus: updateBookingStatus,
-    subscribe: subscribe
+    subscribe: subscribe,
+    canTransition: canTransition
   };
 })();

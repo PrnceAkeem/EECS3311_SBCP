@@ -27,6 +27,10 @@ services:
       DATABASE_URL: postgres://synergy_user:synergy_pass@db:5432/synergy
     ports:
       - "3000:3000"
+    volumes:
+      # Bind-mount the data folder so payment-methods.json persists across
+      # container restarts and can be opened/edited directly on your machine.
+      - ./backend/data:/app/backend/data
     depends_on:
       db:
         condition: service_healthy

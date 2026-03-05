@@ -1,9 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Admin page role:
+  // - reads all bookings from BookingStore (REST)
+  // - updates booking statuses through BookingStore (PATCH)
+  // - receives live updates through BookingStore.subscribe (SSE)
   const tableBody = document.getElementById("adminBookingsBody");
   const messageElement = document.getElementById("adminMessage");
   const STATUS_OPTIONS = [
     "Requested",
     "Confirmed",
+    "Pending Payment",
     "Rejected",
     "Cancelled",
     "Paid",
@@ -16,6 +21,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getStatusClass(status) {
+    if (status === "Pending Payment") {
+      return "status-pending";
+    }
     if (status === "Confirmed") {
       return "status-confirmed";
     }
@@ -41,12 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function createStatusOptions(selectedStatus) {
-    const optionList = [selectedStatus, ...STATUS_OPTIONS].filter(Boolean);
-    const uniqueOptions = [...new Set(optionList)];
-
-    return uniqueOptions.map((status) => {
-      const selectedAttribute = selectedStatus === status ? "selected" : "";
-      return `<option value="${status}" ${selectedAttribute}>${status}</option>`;
+    return STATUS_OPTIONS.map((status) => {
+      const isSelected = selectedStatus === status;
+      const canMove = window.BookingStore && window.BookingStore.canTransition(selectedStatus, status);
+      const isEnabled = isSelected || canMove;
+      return `<option value="${status}" ${isSelected ? "selected" : ""} ${isEnabled ? "" : "disabled"}>${status}</option>`;
     }).join("");
   }
 
