@@ -1,9 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Consultant page role:
+  // - reads all bookings from BookingStore (REST)
+  // - transitions booking statuses via BookingStore (PATCH)
+  // - stays in sync via BookingStore.subscribe (SSE)
   const tableBody = document.getElementById("consultantBookingsBody");
   const messageElement = document.getElementById("consultantMessage");
+  // All possible statuses — "Pending Payment" added to match the State Pattern.
   const STATUS_OPTIONS = [
     "Requested",
     "Confirmed",
+    "Pending Payment",
     "Rejected",
     "Cancelled",
     "Paid",
@@ -16,6 +22,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getStatusClass(status) {
+    if (status === "Pending Payment") {
+      return "status-pending";
+    }
     if (status === "Confirmed") {
       return "status-confirmed";
     }
@@ -41,12 +50,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function createStatusOptions(selectedStatus) {
-    const optionList = [selectedStatus, ...STATUS_OPTIONS].filter(Boolean);
-    const uniqueOptions = [...new Set(optionList)];
-
-    return uniqueOptions.map((status) => {
-      const selectedAttribute = selectedStatus === status ? "selected" : "";
-      return `<option value="${status}" ${selectedAttribute}>${status}</option>`;
+    // Show every possible status but disable the ones that are not valid
+    // transitions from the current status. The current status is always shown
+    // as selected and enabled (can't change away from it without picking a
+    // valid next status). This mirrors the State Pattern on the backend.
+    return STATUS_OPTIONS.map((status) => {
+      const isSelected = selectedStatus === status;
+      const canMove = window.BookingStore && window.BookingStore.canTransition(selectedStatus, status);
+      // Keep the option visible but disabled so it's clear the path is blocked
+      const isEnabled = isSelected || canMove;
+      return `<option value="${status}" ${isSelected ? "selected" : ""} ${isEnabled ? "" : "disabled"}>${status}</option>`;
     }).join("");
   }
 

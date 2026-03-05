@@ -42,32 +42,84 @@
         <tr>
           <th>Type</th>
           <th>Details</th>
+          <th>Added</th>
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="methodsTableBody">
         <tr>
-          <td>Method 1</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-        </tr>
-        <tr>
-          <td>Method 2</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-        </tr>
-        <tr>
-          <td>Method 3</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
+          <td colspan="4" class="empty-bookings">Loading&hellip;</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <div class="stack-button-row">
-    <button type="button" class="action-btn">Add Payment Method</button>
+    <button type="button" class="action-btn" id="openAddMethodBtn">+ Add Payment Method</button>
   </div>
+
+  <!-- Add Payment Method Modal -->
+  <div class="pay-modal-overlay" id="addMethodModal" style="display:none;">
+    <div class="pay-modal">
+      <button type="button" class="pay-modal-close" id="addMethodClose" aria-label="Close">&#x2715;</button>
+      <div class="pay-modal-header">
+        <h2>Add Payment Method</h2>
+        <p class="pay-modal-sub">Your details are stored locally — no real charges occur.</p>
+      </div>
+
+      <div class="pay-modal-body">
+        <div class="add-method-form">
+          <label class="form-label">
+            Method Type
+            <select id="methodTypeSelect" class="form-select">
+              <option value="">Select a type&hellip;</option>
+              <option value="Credit Card">Credit Card</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Interac e-Transfer">Interac e-Transfer</option>
+            </select>
+          </label>
+
+          <div id="ccFields" style="display:none;">
+            <label class="form-label">
+              Cardholder Name
+              <input type="text" id="ccName" class="form-input" placeholder="e.g. Prince Akeem" maxlength="60" />
+            </label>
+            <label class="form-label">
+              Last 4 Digits
+              <input type="text" id="ccLast4" class="form-input" placeholder="e.g. 4242" maxlength="4" />
+            </label>
+          </div>
+
+          <div id="btFields" style="display:none;">
+            <label class="form-label">
+              Bank Name
+              <input type="text" id="btBank" class="form-input" placeholder="e.g. TD Bank" maxlength="60" />
+            </label>
+            <label class="form-label">
+              Account Nickname
+              <input type="text" id="btNick" class="form-input" placeholder="e.g. Chequing" maxlength="40" />
+            </label>
+          </div>
+
+          <!-- Interac e-Transfer only needs a registered email address -->
+          <div id="itFields" style="display:none;">
+            <label class="form-label">
+              Interac Email
+              <input type="email" id="itEmail" class="form-input" placeholder="e.g. you@example.com" maxlength="80" />
+            </label>
+          </div>
+
+          <p id="addMethodError" class="form-error" style="display:none;"></p>
+        </div>
+      </div>
+
+      <div class="pay-modal-footer">
+        <button type="button" class="action-btn" id="saveMethodBtn">Save Method</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/methods.js" defer></script>
 </body>
 
 </html>

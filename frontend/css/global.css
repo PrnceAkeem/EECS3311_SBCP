@@ -242,6 +242,11 @@ td {
   color: var(--warn);
 }
 
+.status-pending {
+  background: rgba(233, 181, 86, 0.2);
+  color: #ffd27d;
+}
+
 .status-confirmed {
   background: rgba(63, 212, 134, 0.2);
   color: #4ef09a;
