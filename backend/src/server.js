@@ -1,6 +1,15 @@
 const express = require("express");
 const path = require("path");
 const { Pool } = require("pg");
+const {
+    RequestedState,
+    ConfirmedState,
+    PendingPaymentState,
+    PaidState,
+    CompletedState,
+    CancelledState,
+    RejectedState
+} = require("./statePattern");
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -11,6 +20,7 @@ const DATABASE_URL =
 const STATUS_VALUES = [
   "Requested",
   "Confirmed",
+  "Pending Payment",
   "Rejected",
   "Cancelled",
   "Paid",
@@ -51,10 +61,102 @@ function mapBookingRow(row) {
     bookingDate: bookingDateValue,
     bookingTime: row.booking_time,
     status: row.status,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
     updatedBy: row.updated_by
   };
+}
+
+// Simple wrapper for state pattern validation
+function validateStateTransition(currentStatus, nextStatus) {
+    // Create a simple booking object that the state can work with
+    const booking = {
+        status: currentStatus,
+        setState: function(newState) {
+            this.status = newState.getStatus();
+        }
+    };
+    
+    // Set initial state
+    let currentState;
+    switch (currentStatus) {
+        case "Requested":
+            currentState = new RequestedState(booking);
+            break;
+        case "Confirmed":
+            currentState = new ConfirmedState(booking);
+            break;
+        case "Pending Payment":
+            currentState = new PendingPaymentState(booking);
+            break;
+        case "Paid":
+            currentState = new PaidState(booking);
+            break;
+        case "Completed":
+            currentState = new CompletedState(booking);
+            break;
+        case "Cancelled":
+            currentState = new CancelledState(booking);
+            break;
+        case "Rejected":
+            currentState = new RejectedState(booking);
+            break;
+        default:
+            throw new Error(`Invalid current status: ${currentStatus}`);
+    }
+    
+    booking.state = currentState;
+    
+    // Try to perform the transition
+    try {
+        switch (nextStatus) {
+            case "Confirmed":
+                if (typeof currentState.confirm === 'function') {
+                    currentState.confirm();
+                } else {
+                    throw new Error(`Cannot transition to Confirmed from ${currentStatus}`);
+                }
+                break;
+            case "Pending Payment":
+                if (typeof currentState.pendingPayment === 'function') {
+                    currentState.pendingPayment();
+                } else {
+                    throw new Error(`Cannot transition to Pending Payment from ${currentStatus}`);
+                }
+                break;
+            case "Paid":
+                if (typeof currentState.pay === 'function') {
+                    currentState.pay();
+                } else {
+                    throw new Error(`Cannot transition to Paid from ${currentStatus}`);
+                }
+                break;
+            case "Completed":
+                if (typeof currentState.complete === 'function') {
+                    currentState.complete();
+                } else {
+                    throw new Error(`Cannot transition to Completed from ${currentStatus}`);
+                }
+                break;
+            case "Cancelled":
+                if (typeof currentState.cancel === 'function') {
+                    currentState.cancel();
+                } else {
+                    throw new Error(`Cannot transition to Cancelled from ${currentStatus}`);
+                }
+                break;
+            case "Rejected":
+                if (typeof currentState.reject === 'function') {
+                    currentState.reject();
+                } else {
+                    throw new Error(`Cannot transition to Rejected from ${currentStatus}`);
+                }
+                break;
+            default:
+                throw new Error(`Invalid next status: ${nextStatus}`);
+        }
+        return true;
+    } catch (error) {
+        throw error;
+    }
 }
 
 function sanitizeStatus(status) {
@@ -83,8 +185,6 @@ async function ensureSchema() {
        booking_date DATE NOT NULL,
        booking_time TEXT NOT NULL,
        status TEXT NOT NULL DEFAULT 'Requested',
-       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
        updated_by TEXT NOT NULL DEFAULT 'client'
      )`
   );
@@ -108,11 +208,6 @@ async function ensureSchema() {
      ADD CONSTRAINT bookings_status_check
      CHECK (status IN (${STATUS_SQL}))`
   );
-
-  await pool.query(
-    `CREATE INDEX IF NOT EXISTS idx_bookings_created_at
-     ON bookings(created_at DESC)`
-  );
 }
 
 async function withDbRetries(maxRetries, retryDelayMs, fn) {
@@ -125,7 +220,6 @@ async function withDbRetries(maxRetries, retryDelayMs, fn) {
       if (attempt >= maxRetries) {
         throw error;
       }
-      // eslint-disable-next-line no-console
       console.log(
         `Database not ready yet (attempt ${attempt}/${maxRetries}). Retrying in ${retryDelayMs}ms...`
       );
@@ -165,8 +259,6 @@ app.get("/api/bookings", async (_request, response) => {
          booking_date::text AS booking_date,
          booking_time,
          status,
-         created_at,
-         updated_at,
          updated_by
        FROM bookings
        ORDER BY id ASC`
@@ -174,7 +266,6 @@ app.get("/api/bookings", async (_request, response) => {
 
     response.json(result.rows.map(mapBookingRow));
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Failed to fetch bookings", error);
     response.status(500).json({ error: "Failed to fetch bookings." });
   }
@@ -228,8 +319,6 @@ app.post("/api/bookings", async (request, response) => {
          booking_date::text AS booking_date,
          booking_time,
          status,
-         created_at,
-         updated_at,
          updated_by`,
       [
         service,
@@ -246,7 +335,6 @@ app.post("/api/bookings", async (request, response) => {
     broadcastBookingEvent("created", booking);
     response.status(201).json(booking);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Failed to create booking", error);
     response.status(500).json({ error: "Failed to create booking." });
   }
@@ -263,11 +351,32 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
   const actor = sanitizeActor(request.body?.actor);
 
   try {
+    // First get the current booking to check status
+    const currentResult = await pool.query(
+      `SELECT status FROM bookings WHERE id = $1`,
+      [bookingId]
+    );
+
+    if (!currentResult.rows.length) {
+      response.status(404).json({ error: "Booking not found." });
+      return;
+    }
+
+    const currentStatus = currentResult.rows[0].status;
+    
+    // Validate the state transition using the state pattern
+    try {
+      validateStateTransition(currentStatus, nextStatus);
+    } catch (stateError) {
+      response.status(400).json({ error: stateError.message });
+      return;
+    }
+
+    // If valid, update the database
     const result = await pool.query(
       `UPDATE bookings
        SET
          status = $1,
-         updated_at = NOW(),
          updated_by = $2
        WHERE id = $3
        RETURNING
@@ -280,22 +389,14 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
          booking_date::text AS booking_date,
          booking_time,
          status,
-         created_at,
-         updated_at,
          updated_by`,
       [nextStatus, actor, bookingId]
     );
-
-    if (!result.rows.length) {
-      response.status(404).json({ error: "Booking not found." });
-      return;
-    }
 
     const booking = mapBookingRow(result.rows[0]);
     broadcastBookingEvent("updated", booking);
     response.json(booking);
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error("Failed to update booking status", error);
     response.status(500).json({ error: "Failed to update booking status." });
   }
@@ -329,13 +430,11 @@ async function startServer() {
   await ensureSchema();
 
   app.listen(PORT, () => {
-    // eslint-disable-next-line no-console
     console.log(`Synergy app listening on port ${PORT}`);
   });
 }
 
 startServer().catch((error) => {
-  // eslint-disable-next-line no-console
   console.error("Failed to start server", error);
   process.exit(1);
 });

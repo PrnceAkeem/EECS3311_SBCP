@@ -51,7 +51,7 @@ class RequestedState extends BookingState {
     }
     
     getStatus() {
-        return 'REQUESTED';
+        return 'Requested';
     }
 }
 
@@ -59,6 +59,12 @@ class ConfirmedState extends BookingState {
     constructor(booking) {
         super(booking);
     }
+
+    pendingPayment() {  
+        this.booking.setState(new PendingPaymentState(this.booking));
+        return this.booking;
+    }
+
     
     cancel() {
         this.booking.setState(new CancelledState(this.booking));
@@ -71,7 +77,7 @@ class ConfirmedState extends BookingState {
     }
     
     getStatus() {
-        return 'CONFIRMED';
+        return 'Confirmed';
     }
 }
 
@@ -92,7 +98,7 @@ class PaidState extends BookingState {
     }
     
     getStatus() {
-        return 'PAID';
+        return 'Paid';
     }
 }
 
@@ -102,7 +108,7 @@ class CompletedState extends BookingState {
     }
     
     getStatus() {
-        return 'COMPLETED';
+        return 'Completed';
     }
 }
 
@@ -112,7 +118,7 @@ class CancelledState extends BookingState {
     }
     
     getStatus() {
-        return 'CANCELLED';
+        return 'Cancelled';
     }
 }
 
@@ -122,15 +128,39 @@ class RejectedState extends BookingState {
     }
     
     getStatus() {
-        return 'REJECTED';
+        return 'Rejected';
     }
 }
 
+class PendingPaymentState extends BookingState {
+    constructor(booking) {
+        super(booking);
+    }
+    
+    pay() {
+        this.booking.setState(new PaidState(this.booking));
+        return this.booking;
+    }
+    
+    cancel() {
+        // Refund logic would go here if needed
+        this.booking.setState(new CancelledState(this.booking));
+        return this.booking;
+    }
+    
+    getStatus() {
+        return 'Pending Payment';
+    }
+}
+
+// Update exports
 module.exports = {
     RequestedState,
     ConfirmedState,
+    PendingPaymentState,  // Add this
     PaidState,
     CompletedState,
     CancelledState,
     RejectedState
 };
+

@@ -8,30 +8,28 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const UPCOMING_STATUSES = new Set(["Requested", "Confirmed", "Paid"]);
+  // Status sets for filtering
+  const UPCOMING_STATUSES = new Set(["Requested", "Confirmed", "Pending Payment", "Paid"]);
   const COMPLETED_STATUSES = new Set(["Completed"]);
   let unsubscribe = null;
 
+  // Get status class for styling
   function getStatusClass(status) {
-    if (status === "Confirmed") {
-      return "status-confirmed";
-    }
-    if (status === "Rejected") {
-      return "status-rejected";
-    }
-    if (status === "Cancelled") {
-      return "status-cancelled";
-    }
-    if (status === "Paid") {
-      return "status-paid";
-    }
-    if (status === "Completed") {
-      return "status-completed";
-    }
-    return "status-requested";
+    const statusClasses = {
+      "Confirmed": "status-confirmed",
+      "Rejected": "status-rejected",
+      "Cancelled": "status-cancelled",
+      "Paid": "status-paid",
+      "Pending Payment": "status-pending",
+      "Completed": "status-completed",
+      "Requested": "status-requested"
+    };
+    
+    return statusClasses[status] || "status-requested";
   }
 
   function escapeHtml(value) {
+    if (value === null || value === undefined) return "-";
     return String(value)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -72,15 +70,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return row;
   }
 
+  // Create action buttons based on booking status
   function createActionsCell(booking) {
-    if (booking.status === "Confirmed") {
+    // Show pay button for Pending Payment status
+    if (booking.status === "Pending Payment") {
+      return `
+        <div class="table-action-group">
+          <button type="button" class="table-action-btn pay" data-action="pay" data-booking-id="${booking.id}">
+            Pay Now
+          </button>
+        </div>
+      `;
+    }
+    
+    // Show cancel button for Requested or Confirmed status
+    if (booking.status === "Requested" || booking.status === "Confirmed") {
       return `
         <div class="table-action-group">
           <button type="button" class="table-action-btn cancel" data-action="cancel" data-booking-id="${booking.id}">
             Cancel
-          </button>
-          <button type="button" class="table-action-btn pay" data-action="pay" data-booking-id="${booking.id}">
-            Pay
           </button>
         </div>
       `;
@@ -106,10 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateMetricCards(bookings) {
     const totalBookings = bookings.length;
     const todayDate = new Date().toISOString().slice(0, 10);
+    
     const upcomingBookings = bookings.filter((booking) => {
       const bookingDate = String(booking.bookingDate || "").slice(0, 10);
       return UPCOMING_STATUSES.has(booking.status) && bookingDate >= todayDate;
     }).length;
+    
     const completedBookings = bookings.filter((booking) => {
       return COMPLETED_STATUSES.has(booking.status);
     }).length;
@@ -147,6 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Handle action button clicks (Pay or Cancel)
   bookingsTableBody.addEventListener("click", async (event) => {
     const actionButton = event.target.closest("button[data-action]");
     if (!actionButton) {
@@ -159,19 +170,48 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const nextStatus = actionType === "pay" ? "Paid" : "Cancelled";
+    // Determine next status based on action
+    let nextStatus;
+    if (actionType === "pay") {
+      nextStatus = "Paid";
+    } else if (actionType === "cancel") {
+      nextStatus = "Cancelled";
+    } else {
+      return;
+    }
+
+    // Confirm cancellation
+    if (actionType === "cancel") {
+      if (!confirm("Are you sure you want to cancel this booking?")) {
+        return;
+      }
+    }
+
+    // Confirm payment
+    if (actionType === "pay") {
+      if (!confirm("Proceed to payment?")) {
+        return;
+      }
+    }
+
     actionButton.disabled = true;
+    const originalText = actionButton.textContent;
+    actionButton.textContent = actionType === "pay" ? "Processing..." : "Cancelling...";
 
     try {
       await window.BookingStore.updateBookingStatus(bookingId, nextStatus, "client");
+      // Show success message
+      alert(`Booking ${actionType === "pay" ? "payment initiated" : "cancelled"} successfully!`);
       renderBookings();
     } catch (error) {
-      alert(error.message || "Failed to update booking.");
+      alert(error.message || `Failed to ${actionType} booking.`);
     } finally {
       actionButton.disabled = false;
+      actionButton.textContent = originalText;
     }
   });
 
+  // Subscribe to real-time updates
   unsubscribe = window.BookingStore.subscribe(() => {
     renderBookings();
   });
@@ -182,5 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Initial render
   renderBookings();
 });

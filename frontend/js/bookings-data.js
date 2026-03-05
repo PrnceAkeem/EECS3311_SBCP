@@ -1,7 +1,9 @@
 (function () {
+  // Add "Pending Payment" to valid statuses to match the state pattern
   const VALID_STATUSES = new Set([
     "Requested",
     "Confirmed",
+    "Pending Payment",  // Added this
     "Rejected",
     "Cancelled",
     "Paid",
@@ -54,10 +56,13 @@
   }
 
   async function updateBookingStatus(bookingId, nextStatus, actor) {
+    // Validate that the next status is valid
+    const sanitizedStatus = sanitizeStatus(nextStatus);
+    
     return apiRequest(`/api/bookings/${bookingId}/status`, {
       method: "PATCH",
       body: JSON.stringify({
-        status: sanitizeStatus(nextStatus),
+        status: sanitizedStatus,
         actor: actor || "system"
       })
     });
@@ -69,6 +74,7 @@
     }
 
     if (!("EventSource" in window)) {
+      // Fallback to polling if EventSource is not supported
       const pollTimer = setInterval(() => {
         listener({ type: "poll" });
       }, 3000);
@@ -78,6 +84,7 @@
       };
     }
 
+    // Use Server-Sent Events for real-time updates
     const stream = new EventSource("/api/bookings/stream");
 
     stream.addEventListener("booking", (event) => {
@@ -89,6 +96,10 @@
       }
     });
 
+    stream.addEventListener("connected", () => {
+      console.log("Connected to booking stream");
+    });
+
     stream.onerror = function onError() {
       // EventSource auto-reconnects. Keeping handler prevents noisy uncaught errors.
     };
@@ -98,10 +109,30 @@
     };
   }
 
+  // Helper function to check if a status allows client actions
+  function canClientCancel(status) {
+    return status === "Requested" || status === "Confirmed";
+  }
+
+  function canClientPay(status) {
+    return status === "Pending Payment";
+  }
+
+  function canClientModify(status) {
+    return canClientCancel(status) || canClientPay(status);
+  }
+
+  // Export the BookingStore object
   window.BookingStore = {
     getBookings: getBookings,
     addBooking: addBooking,
     updateBookingStatus: updateBookingStatus,
-    subscribe: subscribe
+    subscribe: subscribe,
+    // Helper methods for UI logic
+    canClientCancel: canClientCancel,
+    canClientPay: canClientPay,
+    canClientModify: canClientModify,
+    // Expose valid statuses for reference
+    VALID_STATUSES: Array.from(VALID_STATUSES)
   };
 })();
