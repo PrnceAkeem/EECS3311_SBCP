@@ -1,5 +1,9 @@
 // Factory Pattern for Creating Different Types of Users
 
+
+// Base User class
+// This represents a general user in the system and contains common properties
+// shared by all user types.
 class User {
     constructor(id, name, email) {
         this.id = id;
@@ -9,6 +13,8 @@ class User {
     }
 }
 
+// Client class that extends the base User class
+// Clients can book services and store payment methods
 class Client extends User {
     constructor(id, name, email) {
         super(id, name, email);
@@ -18,6 +24,9 @@ class Client extends User {
     }
 }
 
+
+// Consultant class that extends the base User class
+// Consultants provide services and manage their availability
 class Consultant extends User {
     constructor(id, name, email, expertise) {
         super(id, name, email);
@@ -31,6 +40,8 @@ class Consultant extends User {
     }
 }
 
+// Admin class that extends the base User class
+// Admin users have full permissions to manage the system
 class Admin extends User {
     constructor(id, name, email) {
         super(id, name, email);
@@ -38,6 +49,8 @@ class Admin extends User {
         this.permissions = ['all'];
     }
 }
+
+// UserFactory class responsible for creating user objects 
 
 class UserFactory {
     createUser(type, id, name, email, additionalInfo = {}) {
@@ -49,7 +62,7 @@ class UserFactory {
             case 'admin':
                 return new Admin(id, name, email);
             default:
-                throw new Error(`Invalid user type: ${type}`);
+                throw new Error(`Invalid user type: ${type}`); 
         }
     }
 }
