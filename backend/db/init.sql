@@ -11,12 +11,13 @@ CREATE TABLE IF NOT EXISTS bookings (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_by TEXT NOT NULL DEFAULT 'client'
+  
 );
 
 CREATE INDEX IF NOT EXISTS idx_bookings_created_at ON bookings(created_at DESC);
 
 
--- PAYMENTS TABLE (MAIN)
+--PAYMENTS TABLE (MAIN)
 CREATE TABLE IF NOT EXISTS payments (
   payment_id SERIAL PRIMARY KEY,
   booking_id INT NOT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 
--- CREDIT CARD PAYMENTS
+--CREDIT CARD PAYMENTS
 
 CREATE TABLE IF NOT EXISTS credit_card_payments (
   id SERIAL PRIMARY KEY,
@@ -41,7 +42,7 @@ CREATE TABLE IF NOT EXISTS credit_card_payments (
 );
 
 
--- DEBIT CARD PAYMENTS
+--DEBIT CARD PAYMENTS
 CREATE TABLE IF NOT EXISTS debit_card_payments (
   id SERIAL PRIMARY KEY,
   payment_id INT UNIQUE,
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS debit_card_payments (
   FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
 );
 
--- PAYPAL PAYMENTS
+--PAYPAL PAYMENTS
 CREATE TABLE IF NOT EXISTS paypal_payments (
   id SERIAL PRIMARY KEY,
   payment_id INT UNIQUE,
@@ -60,7 +61,7 @@ CREATE TABLE IF NOT EXISTS paypal_payments (
 );
 
 
--- BANK TRANSFER PAYMENTS
+--BANK TRANSFER PAYMENTS
 CREATE TABLE IF NOT EXISTS bank_transfer_payments (
   id SERIAL PRIMARY KEY,
   payment_id INT UNIQUE,
