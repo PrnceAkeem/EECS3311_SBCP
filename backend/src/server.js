@@ -485,6 +485,7 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
         return;
       }
 
+
       paymentReceipt = {
         transactionId: paymentResult.transactionId,
         methodType: savedMethod.type,

@@ -10,6 +10,7 @@ class User {
   }
 }
 
+//Client class
 class Client extends User {
   constructor(id, name, email) {
     super(id, name, email);
@@ -18,6 +19,7 @@ class Client extends User {
   }
 }
 
+//Consultant class
 class Consultant extends User {
   constructor(id, name, email, expertise) {
     super(id, name, email);
