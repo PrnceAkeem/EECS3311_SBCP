@@ -58,15 +58,20 @@ public class SystemPolicyManager {
 
     // ── Getters ───────────────────────────────────────────────────────────────
 
+    // Returns the current cancellation window in hrs
+    // Used by booking services to determine if cancellation is allowed.
     public int getCancellationWindowHours() {
         return cancellationWindowHours;
     }
-
+    //Returns the current refund policy text
     public String getRefundPolicy() {
         return refundPolicy;
     }
 
     // ── Setters (called by Admin via UC12: Define System Policies) ────────────
+
+     //Updates the cancellation window policy
+    //Admins will be able to change how many hours a client has to cancel for free.
 
     public void setCancellationWindowHours(int hours) {
         if (hours < 0) {
@@ -75,6 +80,8 @@ public class SystemPolicyManager {
         this.cancellationWindowHours = hours;
     }
 
+     //Updates the platform refund policy text
+    //Admins use this to define the refund rules displayed to users.
     public void setRefundPolicy(String policy) {
         if (policy == null || policy.isBlank()) {
             throw new IllegalArgumentException("Refund policy cannot be empty.");
