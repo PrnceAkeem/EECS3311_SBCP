@@ -15,11 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function formatBookingId(rawId) {
-    const text = String(rawId || "").trim();
-    if (/^bk_/i.test(text)) {
-      return text.replace(/^bk_/i, "BK-");
-    }
-
     const n = Number(rawId);
     return Number.isInteger(n)
       ? `BK-${String(n).padStart(3, "0")}`
@@ -79,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return `
           <tr>
-            <td>${escapeHtml(formatBookingId(booking.bookingRef || booking.id))}</td>
+            <td>${escapeHtml(formatBookingId(booking.id))}</td>
             <td>${escapeHtml(booking.service || "-")}</td>
             <td>${escapeHtml(booking.price || "-")}</td>
             <td><span class="status-pill ${paymentStatusClass(paymentStatus)}">${escapeHtml(paymentStatus)}</span></td>

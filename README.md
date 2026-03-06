@@ -116,13 +116,9 @@ All four patterns are implemented in `backend/src/patterns/` and wired in `backe
 ## Phase 1 Scope Note
 
 Phase 1 covers the booking lifecycle end-to-end with all four GoF patterns wired and testable.
-The following use cases from the diagram are deferred to Phase 2:
-- UC8: Manage Availability (no TimeSlot/slot availability model yet)
-- UC11: Approve Consultant Registration (no consultant registration flow)
-- UC12: Define System Policies
-- Process Refund (<<extend>> from Apply Cancellation when status = Paid)
-- Validate Availability sub-flow on UC9
-- Real email/SMS/push delivery (Observer notifiers log to console only)
+Current implementation includes availability management, consultant registration approvals,
+system policy configuration, payment processing, and refund handling.
+Observer notifications are functional in-app and currently log delivery actions to console.
 
 ## Repository
 GitHub: [https://github.com/PrnceAkeem/EECS3311_SBCP]

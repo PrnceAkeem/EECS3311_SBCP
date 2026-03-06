@@ -75,6 +75,45 @@ document.addEventListener("DOMContentLoaded", () => {
     setHint(`${enabledCount} slot(s) available. Select one to continue.`);
   }
 
+  async function loadConsultants() {
+    if (!consultantNameSelect) {
+      return;
+    }
+
+    const currentValue = consultantNameSelect.value;
+    consultantNameSelect.innerHTML = '<option value="" selected disabled>Loading consultants...</option>';
+
+    try {
+      const response = await fetch("/api/consultants");
+      if (!response.ok) {
+        throw new Error("Failed to load consultants.");
+      }
+
+      const consultants = await response.json();
+      if (!Array.isArray(consultants) || !consultants.length) {
+        consultantNameSelect.innerHTML = '<option value="" selected disabled>No consultants available</option>';
+        return;
+      }
+
+      consultantNameSelect.innerHTML = '<option value="" disabled>Select a consultant</option>';
+      consultants.forEach((consultant) => {
+        const name = String(consultant.name || "").trim();
+        if (!name) {
+          return;
+        }
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        consultantNameSelect.appendChild(option);
+      });
+
+      const hasCurrent = consultants.some((consultant) => consultant.name === currentValue);
+      consultantNameSelect.value = hasCurrent ? currentValue : "";
+    } catch {
+      consultantNameSelect.innerHTML = '<option value="" selected disabled>Select a consultant</option>';
+    }
+  }
+
   async function refreshAvailability() {
     const consultantName = consultantNameSelect.value;
     const bookingDate = bookingDateInput.value;
@@ -169,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       serviceNameElement.innerText = button.dataset.service || "--";
       servicePriceElement.innerText = button.dataset.price || "--";
       openBookingModal();
-      refreshAvailability();
+      loadConsultants().then(() => refreshAvailability());
     });
   });
 
@@ -248,4 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
       resetBookingForm();
     }
   });
+
+  loadConsultants();
 });

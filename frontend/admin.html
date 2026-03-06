@@ -29,7 +29,40 @@
     </div>
 
     <section class="table-card section-card">
-      <h2>UC11: Consultant Registration Approvals</h2>
+      <h2>Consultant Directory</h2>
+      <p class="page-subtitle">Add consultants here so they appear in consultant availability and booking flows.</p>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Consultant Name
+          <input id="consultantNameInput" class="input-field" type="text" maxlength="80" placeholder="Jane Doe" />
+        </label>
+        <label class="form-label">
+          Email
+          <input id="consultantEmailInput" class="input-field" type="email" maxlength="120" placeholder="jane@example.com" />
+        </label>
+        <label class="form-label">
+          Expertise
+          <input id="consultantExpertiseInput" class="input-field" type="text" maxlength="120" placeholder="Cloud migration" />
+        </label>
+        <button type="button" id="addConsultantBtn" class="action-btn">Add Consultant</button>
+      </div>
+      <div class="table-wrap compact-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Consultant ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Expertise</th>
+            </tr>
+          </thead>
+          <tbody id="consultantDirectoryBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>Consultant Registration Approvals</h2>
       <div class="table-wrap compact-wrap">
         <table>
           <thead>
@@ -48,7 +81,7 @@
     </section>
 
     <section class="table-card section-card">
-      <h2>UC12: System Policies</h2>
+      <h2>System Policies</h2>
       <div class="inline-form-grid">
         <label class="form-label">
           Cancellation Window (hours)

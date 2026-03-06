@@ -8,11 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const addAvailabilityBtn = document.getElementById("addAvailabilityBtn");
   const availabilityTableBody = document.getElementById("availabilityTableBody");
 
-  const registrationName = document.getElementById("registrationName");
-  const registrationEmail = document.getElementById("registrationEmail");
-  const registrationExpertise = document.getElementById("registrationExpertise");
-  const submitRegistrationBtn = document.getElementById("submitRegistrationBtn");
-
   const STATUS_OPTIONS = [
     "Requested",
     "Confirmed",
@@ -66,16 +61,49 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${hour}:${match[2]} ${match[3]}`;
   }
 
-  function formatRef(prefix, value, fallbackId) {
-    const text = String(value || "").trim();
-    if (text) {
-      return text.replace(/^bk_/i, "BK-").replace(/^cu_/i, "CUS-");
-    }
-
-    const n = Number(fallbackId);
+  function formatRef(prefix, rawId) {
+    const n = Number(rawId);
     return Number.isInteger(n)
       ? `${prefix}-${String(n).padStart(3, "0")}`
-      : `${prefix}-${escapeHtml(String(fallbackId || "-"))}`;
+      : `${prefix}-${escapeHtml(String(rawId || "-"))}`;
+  }
+
+  async function loadConsultants() {
+    if (!availabilityConsultantName) return;
+
+    const currentValue = availabilityConsultantName.value;
+
+    try {
+      const response = await fetch("/api/consultants");
+      if (!response.ok) {
+        throw new Error("Failed to load consultants.");
+      }
+
+      const consultants = await response.json();
+      if (!Array.isArray(consultants) || !consultants.length) {
+        availabilityConsultantName.innerHTML =
+          '<option value="" selected disabled>No consultants available</option>';
+        return;
+      }
+
+      availabilityConsultantName.innerHTML = [
+        '<option value="" disabled>Select consultant</option>',
+        ...consultants.map((consultant) => {
+          const name = String(consultant.name || "").trim();
+          const expertise = String(consultant.expertise || "general").trim();
+          return `<option value="${escapeHtml(name)}">${escapeHtml(name)} (${escapeHtml(expertise)})</option>`;
+        })
+      ].join("");
+
+      const hasCurrent = consultants.some((consultant) => consultant.name === currentValue);
+      availabilityConsultantName.value = hasCurrent
+        ? currentValue
+        : String(consultants[0].name || "");
+    } catch (error) {
+      availabilityConsultantName.innerHTML =
+        '<option value="" selected disabled>Unable to load consultants</option>';
+      showToast(error.message || "Could not load consultants.");
+    }
   }
 
   function getStatusClass(status) {
@@ -100,8 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function createBookingRow(booking) {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${escapeHtml(formatRef("BK", booking.bookingRef, booking.id))}</td>
-      <td>${escapeHtml(formatRef("CUS", booking.customerId, booking.id))}</td>
+      <td>${escapeHtml(formatRef("BK", booking.id))}</td>
+      <td>${escapeHtml(formatRef("CUS", booking.id))}</td>
       <td>${escapeHtml(booking.clientName || "-")}</td>
       <td>${escapeHtml(booking.service || "-")}</td>
       <td>${escapeHtml(booking.consultantName || "-")}</td>
@@ -151,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const consultantName = availabilityConsultantName.value.trim();
     if (!consultantName) {
-      availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Enter a consultant name to view availability.</td></tr>';
+      availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Select a consultant to view availability.</td></tr>';
       return;
     }
 
@@ -245,48 +273,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function submitRegistration() {
-    const name = registrationName.value.trim();
-    const email = registrationEmail.value.trim();
-    const expertise = registrationExpertise.value.trim();
-
-    if (!name || !email) {
-      showToast("Registration name and email are required.");
-      return;
-    }
-
-    submitRegistrationBtn.disabled = true;
-    try {
-      const response = await fetch("/api/consultants/registrations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name, email, expertise })
-      });
-
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.error || "Failed to submit registration.");
-      }
-
-      registrationName.value = "";
-      registrationEmail.value = "";
-      registrationExpertise.value = "";
-      showToast("Registration request submitted.");
-    } catch (error) {
-      showToast(error.message || "Could not submit registration.");
-    } finally {
-      submitRegistrationBtn.disabled = false;
-    }
-  }
-
   addAvailabilityBtn.addEventListener("click", addAvailability);
   availabilityConsultantName.addEventListener("change", () => {
     loadAvailability();
   });
-
-  submitRegistrationBtn.addEventListener("click", submitRegistration);
 
   availabilityTableBody.addEventListener("click", async (event) => {
     const removeButton = event.target.closest('button[data-role="remove-slot"]');
@@ -340,5 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderBookings();
-  loadAvailability();
+  loadConsultants().then(() => {
+    loadAvailability();
+  });
 });

@@ -22,6 +22,7 @@ const DATABASE_URL =
 const DATA_DIR = path.join(__dirname, "..", "data");
 const PAYMENT_METHODS_FILE = path.join(DATA_DIR, "payment-methods.json");
 const CONSULTANT_REGISTRATIONS_FILE = path.join(DATA_DIR, "consultant-registrations.json");
+const CONSULTANTS_FILE = path.join(DATA_DIR, "consultants.json");
 const SYSTEM_POLICIES_FILE = path.join(DATA_DIR, "system-policies.json");
 
 const DEFAULT_POLICIES = {
@@ -30,6 +31,30 @@ const DEFAULT_POLICIES = {
   notificationsEnabled: true,
   refundPolicy: "Paid bookings cancelled before the session are refunded automatically."
 };
+
+const DEFAULT_CONSULTANTS = [
+  {
+    id: "con_1",
+    name: "John Smith",
+    email: "john.smith@consultant.synergy.local",
+    expertise: "Software Architecture",
+    createdAt: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "con_2",
+    name: "Angela Fox",
+    email: "angela.fox@consultant.synergy.local",
+    expertise: "Technical Interviews",
+    createdAt: "2026-01-01T00:00:00.000Z"
+  },
+  {
+    id: "con_3",
+    name: "Brian Flys",
+    email: "brian.flys@consultant.synergy.local",
+    expertise: "Career Coaching",
+    createdAt: "2026-01-01T00:00:00.000Z"
+  }
+];
 
 const STATUS_VALUES = [
   "Requested",
@@ -92,6 +117,9 @@ function ensureDataFiles() {
   if (!fs.existsSync(CONSULTANT_REGISTRATIONS_FILE)) {
     writeJsonFile(CONSULTANT_REGISTRATIONS_FILE, []);
   }
+  if (!fs.existsSync(CONSULTANTS_FILE)) {
+    writeJsonFile(CONSULTANTS_FILE, DEFAULT_CONSULTANTS);
+  }
   if (!fs.existsSync(SYSTEM_POLICIES_FILE)) {
     writeJsonFile(SYSTEM_POLICIES_FILE, DEFAULT_POLICIES);
   }
@@ -111,6 +139,14 @@ function readConsultantRegistrations() {
 
 function writeConsultantRegistrations(registrations) {
   writeJsonFile(CONSULTANT_REGISTRATIONS_FILE, registrations);
+}
+
+function readConsultants() {
+  return readJsonFile(CONSULTANTS_FILE, DEFAULT_CONSULTANTS);
+}
+
+function writeConsultants(consultants) {
+  writeJsonFile(CONSULTANTS_FILE, consultants);
 }
 
 function readSystemPolicies() {
@@ -135,6 +171,20 @@ function toPublicPaymentMethod(method) {
     label: method.label,
     createdAt: method.createdAt,
     updatedAt: method.updatedAt || null
+  };
+}
+
+function toPublicConsultant(consultant) {
+  if (!consultant) {
+    return null;
+  }
+
+  return {
+    id: consultant.id,
+    name: consultant.name,
+    email: consultant.email || "",
+    expertise: consultant.expertise || "general",
+    createdAt: consultant.createdAt || null
   };
 }
 
@@ -212,7 +262,38 @@ function isFutureExpiry(expiryText) {
   return expiryDate.getTime() >= Date.now();
 }
 
-function buildTransactionId(prefix) {
+function normalizeNumericId(rawValue) {
+  const numericValue = Number(rawValue);
+  if (Number.isInteger(numericValue) && numericValue > 0) {
+    return numericValue;
+  }
+  return null;
+}
+
+function buildCanonicalBookingRef(bookingId) {
+  const normalizedId = normalizeNumericId(bookingId);
+  return normalizedId ? `bk_${normalizedId}` : null;
+}
+
+function buildCanonicalCustomerId(bookingId) {
+  const normalizedId = normalizeNumericId(bookingId);
+  return normalizedId ? `cu_${normalizedId}` : null;
+}
+
+function paymentMethodPrefix(methodType) {
+  if (methodType === "Credit Card") return "CC";
+  if (methodType === "Debit Card") return "DC";
+  if (methodType === "Bank Transfer") return "BT";
+  if (methodType === "PayPal") return "PP";
+  return "PAY";
+}
+
+function buildTransactionId(prefix, bookingId = null) {
+  const normalizedId = normalizeNumericId(bookingId);
+  if (normalizedId) {
+    return `${prefix}-${String(normalizedId).padStart(6, "0")}`;
+  }
+
   const timePart = Date.now().toString().slice(-6);
   const randomPart = Math.random().toString(36).slice(2, 8).toUpperCase();
   return `${prefix}-${timePart}-${randomPart}`;
@@ -439,6 +520,7 @@ function mapBookingRow(row) {
     return null;
   }
 
+  const normalizedBookingId = normalizeNumericId(row.id);
   const bookingDateValue =
     row.booking_date instanceof Date
       ? row.booking_date.toISOString().slice(0, 10)
@@ -446,8 +528,10 @@ function mapBookingRow(row) {
 
   return {
     id: row.id,
-    bookingRef: row.booking_ref || null,
-    customerId: row.customer_id || null,
+    bookingRef:
+      buildCanonicalBookingRef(normalizedBookingId) || row.booking_ref || null,
+    customerId:
+      buildCanonicalCustomerId(normalizedBookingId) || row.customer_id || null,
     service: row.service,
     price: row.price,
     clientName: row.client_name,
@@ -517,7 +601,30 @@ async function ensureSchema() {
     `UPDATE bookings
      SET booking_ref = 'bk_' || id,
          customer_id = 'cu_' || id
-     WHERE booking_ref IS NULL`
+     WHERE booking_ref IS DISTINCT FROM ('bk_' || id)
+        OR customer_id IS DISTINCT FROM ('cu_' || id)`
+  );
+
+  await pool.query(
+    `UPDATE bookings
+     SET payment_transaction_id = (
+           COALESCE(NULLIF(split_part(payment_transaction_id, '-', 1), ''), 'PAY')
+           || '-' || LPAD(id::text, 6, '0')
+         ),
+         payment_processed_at = COALESCE(payment_processed_at, updated_at, created_at)
+     WHERE payment_status IN ('Success', 'Refunded')
+       AND payment_transaction_id IS DISTINCT FROM (
+         COALESCE(NULLIF(split_part(payment_transaction_id, '-', 1), ''), 'PAY')
+         || '-' || LPAD(id::text, 6, '0')
+       )`
+  );
+
+  await pool.query(
+    `UPDATE bookings
+     SET refund_transaction_id = 'RF-' || LPAD(id::text, 6, '0'),
+         refund_processed_at = COALESCE(refund_processed_at, updated_at, created_at)
+     WHERE payment_status = 'Refunded'
+       AND refund_transaction_id IS DISTINCT FROM ('RF-' || LPAD(id::text, 6, '0'))`
   );
 
   await pool.query(
@@ -718,17 +825,11 @@ app.post("/api/bookings", async (request, response) => {
       return;
     }
 
-    const now = Date.now();
-    const bookingRef = `bk_${now}`;
-    const customerId = `cu_${now}${Math.random().toString(36).slice(2, 6)}`;
-
     const policies = readSystemPolicies();
     const adjustedPrice = applyPricingPolicy(price, policies.pricingMultiplier);
 
-    const result = await pool.query(
+    const insertResult = await pool.query(
       `INSERT INTO bookings (
-         booking_ref,
-         customer_id,
          service,
          price,
          client_name,
@@ -740,7 +841,28 @@ app.post("/api/bookings", async (request, response) => {
          payment_status,
          updated_by
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Requested', NULL, 'client')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'Requested', NULL, 'client')
+       RETURNING id`,
+      [
+        sanitizeText(service, 120),
+        adjustedPrice,
+        actors.client.name,
+        actors.client.email,
+        actors.consultant.name,
+        safeBookingDate,
+        safeBookingTime
+      ]
+    );
+
+    const insertedBookingId = insertResult.rows[0].id;
+    const canonicalBookingRef = buildCanonicalBookingRef(insertedBookingId);
+    const canonicalCustomerId = buildCanonicalCustomerId(insertedBookingId);
+
+    const result = await pool.query(
+      `UPDATE bookings
+       SET booking_ref = $1,
+           customer_id = $2
+       WHERE id = $3
        RETURNING
          id,
          booking_ref,
@@ -761,17 +883,7 @@ app.post("/api/bookings", async (request, response) => {
          created_at,
          updated_at,
          updated_by`,
-      [
-        bookingRef,
-        customerId,
-        sanitizeText(service, 120),
-        adjustedPrice,
-        actors.client.name,
-        actors.client.email,
-        actors.consultant.name,
-        safeBookingDate,
-        safeBookingTime
-      ]
+      [canonicalBookingRef, canonicalCustomerId, insertedBookingId]
     );
 
     await pool.query(
@@ -925,11 +1037,17 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
         return;
       }
 
+      const canonicalPaymentTransactionId =
+        current.payment_transaction_id ||
+        buildTransactionId(paymentMethodPrefix(savedMethod.type), bookingId);
+      const canonicalPaymentProcessedAt =
+        current.payment_processed_at || new Date().toISOString();
+
       paymentReceipt = {
-        transactionId: paymentResult.transactionId,
+        transactionId: canonicalPaymentTransactionId,
         methodType: savedMethod.type,
         methodLabel: savedMethod.label,
-        processedAt: new Date().toISOString()
+        processedAt: canonicalPaymentProcessedAt
       };
 
       nextPaymentStatus = "Success";
@@ -940,8 +1058,9 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
     }
 
     if (currentStatus === "Paid" && nextStatus === "Cancelled") {
-      const refundTransactionId = buildTransactionId("RF");
-      const refundedAt = new Date().toISOString();
+      const refundTransactionId =
+        current.refund_transaction_id || buildTransactionId("RF", bookingId);
+      const refundedAt = current.refund_processed_at || new Date().toISOString();
 
       refundReceipt = {
         refundTransactionId,
@@ -1141,6 +1260,69 @@ app.delete("/api/payment-methods/:id", (request, response) => {
   methods.splice(idx, 1);
   writePaymentMethods(methods);
   response.status(204).end();
+});
+
+app.get("/api/consultants", (_request, response) => {
+  const consultants = readConsultants()
+    .map(toPublicConsultant)
+    .filter(Boolean)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  response.json(consultants);
+});
+
+app.post("/api/consultants", (request, response) => {
+  const actor = sanitizeActor(request.body?.actor);
+  if (actor !== "admin") {
+    response.status(403).json({ error: "Only admin can add consultants." });
+    return;
+  }
+
+  const name = sanitizeText(request.body?.name, 80);
+  const expertise = sanitizeText(request.body?.expertise, 120) || "general";
+  const email = sanitizeText(request.body?.email, 120).toLowerCase();
+
+  if (!name) {
+    response.status(400).json({ error: "Consultant name is required." });
+    return;
+  }
+
+  if (email && !isValidEmail(email)) {
+    response.status(400).json({ error: "Consultant email format is invalid." });
+    return;
+  }
+
+  const consultants = readConsultants();
+  const nameKey = name.toLowerCase();
+  const emailKey = email.toLowerCase();
+  const duplicate = consultants.find((consultant) => {
+    const consultantName = String(consultant.name || "").trim().toLowerCase();
+    const consultantEmail = String(consultant.email || "").trim().toLowerCase();
+    if (consultantName && consultantName === nameKey) {
+      return true;
+    }
+    if (emailKey && consultantEmail && consultantEmail === emailKey) {
+      return true;
+    }
+    return false;
+  });
+
+  if (duplicate) {
+    response.status(409).json({ error: "Consultant already exists." });
+    return;
+  }
+
+  const consultant = {
+    id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    name,
+    email,
+    expertise,
+    createdAt: new Date().toISOString()
+  };
+
+  consultants.push(consultant);
+  writeConsultants(consultants);
+  response.status(201).json(toPublicConsultant(consultant));
 });
 
 app.get("/api/availability", async (request, response) => {
@@ -1357,6 +1539,36 @@ app.patch("/api/consultants/registrations/:id", (request, response) => {
   };
 
   writeConsultantRegistrations(registrations);
+
+  if (status === "Approved") {
+    const approvedRegistration = registrations[index];
+    const consultants = readConsultants();
+    const approvedName = String(approvedRegistration.name || "").trim().toLowerCase();
+    const approvedEmail = String(approvedRegistration.email || "").trim().toLowerCase();
+    const alreadyExists = consultants.some((consultant) => {
+      const consultantName = String(consultant.name || "").trim().toLowerCase();
+      const consultantEmail = String(consultant.email || "").trim().toLowerCase();
+      if (approvedName && consultantName === approvedName) {
+        return true;
+      }
+      if (approvedEmail && consultantEmail && consultantEmail === approvedEmail) {
+        return true;
+      }
+      return false;
+    });
+
+    if (!alreadyExists) {
+      consultants.push({
+        id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: approvedRegistration.name,
+        email: approvedRegistration.email,
+        expertise: approvedRegistration.expertise || "general",
+        createdAt: new Date().toISOString()
+      });
+      writeConsultants(consultants);
+    }
+  }
+
   response.json(registrations[index]);
 });
 

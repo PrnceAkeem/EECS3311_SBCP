@@ -2,6 +2,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("adminBookingsBody");
   const toastEl = document.getElementById("adminToast");
 
+  const consultantNameInput = document.getElementById("consultantNameInput");
+  const consultantEmailInput = document.getElementById("consultantEmailInput");
+  const consultantExpertiseInput = document.getElementById("consultantExpertiseInput");
+  const addConsultantBtn = document.getElementById("addConsultantBtn");
+  const consultantDirectoryBody = document.getElementById("consultantDirectoryBody");
+
   const registrationTableBody = document.getElementById("registrationTableBody");
 
   const policyCancellationWindow = document.getElementById("policyCancellationWindow");
@@ -44,16 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, "&#39;");
   }
 
-  function formatRef(prefix, value, fallbackId) {
-    const text = String(value || "").trim();
-    if (text) {
-      return text.replace(/^bk_/i, "BK-").replace(/^cu_/i, "CUS-");
-    }
-
-    const n = Number(fallbackId);
+  function formatRef(prefix, rawId) {
+    const n = Number(rawId);
     return Number.isInteger(n)
       ? `${prefix}-${String(n).padStart(3, "0")}`
-      : `${prefix}-${escapeHtml(String(fallbackId || "-"))}`;
+      : `${prefix}-${escapeHtml(String(rawId || "-"))}`;
   }
 
   function getStatusClass(status) {
@@ -78,8 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function createBookingRow(booking) {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${escapeHtml(formatRef("BK", booking.bookingRef, booking.id))}</td>
-      <td>${escapeHtml(formatRef("CUS", booking.customerId, booking.id))}</td>
+      <td>${escapeHtml(formatRef("BK", booking.id))}</td>
+      <td>${escapeHtml(formatRef("CUS", booking.id))}</td>
       <td>${escapeHtml(booking.clientName || "-")}</td>
       <td>${escapeHtml(booking.service || "-")}</td>
       <td>${escapeHtml(booking.consultantName || "-")}</td>
@@ -117,6 +118,79 @@ document.addEventListener("DOMContentLoaded", () => {
       tableBody.innerHTML = `<tr><td colspan="9" class="empty-row">${escapeHtml(error.message || "Failed to load bookings.")}</td></tr>`;
     } finally {
       isRendering = false;
+    }
+  }
+
+  async function loadConsultants() {
+    if (!consultantDirectoryBody) return;
+
+    consultantDirectoryBody.innerHTML = '<tr><td colspan="4" class="empty-row">Loading consultants...</td></tr>';
+    try {
+      const response = await fetch("/api/consultants");
+      if (!response.ok) {
+        throw new Error("Failed to load consultants.");
+      }
+
+      const consultants = await response.json();
+      if (!consultants.length) {
+        consultantDirectoryBody.innerHTML = '<tr><td colspan="4" class="empty-row">No consultants available yet.</td></tr>';
+        return;
+      }
+
+      consultantDirectoryBody.innerHTML = consultants.map((consultant) => {
+        return `
+          <tr>
+            <td>${escapeHtml(consultant.id || "-")}</td>
+            <td>${escapeHtml(consultant.name || "-")}</td>
+            <td>${escapeHtml(consultant.email || "-")}</td>
+            <td>${escapeHtml(consultant.expertise || "general")}</td>
+          </tr>
+        `;
+      }).join("");
+    } catch (error) {
+      consultantDirectoryBody.innerHTML = `<tr><td colspan="4" class="empty-row">${escapeHtml(error.message || "Failed to load consultants.")}</td></tr>`;
+    }
+  }
+
+  async function addConsultant() {
+    const name = consultantNameInput.value.trim();
+    const email = consultantEmailInput.value.trim();
+    const expertise = consultantExpertiseInput.value.trim();
+
+    if (!name) {
+      showToast("Consultant name is required.");
+      return;
+    }
+
+    addConsultantBtn.disabled = true;
+    try {
+      const response = await fetch("/api/consultants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          actor: "admin",
+          name,
+          email,
+          expertise
+        })
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "Failed to add consultant.");
+      }
+
+      consultantNameInput.value = "";
+      consultantEmailInput.value = "";
+      consultantExpertiseInput.value = "";
+      showToast("Consultant added.");
+      await loadConsultants();
+    } catch (error) {
+      showToast(error.message || "Could not add consultant.");
+    } finally {
+      addConsultantBtn.disabled = false;
     }
   }
 
@@ -183,6 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       showToast(`Registration ${status.toLowerCase()}.`);
       await loadRegistrations();
+      await loadConsultants();
     } catch (error) {
       showToast(error.message || "Could not review registration.");
       buttonEl.disabled = false;
@@ -275,6 +350,9 @@ document.addEventListener("DOMContentLoaded", () => {
     await reviewRegistration(registrationId, status, actionButton);
   });
 
+  if (addConsultantBtn) {
+    addConsultantBtn.addEventListener("click", addConsultant);
+  }
   savePoliciesBtn.addEventListener("click", savePolicies);
 
   unsubscribe = window.BookingStore.subscribe(() => {
@@ -286,6 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderBookings();
+  loadConsultants();
   loadRegistrations();
   loadPolicies();
 });
