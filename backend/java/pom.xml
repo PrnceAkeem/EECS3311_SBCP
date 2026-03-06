@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    pom.xml — Maven build descriptor for the Java HTTP backend
+    ============================================================
+
+    HOW THIS FILE WORKS:
+      Maven reads this file to understand how to compile, package, and run
+      the project. Two commands are all you need:
+
+        mvn package          → compiles every .java file and produces
+                               target/synergy-booking-1.0.0.jar
+
+        java -jar target/synergy-booking-1.0.0.jar
+                             → starts the HTTP server on port 8080
+
+    WHY maven-shade-plugin?
+      The Java standard library does not include the PostgreSQL JDBC driver.
+      The shade plugin "shades" (bundles) the driver's classes directly into
+      our output jar so that one jar file is self-contained — no separate
+      classpath flag is needed at runtime.
+
+    DATABASE_URL environment variable:
+      Set this before running the jar so Database.java can connect.
+      Example (matches docker-compose.yml):
+        export DATABASE_URL=postgres://synergy_user:synergy_pass@localhost:5432/synergy
+        java -jar target/synergy-booking-1.0.0.jar
+  -->
+
+  <groupId>ca.eecs3311.synergy</groupId>
+  <artifactId>synergy-booking</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <!-- Compile to Java 17 bytecode — available on any modern JDK -->
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!--
+      postgresql — the official JDBC driver from the PostgreSQL Global
+      Development Group. JDBC (Java Database Connectivity) is the standard
+      Java API for talking to relational databases. Without this jar,
+      DriverManager.getConnection("jdbc:postgresql://...") would throw
+      "No suitable driver found."
+
+      Version 42.7.3 supports PostgreSQL 16 (used in docker-compose.yml).
+    -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.3</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!--
+        maven-shade-plugin:
+          Runs during the "package" phase (after compile).
+          Merges all dependency classes into one "uber-jar" (also called a
+          fat jar or shaded jar).  The ManifestResourceTransformer sets the
+          Main-Class attribute in MANIFEST.MF so Java knows which class to
+          launch when you run "java -jar ...".
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.5.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals><goal>shade</goal></goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <!-- Server is in the default package (no package declaration) -->
+                  <mainClass>Server</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

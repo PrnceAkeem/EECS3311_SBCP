@@ -1,8 +1,46 @@
+// =============================================================================
+// methods.js — Payment Methods management page (methods.html)
+// =============================================================================
+//
+// WHAT THIS FILE DOES:
+//   Handles all user interactions on the "Pay Methods" page.  Every action
+//   (load, add, remove) makes an HTTP request to the Java backend, which
+//   persists data in the PostgreSQL payment_methods table.
+//
+// HOW HTTP REQUESTS + JSON PARSING WORK HERE:
+//
+//   We use the browser's fetch() API to send HTTP requests.  fetch() always
+//   returns a Promise, so every network call is asynchronous (async/await).
+//   The Java server responds with JSON text; response.json() parses that text
+//   into a JavaScript object automatically.
+//
+//   ┌─────────────────────────────────────────────────────────────────────┐
+//   │  JS fetch()  →  HTTP request  →  Java handler  →  JDBC  →  SQL DB  │
+//   │  JS result   ←  HTTP response  ←  JSON string  ←  ResultSet rows   │
+//   └─────────────────────────────────────────────────────────────────────┘
+//
+// THREE OPERATIONS:
+//   GET  /api/payment-methods         → load and render the table
+//   POST /api/payment-methods         → save a new method, refresh table
+//   DELETE /api/payment-methods/:id   → remove a method, refresh table
+//
+// NOTE ON RELATIVE vs ABSOLUTE URLs:
+//   methods.html loads ONLY this script (bookings-data.js is not loaded here).
+//   We therefore define API_BASE directly in this file.
+//   All fetch() calls use API_BASE + path (absolute URL), NOT relative paths.
+//   Relative paths like "/api/..." would resolve against the file server that
+//   serves the HTML — not the Java backend — and would fail with 404.
+//
+// =============================================================================
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Interaction map:
-  // - This page owns payment method CRUD against backend /api/payment-methods.
-  // - booking.js reads these saved methods during the client payment modal flow.
-  // DOM references
+
+  // ── Base URL for the Java HTTP backend ────────────────────────────────────
+  // All fetch() calls in this file target this origin.
+  // Must match the port in Server.java (PORT = 8080).
+  const API_BASE = "http://localhost:8080";
+
+  // ── DOM references ────────────────────────────────────────────────────────
   const tableBody  = document.getElementById("methodsTableBody");
   const openBtn    = document.getElementById("openAddMethodBtn");
   const modal      = document.getElementById("addMethodModal");
@@ -10,12 +48,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const typeSelect = document.getElementById("methodTypeSelect");
   const ccFields   = document.getElementById("ccFields");
   const btFields   = document.getElementById("btFields");
-  const itFields   = document.getElementById("itFields");   // Interac e-Transfer
+  const itFields   = document.getElementById("itFields");
   const saveBtn    = document.getElementById("saveMethodBtn");
   const errorMsg   = document.getElementById("addMethodError");
 
-  // Utilities
+  // ── Utilities ─────────────────────────────────────────────────────────────
 
+  /** Escapes special HTML characters to prevent XSS when inserting user data. */
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, "&amp;")
@@ -25,6 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/'/g, "&#39;");
   }
 
+  /** Formats an ISO-8601 date string into a locale-friendly YYYY-MM-DD date. */
   function formatDate(isoString) {
     const d = new Date(isoString);
     if (isNaN(d)) return "-";
@@ -41,26 +81,63 @@ document.addEventListener("DOMContentLoaded", () => {
     errorMsg.style.display = "none";
   }
 
-  // Load and render the payment methods table
+  // ==========================================================================
+  // LOAD — GET /api/payment-methods
+  // ==========================================================================
+  //
+  // HTTP flow:
+  //   fetch(API_BASE + "/api/payment-methods")
+  //   → Java GetPaymentMethodsHandler.handle()
+  //   → new PaymentMethodStore().getAllMethodsJson()
+  //   → SQL: SELECT id, type, label, created_at FROM payment_methods ORDER BY created_at DESC
+  //   → Java hand-builds a JSON array string and writes it to the response body
+  //   → response.json() parses "[{...},{...}]" into a JS array
+  //   → renderTable(methods) stamps each object into a <tr>
+  //
+  // ==========================================================================
 
   async function loadMethods() {
-    tableBody.innerHTML = '<tr><td colspan="4" class="empty-bookings">Loading&hellip;</td></tr>';
+    tableBody.innerHTML =
+      '<tr><td colspan="4" class="empty-bookings">Loading&hellip;</td></tr>';
+
     try {
-      const response = await fetch("/api/payment-methods");
-      const methods  = await response.json();
+      // fetch() sends a GET request; the Java server responds with JSON
+      const response = await fetch(API_BASE + "/api/payment-methods");
+
+      if (!response.ok) {
+        // Non-2xx status: try to read the error message the server sent
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || `Server error ${response.status}`);
+      }
+
+      // response.json() reads the response body text and parses it as JSON.
+      // The result is a JS array: [{ id, type, label, createdAt }, ...]
+      const methods = await response.json();
       renderTable(methods);
-    } catch {
-      tableBody.innerHTML = '<tr><td colspan="4" class="empty-bookings">Failed to load payment methods.</td></tr>';
+
+    } catch (err) {
+      tableBody.innerHTML =
+        `<tr><td colspan="4" class="empty-bookings">
+           Failed to load payment methods: ${escapeHtml(err.message)}
+         </td></tr>`;
     }
   }
 
+  // ==========================================================================
+  // RENDER — builds the table rows from the JS array returned by the server
+  // ==========================================================================
+
   function renderTable(methods) {
-    // Full replacement — no appending, so no risk of duplicates
+    // Full replacement — no appending, so no risk of duplicate rows
     if (!methods.length) {
-      tableBody.innerHTML = '<tr><td colspan="4" class="empty-bookings">No payment methods saved yet. Add one below.</td></tr>';
+      tableBody.innerHTML =
+        '<tr><td colspan="4" class="empty-bookings">' +
+        'No payment methods saved yet. Add one below.</td></tr>';
       return;
     }
 
+    // Each object in the array has: { id, type, label, createdAt }
+    // The Java PaymentMethod.toJson() serialises these fields.
     tableBody.innerHTML = methods.map((m) => `
       <tr>
         <td>${escapeHtml(m.type)}</td>
@@ -76,7 +153,19 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
-  // Delete a saved method
+  // ==========================================================================
+  // DELETE — DELETE /api/payment-methods/:id
+  // ==========================================================================
+  //
+  // HTTP flow:
+  //   fetch(API_BASE + "/api/payment-methods/" + id, { method: "DELETE" })
+  //   → Java DeletePaymentMethodHandler.handle()
+  //   → URL pattern extracts the id segment
+  //   → new PaymentMethodStore().deleteMethod(id)
+  //   → SQL: DELETE FROM payment_methods WHERE id = ?
+  //   → Java returns 204 No Content (no body) on success
+  //
+  // ==========================================================================
 
   tableBody.addEventListener("click", async (event) => {
     const btn = event.target.closest('button[data-action="delete"]');
@@ -87,28 +176,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btn.disabled = true;
     try {
-      const response = await fetch(`/api/payment-methods/${encodeURIComponent(methodId)}`, {
-        method: "DELETE"
-      });
-      // 204 No Content is the success response from the server
+      // encodeURIComponent handles IDs that contain special characters
+      const response = await fetch(
+        API_BASE + "/api/payment-methods/" + encodeURIComponent(methodId),
+        { method: "DELETE" }
+      );
+
+      // 204 No Content is the success response (no body to parse)
+      // 404 means the id does not exist in the DB
       if (!response.ok && response.status !== 204) {
-        throw new Error("Failed to remove payment method.");
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || `Server error ${response.status}`);
       }
-      loadMethods(); // refresh the table
+
+      loadMethods(); // re-fetch and re-render the updated list
+
     } catch (error) {
       alert(error.message || "Could not remove payment method.");
       btn.disabled = false;
     }
   });
 
-  // Modal open / close
+  // ── Modal open / close ────────────────────────────────────────────────────
 
   function openModal() {
     // Reset all fields and hide sub-sections before showing the modal
-    typeSelect.value = "";
-    ccFields.style.display = "none";
-    btFields.style.display = "none";
-    itFields.style.display = "none";
+    typeSelect.value           = "";
+    ccFields.style.display     = "none";
+    btFields.style.display     = "none";
+    itFields.style.display     = "none";
     document.getElementById("ccName").value  = "";
     document.getElementById("ccLast4").value = "";
     document.getElementById("btBank").value  = "";
@@ -128,19 +224,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) closeModal(); // backdrop click closes modal
   });
 
-  // Show the right sub-fields whenever the type dropdown changes
+  // Show the right sub-fields when the type dropdown changes
   typeSelect.addEventListener("change", () => {
-    ccFields.style.display = typeSelect.value === "Credit Card"  ? "block" : "none";
-    btFields.style.display = typeSelect.value === "Bank Transfer" ? "block" : "none";
+    ccFields.style.display = typeSelect.value === "Credit Card"        ? "block" : "none";
+    btFields.style.display = typeSelect.value === "Bank Transfer"      ? "block" : "none";
     itFields.style.display = typeSelect.value === "Interac e-Transfer" ? "block" : "none";
     clearError();
   });
 
-  // Save a new payment method
+  // ==========================================================================
+  // SAVE — POST /api/payment-methods
+  // ==========================================================================
+  //
+  // HTTP flow:
+  //   fetch(API_BASE + "/api/payment-methods", { method: "POST", body: JSON })
+  //   → Java PostPaymentMethodHandler.handle()
+  //   → reads body, calls parseField("type") and parseField("label")
+  //   → generates id = "pm_" + System.currentTimeMillis()
+  //   → new PaymentMethodStore().addMethod(id, type, label)
+  //   → SQL: INSERT INTO payment_methods (id, type, label)
+  //          VALUES (?, ?, ?) RETURNING id, type, label, created_at
+  //   → Java returns the inserted row as JSON (status 201 Created)
+  //   → JS closes the modal and re-fetches the table to show the new row
   //
   // We build a human-readable "label" from the form inputs and POST
-  // { type, label } to the backend. No real card numbers or credentials
+  // { type, label } to the backend.  No real card numbers or credentials
   // are stored — this is a simulation for demo/grading purposes.
+  //
+  // ==========================================================================
 
   saveBtn.addEventListener("click", async () => {
     clearError();
@@ -151,6 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // Build the label string from whichever sub-fields are visible
     let label = "";
 
     if (type === "Credit Card") {
@@ -176,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
       label = `${bank} (${nick})`;
 
     } else if (type === "Interac e-Transfer") {
-      // Interac only needs a registered email address
       const email = document.getElementById("itEmail").value.trim();
       if (!email) {
         showError("Please enter your Interac email address.");
@@ -187,17 +298,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveBtn.disabled = true;
     try {
-      const response = await fetch("/api/payment-methods", {
-        method: "POST",
+      // Send { type, label } as a JSON body.
+      // The Java handler generates the id ("pm_<epochMs>") server-side.
+      const response = await fetch(API_BASE + "/api/payment-methods", {
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, label })
+        body:    JSON.stringify({ type, label })
       });
+
       if (!response.ok) {
+        // Parse the { "error": "..." } object the Java handler sends on failure
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload.error || "Failed to save payment method.");
       }
+
+      // response.json() parses the 201-Created body: the newly inserted row
+      // { id, type, label, createdAt } — we don't need it here, just refresh
+      await response.json();
+
       closeModal();
-      loadMethods(); // refresh the table to show the new entry
+      loadMethods(); // re-fetch and re-render to show the new row
+
     } catch (error) {
       showError(error.message || "Could not save payment method.");
     } finally {
@@ -205,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Load the table on page load
+  // ── Initial page load ─────────────────────────────────────────────────────
+  // Fetch and render the current list of saved payment methods from the DB.
   loadMethods();
 });

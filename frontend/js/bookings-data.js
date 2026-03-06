@@ -1,9 +1,13 @@
 (function () {
   // Interaction map:
   // - client.js/admin.js/consultant.js/booking.js call into BookingStore.
-  // - BookingStore talks to server.js REST + SSE endpoints.
-  // - server.js validates transitions using the backend State Pattern.
-  // - server.js applies Strategy/Observer/Factory behaviors as needed.
+  // - BookingStore talks to the Java backend REST + SSE endpoints (port 8080).
+  // - Java backend validates transitions using the State Pattern.
+  // - Java backend applies Strategy/Observer/Factory behaviors as needed.
+
+  // Base URL for the Java backend. All API requests are sent here.
+  const API_BASE = "http://localhost:8080";
+
   const VALID_STATUSES = new Set([
     "Requested",
     "Confirmed",
@@ -39,7 +43,7 @@
   }
 
   async function apiRequest(path, options) {
-    const response = await fetch(path, {
+    const response = await fetch(API_BASE + path, {
       headers: {
         "Content-Type": "application/json"
       },
@@ -72,15 +76,44 @@
     return "Requested";
   }
 
+  // ==========================================================================
+  // Booking API — reads and writes the in-memory BookingStore on the Java server
+  // ==========================================================================
+
   async function getBookings() {
+    // HTTP GET → Java GetBookingsHandler → BookingStore.getAllBookingsJson()
+    // Returns a JSON array of booking objects; JS parses it with response.json()
     return apiRequest("/api/bookings");
   }
 
   async function addBooking(bookingData) {
+    // HTTP POST with JSON body → Java PostBookingHandler → BookingStore.addBooking()
+    // Also triggers the Observer pattern (email/SMS/push notifications logged to console)
     return apiRequest("/api/bookings", {
       method: "POST",
       body: JSON.stringify(bookingData || {})
     });
+  }
+
+  // ==========================================================================
+  // Payment-method API — reads and writes the payment_methods PostgreSQL table
+  // ==========================================================================
+
+  /**
+   * Fetches all saved payment methods from the Java backend.
+   *
+   * HTTP flow:
+   *   fetch(API_BASE + "/api/payment-methods")    ← GET request
+   *   → Java GetPaymentMethodsHandler             ← routes the request
+   *   → PaymentMethodStore.getAllMethodsJson()     ← runs SELECT query via JDBC
+   *   → PostgreSQL payment_methods table          ← returns rows
+   *   → Java serialises rows to JSON array        ← sends 200 response
+   *   → JS response.json() parses the array       ← used by the payment modal
+   *
+   * Consumed by: booking.js (payment modal) and methods.js (table render)
+   */
+  async function getPaymentMethods() {
+    return apiRequest("/api/payment-methods");
   }
 
   // metadata is optional and currently used by booking.js when client pays.
@@ -92,14 +125,12 @@
     };
 
     if (metadata && typeof metadata === "object") {
+      // Java backend (ApiHandler.java) reads "methodId" and "methodType"
       if (metadata.paymentMethodId) {
-        payload.paymentMethodId = metadata.paymentMethodId;
+        payload.methodId = metadata.paymentMethodId;
       }
       if (metadata.paymentMethodType) {
-        payload.paymentMethodType = metadata.paymentMethodType;
-      }
-      if (metadata.paymentMethodLabel) {
-        payload.paymentMethodLabel = metadata.paymentMethodLabel;
+        payload.methodType = metadata.paymentMethodType;
       }
     }
 
@@ -124,7 +155,7 @@
       };
     }
 
-    const stream = new EventSource("/api/bookings/stream");
+    const stream = new EventSource(API_BASE + "/api/bookings/stream");
 
     stream.addEventListener("booking", (event) => {
       try {
@@ -145,10 +176,11 @@
   }
 
   window.BookingStore = {
-    getBookings: getBookings,
-    addBooking: addBooking,
+    getBookings:         getBookings,
+    addBooking:          addBooking,
     updateBookingStatus: updateBookingStatus,
-    subscribe: subscribe,
-    canTransition: canTransition
+    getPaymentMethods:   getPaymentMethods,   // used by booking.js payment modal
+    subscribe:           subscribe,
+    canTransition:       canTransition
   };
 })();

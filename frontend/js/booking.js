@@ -200,17 +200,28 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("click", (e) => { if (e.target === modal) closePaymentModal(); });
     document.getElementById("payModalClose").addEventListener("click", closePaymentModal);
 
-    // Fetch saved methods — check modalId before touching the DOM so stale
-    // responses from a previously closed modal do nothing.
-    fetch("/api/payment-methods")
-      .then((r) => r.json())
+    // Fetch saved payment methods from the Java backend via HTTP.
+    //
+    // HTTP flow:
+    //   window.BookingStore.getPaymentMethods()
+    //   → fetch("http://localhost:8080/api/payment-methods")   [GET]
+    //   → Java GetPaymentMethodsHandler
+    //   → PaymentMethodStore.getAllMethodsJson()  (JDBC SELECT)
+    //   → PostgreSQL payment_methods table
+    //   → Java returns JSON array
+    //   → JS response.json() parses it
+    //   → renderMethodList() populates the radio list in the modal
+    //
+    // The modalId guard drops the response if the user closed this modal
+    // before the fetch completed (prevents stale DOM updates).
+    window.BookingStore.getPaymentMethods()
       .then((methods) => {
-        if (modalId !== currentModalId) return; // this modal was closed already
+        if (modalId !== currentModalId) return; // modal already closed
         renderMethodList(bookingId, methods);
       })
       .catch(() => {
         if (modalId !== currentModalId) return;
-        renderMethodList(bookingId, []);
+        renderMethodList(bookingId, []); // fallback: show "no methods" UI
       });
   }
 
@@ -297,10 +308,8 @@ document.addEventListener("DOMContentLoaded", () => {
             paymentMethodLabel: method.label
           }
         );
-        const txnId =
-          updatedBooking && updatedBooking.payment
-            ? updatedBooking.payment.transactionId
-            : "";
+        // Java BookingStore.Booking.toJson() returns transactionId as a top-level field
+        const txnId = updatedBooking ? (updatedBooking.transactionId || "") : "";
 
         body.innerHTML = `
           <div class="pay-success">

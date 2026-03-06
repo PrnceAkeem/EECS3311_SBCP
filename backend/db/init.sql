@@ -69,3 +69,18 @@ CREATE TABLE IF NOT EXISTS bank_transfer_payments (
   routing_number TEXT NOT NULL,
   FOREIGN KEY (payment_id) REFERENCES payments(payment_id)
 );
+
+
+-- SAVED PAYMENT METHODS (client's wallet — stored per user session)
+-- This table is the persistence layer for the "Pay Methods" page.
+-- The Java PaymentMethodStore reads/writes here via JDBC.
+-- Unlike the payments table (which records completed transactions),
+-- this table stores the client's saved cards/accounts for future use.
+CREATE TABLE IF NOT EXISTS payment_methods (
+  id          TEXT        PRIMARY KEY,          -- "pm_<epoch-ms>" generated at insert time
+  type        TEXT        NOT NULL,             -- "Credit Card" | "Bank Transfer" | "PayPal" | "Interac e-Transfer"
+  label       TEXT        NOT NULL,             -- human-readable: "Alice - ending in 4242"
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_payment_methods_created_at ON payment_methods(created_at DESC);
