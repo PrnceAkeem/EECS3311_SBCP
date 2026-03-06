@@ -36,5 +36,43 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # ── Java HTTP backend (port 8080) ──────────────────────────────────────────
+  # Serves all /api/* endpoints that the frontend JS fetches from
+  # http://localhost:8080.  Built from backend/java/Dockerfile using a
+  # multi-stage Maven build → slim JRE image.
+  #
+  # HOW IT CONNECTS TO POSTGRES:
+  #   DATABASE_URL is parsed by db/Database.java at class-load time.
+  #   The hostname "db" resolves to the postgres container because Docker
+  #   Compose puts all services on a shared network by default.
+  #
+  # WHY depends_on with service_healthy?
+  #   The Java server tries to open a JDBC connection on the first
+  #   payment-methods request. If PostgreSQL is not ready yet, that
+  #   request would fail. The healthcheck guarantees pg_isready passes
+  #   before Docker starts this container.
+  java-api:
+    build:
+      # Build context is the repo root so the Dockerfile can COPY
+      # backend/java/pom.xml and backend/java/src using paths relative
+      # to the root (matching the COPY instructions in backend/java/Dockerfile).
+      context: .
+      dockerfile: backend/java/Dockerfile
+    container_name: synergy-java-api
+    environment:
+      # Passed to System.getenv("DATABASE_URL") in db/Database.java.
+      # "db" is the Docker Compose service name for PostgreSQL; Docker's
+      # internal DNS resolves it to the postgres container's IP address.
+      DATABASE_URL: postgres://synergy_user:synergy_pass@db:5432/synergy
+    ports:
+      # Map host port 8080 → container port 8080.
+      # Frontend JS files call http://localhost:8080/api/... — that traffic
+      # reaches this container via this port mapping.
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   postgres_data:

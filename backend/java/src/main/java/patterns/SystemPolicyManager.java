@@ -1,7 +1,7 @@
 package patterns;
 
 // =============================================================================
-// Singleton.java — GoF Singleton Pattern (System Policy Manager)
+// SystemPolicyManager.java — GoF Singleton Pattern
 // =============================================================================
 //
 // WHAT IS THE SINGLETON PATTERN?
@@ -11,19 +11,12 @@ package patterns;
 // HOW IT WORKS HERE:
 //   - SystemPolicyManager holds platform-wide policies (cancellation window,
 //     refund policy) that apply uniformly across all bookings.
-//   - server.js uses getInstance() whenever it needs to read or write policies.
+//   - Server.java uses getInstance() at startup to demonstrate the pattern.
 //   - Admin users call setCancellationWindowHours() and setRefundPolicy()
 //     through the service layer (UC12: Define System Policies).
-//   - BookingService and ConsultantService read policies via getInstance()
-//     without needing the object passed in as a dependency.
 //
-// CLASSES IN THIS FILE:
-//   SystemPolicyManager – the single Singleton class
-//
-// =============================================================================
-
-// =============================================================================
-// SystemPolicyManager — Platform-wide policy store (Singleton)
+// Public because Server.java calls SystemPolicyManager.getInstance().
+// Must be in its own file (Java: one public class per file).
 // =============================================================================
 public class SystemPolicyManager {
 
