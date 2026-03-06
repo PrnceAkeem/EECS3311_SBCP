@@ -32,7 +32,7 @@
   <main class="page-shell">
     <div class="heading">
       <h1>Payment Methods</h1>
-      <h2>Manage your saved payment options</h2>
+      <h2>Add, edit, and remove saved payment methods</h2>
     </div>
   </main>
 
@@ -58,13 +58,12 @@
     <button type="button" class="action-btn" id="openAddMethodBtn">+ Add Payment Method</button>
   </div>
 
-  <!-- Add Payment Method Modal -->
   <div class="pay-modal-overlay" id="addMethodModal" style="display:none;">
     <div class="pay-modal">
       <button type="button" class="pay-modal-close" id="addMethodClose" aria-label="Close">&#x2715;</button>
       <div class="pay-modal-header">
         <h2>Add Payment Method</h2>
-        <p class="pay-modal-sub">Your details are stored locally — no real charges occur.</p>
+        <p class="pay-modal-sub">Simulated storage only. No real charges occur.</p>
       </div>
 
       <div class="pay-modal-body">
@@ -80,34 +79,44 @@
             </select>
           </label>
 
-          <!-- Credit Card and Debit Card share the same fields -->
           <div id="cardFields" style="display:none;">
             <label class="form-label">
               Cardholder Name
-              <input type="text" id="cardName" class="form-input" placeholder="e.g. Prince Akeem" maxlength="60" />
+              <input type="text" id="cardName" class="form-input" maxlength="60" placeholder="e.g. Prince Akeem" />
             </label>
             <label class="form-label">
-              Last 4 Digits
-              <input type="text" id="cardLast4" class="form-input" placeholder="e.g. 4242" maxlength="4" />
+              Card Number (16 digits)
+              <input type="text" id="cardNumber" class="form-input" maxlength="19" placeholder="1111 2222 3333 4444" />
+            </label>
+            <label class="form-label">
+              Expiry (MM/YY)
+              <input type="text" id="cardExpiry" class="form-input" maxlength="5" placeholder="08/30" />
+            </label>
+            <label class="form-label">
+              CVV (3-4 digits)
+              <input type="text" id="cardCvv" class="form-input" maxlength="4" placeholder="123" />
             </label>
           </div>
 
           <div id="btFields" style="display:none;">
             <label class="form-label">
               Bank Name
-              <input type="text" id="btBank" class="form-input" placeholder="e.g. TD Bank" maxlength="60" />
+              <input type="text" id="btBank" class="form-input" maxlength="60" placeholder="e.g. TD Bank" />
             </label>
             <label class="form-label">
-              Account Nickname
-              <input type="text" id="btNick" class="form-input" placeholder="e.g. Chequing" maxlength="40" />
+              Account Number
+              <input type="text" id="btAccount" class="form-input" maxlength="17" placeholder="6-17 digits" />
+            </label>
+            <label class="form-label">
+              Routing Number (9 digits)
+              <input type="text" id="btRouting" class="form-input" maxlength="9" placeholder="123456789" />
             </label>
           </div>
 
-          <!-- PayPal only needs a registered email address -->
           <div id="ppFields" style="display:none;">
             <label class="form-label">
               PayPal Email
-              <input type="email" id="ppEmail" class="form-input" placeholder="e.g. you@paypal.com" maxlength="80" />
+              <input type="email" id="ppEmail" class="form-input" maxlength="80" placeholder="you@paypal.com" />
             </label>
           </div>
 

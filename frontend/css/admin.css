@@ -84,3 +84,28 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+.section-card {
+  margin-bottom: 1rem;
+}
+
+.section-card h2 {
+  margin-bottom: 0.9rem;
+  font-size: 1.15rem;
+}
+
+.inline-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.7rem;
+  align-items: end;
+}
+
+.inline-form-grid .action-btn {
+  height: 40px;
+}
+
+.compact-wrap {
+  width: 100%;
+  margin: 0;
+}

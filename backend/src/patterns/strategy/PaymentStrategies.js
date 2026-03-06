@@ -4,16 +4,24 @@
 // - server.js calls PaymentStrategyFactory.create(methodType) when a booking
 //   moves to "Paid" status.
 // - The factory returns the right concrete strategy for the payment type.
-// - The strategy's process() validates the details and returns a transaction ID.
-// - server.js includes that transaction ID in the PATCH response so the frontend
-//   can display it to the client.
-//
-// Supported types (must match frontend dropdowns + ALLOWED_METHOD_TYPES in server.js):
-//   Credit Card, Debit Card, Bank Transfer, PayPal
+// - The strategy validates method-specific details and returns a transaction ID.
 
-// ---------------------------------------------------------------------------
-// Base strategy — all concrete strategies extend this
-// ---------------------------------------------------------------------------
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
+function isFutureExpiry(expiryText) {
+  const match = String(expiryText || "").trim().match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+  if (!match) {
+    return false;
+  }
+
+  const expiryMonth = Number(match[1]);
+  const expiryYear = 2000 + Number(match[2]);
+  const expiryDate = new Date(expiryYear, expiryMonth, 0, 23, 59, 59, 999);
+  return expiryDate.getTime() >= Date.now();
+}
+
 class PaymentStrategy {
   process(_amount, _details) {
     throw new Error("process() must be implemented by a concrete strategy.");
@@ -23,21 +31,26 @@ class PaymentStrategy {
     return true;
   }
 
-  // Generates a unique simulated transaction ID with a type prefix.
-  // e.g. CC-1234567890-ABC123
   buildTransactionId(prefix) {
-    const timePart   = Date.now().toString().slice(-6);
+    const timePart = Date.now().toString().slice(-6);
     const randomPart = Math.random().toString(36).slice(2, 8).toUpperCase();
     return `${prefix}-${timePart}-${randomPart}`;
   }
 }
 
-// ---------------------------------------------------------------------------
-// Credit Card — requires a saved method with type "Credit Card"
-// ---------------------------------------------------------------------------
 class CreditCardPayment extends PaymentStrategy {
   validate(details) {
-    return Boolean(details && details.methodId && details.methodType === "Credit Card");
+    const methodDetails = details?.details || {};
+    const cardNumber = String(methodDetails.cardNumber || "").replace(/\D/g, "");
+    const cvv = String(methodDetails.cvv || "").replace(/\D/g, "");
+    return Boolean(
+      details &&
+      details.methodId &&
+      details.methodType === "Credit Card" &&
+      /^\d{16}$/.test(cardNumber) &&
+      isFutureExpiry(methodDetails.expiry) &&
+      /^\d{3,4}$/.test(cvv)
+    );
   }
 
   process(amount, details) {
@@ -52,12 +65,19 @@ class CreditCardPayment extends PaymentStrategy {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Debit Card — same validation shape as Credit Card, different prefix
-// ---------------------------------------------------------------------------
 class DebitCardPayment extends PaymentStrategy {
   validate(details) {
-    return Boolean(details && details.methodId && details.methodType === "Debit Card");
+    const methodDetails = details?.details || {};
+    const cardNumber = String(methodDetails.cardNumber || "").replace(/\D/g, "");
+    const cvv = String(methodDetails.cvv || "").replace(/\D/g, "");
+    return Boolean(
+      details &&
+      details.methodId &&
+      details.methodType === "Debit Card" &&
+      /^\d{16}$/.test(cardNumber) &&
+      isFutureExpiry(methodDetails.expiry) &&
+      /^\d{3,4}$/.test(cvv)
+    );
   }
 
   process(amount, details) {
@@ -72,12 +92,18 @@ class DebitCardPayment extends PaymentStrategy {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Bank Transfer — initiated as a transfer, slightly longer simulated delay
-// ---------------------------------------------------------------------------
 class BankTransferPayment extends PaymentStrategy {
   validate(details) {
-    return Boolean(details && details.methodId && details.methodType === "Bank Transfer");
+    const methodDetails = details?.details || {};
+    const accountNumber = String(methodDetails.accountNumber || "").replace(/\D/g, "");
+    const routingNumber = String(methodDetails.routingNumber || "").replace(/\D/g, "");
+    return Boolean(
+      details &&
+      details.methodId &&
+      details.methodType === "Bank Transfer" &&
+      /^\d{6,17}$/.test(accountNumber) &&
+      /^\d{9}$/.test(routingNumber)
+    );
   }
 
   process(amount, details) {
@@ -92,12 +118,15 @@ class BankTransferPayment extends PaymentStrategy {
   }
 }
 
-// ---------------------------------------------------------------------------
-// PayPal — requires a saved PayPal method (email-based)
-// ---------------------------------------------------------------------------
 class PayPalPayment extends PaymentStrategy {
   validate(details) {
-    return Boolean(details && details.methodId && details.methodType === "PayPal");
+    const methodDetails = details?.details || {};
+    return Boolean(
+      details &&
+      details.methodId &&
+      details.methodType === "PayPal" &&
+      isValidEmail(methodDetails.paypalEmail)
+    );
   }
 
   process(amount, details) {
@@ -112,15 +141,12 @@ class PayPalPayment extends PaymentStrategy {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Factory — picks the right strategy based on payment method type string
-// ---------------------------------------------------------------------------
 class PaymentStrategyFactory {
   static create(methodType) {
-    if (methodType === "Credit Card")   return new CreditCardPayment();
-    if (methodType === "Debit Card")    return new DebitCardPayment();
+    if (methodType === "Credit Card") return new CreditCardPayment();
+    if (methodType === "Debit Card") return new DebitCardPayment();
     if (methodType === "Bank Transfer") return new BankTransferPayment();
-    if (methodType === "PayPal")        return new PayPalPayment();
+    if (methodType === "PayPal") return new PayPalPayment();
     throw new Error(`Unsupported payment method type: ${methodType}`);
   }
 }

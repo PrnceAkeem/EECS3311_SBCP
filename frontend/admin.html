@@ -25,10 +25,56 @@
   <main class="management-page">
     <div class="page-head">
       <h1>Admin Dashboard</h1>
-      <p class="page-subtitle">Review and update all booking requests.</p>
+      <p class="page-subtitle">Approve consultants, define policies, and monitor bookings.</p>
     </div>
 
-    <div class="table-card">
+    <section class="table-card section-card">
+      <h2>UC11: Consultant Registration Approvals</h2>
+      <div class="table-wrap compact-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Registration ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Expertise</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="registrationTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>UC12: System Policies</h2>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Cancellation Window (hours)
+          <input id="policyCancellationWindow" class="input-field" type="number" min="0" max="168" />
+        </label>
+        <label class="form-label">
+          Pricing Multiplier
+          <input id="policyPricingMultiplier" class="input-field" type="number" min="0.1" max="5" step="0.01" />
+        </label>
+        <label class="form-label">
+          Notifications Enabled
+          <select id="policyNotificationsEnabled" class="input-field">
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </select>
+        </label>
+        <label class="form-label">
+          Refund Policy
+          <input id="policyRefundPolicy" class="input-field" type="text" maxlength="300" />
+        </label>
+        <button type="button" id="savePoliciesBtn" class="action-btn">Save Policies</button>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>Booking Lifecycle Oversight</h2>
       <table>
         <thead>
           <tr>
@@ -45,7 +91,7 @@
         </thead>
         <tbody id="adminBookingsBody"></tbody>
       </table>
-    </div>
+    </section>
   </main>
 
   <div id="adminToast" class="toast" aria-live="polite"></div>

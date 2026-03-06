@@ -25,10 +25,66 @@
   <main class="management-page">
     <div class="page-head">
       <h1>Consultant Dashboard</h1>
-      <p class="page-subtitle">Manage your assigned booking requests.</p>
+      <p class="page-subtitle">Manage availability and booking requests.</p>
     </div>
 
-    <div class="table-card">
+    <section class="table-card section-card">
+      <h2>UC8: Manage Availability</h2>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Consultant Name
+          <input id="availabilityConsultantName" class="input-field" type="text" value="John Smith" maxlength="80" />
+        </label>
+        <label class="form-label">
+          Date
+          <input id="availabilityDate" class="input-field" type="date" />
+        </label>
+        <label class="form-label">
+          Time (e.g. 10:00 AM)
+          <input id="availabilityTime" class="input-field" type="text" placeholder="10:00 AM" maxlength="8" />
+        </label>
+        <button type="button" id="addAvailabilityBtn" class="action-btn">Add Slot</button>
+      </div>
+
+      <div class="table-wrap compact-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Consultant</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="availabilityTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>Consultant Registration Request</h2>
+      <p class="page-subtitle">Use this to submit a registration request for admin approval.</p>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Full Name
+          <input id="registrationName" class="input-field" type="text" maxlength="80" placeholder="Jane Doe" />
+        </label>
+        <label class="form-label">
+          Email
+          <input id="registrationEmail" class="input-field" type="email" maxlength="120" placeholder="jane@example.com" />
+        </label>
+        <label class="form-label">
+          Expertise
+          <input id="registrationExpertise" class="input-field" type="text" maxlength="120" placeholder="Cloud migration" />
+        </label>
+        <button type="button" id="submitRegistrationBtn" class="action-btn">Submit Registration</button>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>UC9/UC10: Booking Lifecycle Management</h2>
       <table>
         <thead>
           <tr>
@@ -45,7 +101,7 @@
         </thead>
         <tbody id="consultantBookingsBody"></tbody>
       </table>
-    </div>
+    </section>
   </main>
 
   <div id="consultantToast" class="toast" aria-live="polite"></div>

@@ -1,11 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Consultant page role:
-  // - reads all bookings from BookingStore (REST)
-  // - transitions booking statuses via BookingStore (PATCH)
-  // - stays in sync via BookingStore.subscribe (SSE)
   const tableBody = document.getElementById("consultantBookingsBody");
   const toastEl = document.getElementById("consultantToast");
-  // All possible statuses — "Pending Payment" added to match the State Pattern.
+
+  const availabilityConsultantName = document.getElementById("availabilityConsultantName");
+  const availabilityDate = document.getElementById("availabilityDate");
+  const availabilityTime = document.getElementById("availabilityTime");
+  const addAvailabilityBtn = document.getElementById("addAvailabilityBtn");
+  const availabilityTableBody = document.getElementById("availabilityTableBody");
+
+  const registrationName = document.getElementById("registrationName");
+  const registrationEmail = document.getElementById("registrationEmail");
+  const registrationExpertise = document.getElementById("registrationExpertise");
+  const submitRegistrationBtn = document.getElementById("submitRegistrationBtn");
+
   const STATUS_OPTIONS = [
     "Requested",
     "Confirmed",
@@ -15,12 +22,17 @@ document.addEventListener("DOMContentLoaded", () => {
     "Paid",
     "Completed"
   ];
+
   let unsubscribe = null;
   let isRendering = false;
   let toastTimer = null;
 
   if (!tableBody || !window.BookingStore) {
     return;
+  }
+
+  if (availabilityDate) {
+    availabilityDate.min = new Date().toISOString().split("T")[0];
   }
 
   function showToast(message) {
@@ -30,68 +42,66 @@ document.addEventListener("DOMContentLoaded", () => {
     toastTimer = setTimeout(() => toastEl.classList.remove("toast-visible"), 3000);
   }
 
-  // Formats a raw SERIAL integer as BK-001 / CUS-001 — matches booking.html convention.
-  function formatId(prefix, rawId) {
-    const n = Number(rawId);
-    return Number.isInteger(n) ? `${prefix}-${String(n).padStart(3, "0")}` : `${prefix}-${rawId}`;
-  }
-
-  function getStatusClass(status) {
-    if (status === "Pending Payment") {
-      return "status-pending";
-    }
-    if (status === "Confirmed") {
-      return "status-confirmed";
-    }
-    if (status === "Rejected") {
-      return "status-rejected";
-    }
-    if (status === "Paid") {
-      return "status-paid";
-    }
-    if (status === "Completed") {
-      return "status-completed";
-    }
-    if (status === "Cancelled") {
-      return "status-cancelled";
-    }
-    return "status-requested";
-  }
-
-  function createEmptyRow() {
-    const row = document.createElement("tr");
-    row.innerHTML = '<td colspan="9" class="empty-row">No bookings are available yet.</td>';
-    return row;
-  }
-
-  function createStatusOptions(selectedStatus) {
-    // Show every possible status but disable the ones that are not valid
-    // transitions from the current status. The current status is always shown
-    // as selected and enabled (can't change away from it without picking a
-    // valid next status). This mirrors the State Pattern on the backend.
-    return STATUS_OPTIONS.map((status) => {
-      const isSelected = selectedStatus === status;
-      const canMove = window.BookingStore && window.BookingStore.canTransition(selectedStatus, status);
-      // Keep the option visible but disabled so it's clear the path is blocked
-      const isEnabled = isSelected || canMove;
-      return `<option value="${status}" ${isSelected ? "selected" : ""} ${isEnabled ? "" : "disabled"}>${status}</option>`;
-    }).join("");
-  }
-
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
+      .replace(/\"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function normalizeTime(value) {
+    const raw = String(value || "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, " ");
+
+    const match = raw.match(/^(0?[1-9]|1[0-2]):([0-5][0-9])\s(AM|PM)$/);
+    if (!match) {
+      return "";
+    }
+
+    const hour = String(Number(match[1])).padStart(2, "0");
+    return `${hour}:${match[2]} ${match[3]}`;
+  }
+
+  function formatRef(prefix, value, fallbackId) {
+    const text = String(value || "").trim();
+    if (text) {
+      return text.replace(/^bk_/i, "BK-").replace(/^cu_/i, "CUS-");
+    }
+
+    const n = Number(fallbackId);
+    return Number.isInteger(n)
+      ? `${prefix}-${String(n).padStart(3, "0")}`
+      : `${prefix}-${escapeHtml(String(fallbackId || "-"))}`;
+  }
+
+  function getStatusClass(status) {
+    if (status === "Pending Payment") return "status-pending";
+    if (status === "Confirmed") return "status-confirmed";
+    if (status === "Rejected") return "status-rejected";
+    if (status === "Paid") return "status-paid";
+    if (status === "Completed") return "status-completed";
+    if (status === "Cancelled") return "status-cancelled";
+    return "status-requested";
+  }
+
+  function createStatusOptions(selectedStatus) {
+    return STATUS_OPTIONS.map((status) => {
+      const isSelected = selectedStatus === status;
+      const canMove = window.BookingStore && window.BookingStore.canTransition(selectedStatus, status);
+      const isEnabled = isSelected || canMove;
+      return `<option value="${status}" ${isSelected ? "selected" : ""} ${isEnabled ? "" : "disabled"}>${status}</option>`;
+    }).join("");
   }
 
   function createBookingRow(booking) {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${escapeHtml(formatId("BK", booking.id))}</td>
-      <td>${escapeHtml(formatId("CUS", booking.id))}</td>
+      <td>${escapeHtml(formatRef("BK", booking.bookingRef, booking.id))}</td>
+      <td>${escapeHtml(formatRef("CUS", booking.customerId, booking.id))}</td>
       <td>${escapeHtml(booking.clientName || "-")}</td>
       <td>${escapeHtml(booking.service || "-")}</td>
       <td>${escapeHtml(booking.consultantName || "-")}</td>
@@ -111,7 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function renderBookings() {
-    // Guard against concurrent renders triggered by both SSE and the save handler.
     if (isRendering) return;
     isRendering = true;
     tableBody.innerHTML = "";
@@ -119,7 +128,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const bookings = await window.BookingStore.getBookings();
       if (!bookings.length) {
-        tableBody.appendChild(createEmptyRow());
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="9" class="empty-row">No bookings are available yet.</td>';
+        tableBody.appendChild(row);
         return;
       }
 
@@ -134,6 +145,158 @@ document.addEventListener("DOMContentLoaded", () => {
       isRendering = false;
     }
   }
+
+  async function loadAvailability() {
+    if (!availabilityTableBody) return;
+
+    const consultantName = availabilityConsultantName.value.trim();
+    if (!consultantName) {
+      availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Enter a consultant name to view availability.</td></tr>';
+      return;
+    }
+
+    availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Loading availability...</td></tr>';
+
+    try {
+      const params = new URLSearchParams({ consultantName });
+      const response = await fetch(`/api/availability?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error("Failed to load availability.");
+      }
+
+      const slots = await response.json();
+      if (!slots.length) {
+        availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No availability slots yet.</td></tr>';
+        return;
+      }
+
+      availabilityTableBody.innerHTML = slots.map((slot) => {
+        const availabilityText = slot.isAvailable ? "Available" : "Booked";
+        return `
+          <tr>
+            <td>${escapeHtml(slot.id)}</td>
+            <td>${escapeHtml(slot.consultantName)}</td>
+            <td>${escapeHtml(slot.bookingDate)}</td>
+            <td>${escapeHtml(slot.bookingTime)}</td>
+            <td>${escapeHtml(availabilityText)}</td>
+            <td>
+              <button type="button" class="table-action-btn cancel" data-role="remove-slot" data-slot-id="${escapeHtml(slot.id)}" ${slot.isAvailable ? "" : "disabled"}>Remove</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    } catch (error) {
+      availabilityTableBody.innerHTML = `<tr><td colspan="6" class="empty-row">${escapeHtml(error.message || "Failed to load availability.")}</td></tr>`;
+    }
+  }
+
+  async function addAvailability() {
+    const consultantName = availabilityConsultantName.value.trim();
+    const bookingDate = availabilityDate.value;
+    const bookingTime = normalizeTime(availabilityTime.value);
+
+    if (!consultantName || !bookingDate || !bookingTime) {
+      showToast("Consultant name, date, and time are required.");
+      return;
+    }
+
+    addAvailabilityBtn.disabled = true;
+    try {
+      const response = await fetch("/api/availability", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ consultantName, bookingDate, bookingTime })
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "Failed to add availability slot.");
+      }
+
+      availabilityTime.value = "";
+      showToast("Availability slot saved.");
+      await loadAvailability();
+    } catch (error) {
+      showToast(error.message || "Could not add slot.");
+    } finally {
+      addAvailabilityBtn.disabled = false;
+    }
+  }
+
+  async function removeAvailability(slotId, buttonEl) {
+    buttonEl.disabled = true;
+    try {
+      const response = await fetch(`/api/availability/${encodeURIComponent(slotId)}`, {
+        method: "DELETE"
+      });
+
+      if (!response.ok && response.status !== 204) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "Failed to remove availability slot.");
+      }
+
+      showToast("Availability slot removed.");
+      await loadAvailability();
+    } catch (error) {
+      showToast(error.message || "Could not remove slot.");
+      buttonEl.disabled = false;
+    }
+  }
+
+  async function submitRegistration() {
+    const name = registrationName.value.trim();
+    const email = registrationEmail.value.trim();
+    const expertise = registrationExpertise.value.trim();
+
+    if (!name || !email) {
+      showToast("Registration name and email are required.");
+      return;
+    }
+
+    submitRegistrationBtn.disabled = true;
+    try {
+      const response = await fetch("/api/consultants/registrations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email, expertise })
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "Failed to submit registration.");
+      }
+
+      registrationName.value = "";
+      registrationEmail.value = "";
+      registrationExpertise.value = "";
+      showToast("Registration request submitted.");
+    } catch (error) {
+      showToast(error.message || "Could not submit registration.");
+    } finally {
+      submitRegistrationBtn.disabled = false;
+    }
+  }
+
+  addAvailabilityBtn.addEventListener("click", addAvailability);
+  availabilityConsultantName.addEventListener("change", () => {
+    loadAvailability();
+  });
+
+  submitRegistrationBtn.addEventListener("click", submitRegistration);
+
+  availabilityTableBody.addEventListener("click", async (event) => {
+    const removeButton = event.target.closest('button[data-role="remove-slot"]');
+    if (!removeButton) return;
+
+    const slotId = Number(removeButton.dataset.slotId);
+    if (!Number.isInteger(slotId)) return;
+
+    await removeAvailability(slotId, removeButton);
+  });
 
   tableBody.addEventListener("click", async (event) => {
     const saveButton = event.target.closest('button[data-role="status-save"]');
@@ -157,8 +320,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "consultant"
       );
       showToast(`Booking updated to ${updatedBooking.status}.`);
-      // SSE will trigger renderBookings() automatically on the backend broadcast.
-      // Calling it here too would cause the duplication bug — rely on SSE only.
+      await loadAvailability();
     } catch (error) {
       showToast(error.message || "Could not update booking status.");
     } finally {
@@ -168,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   unsubscribe = window.BookingStore.subscribe(() => {
     renderBookings();
+    loadAvailability();
   });
 
   window.addEventListener("beforeunload", () => {
@@ -177,4 +340,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderBookings();
+  loadAvailability();
 });

@@ -3,11 +3,6 @@ const path = require("path");
 const fs = require("fs");
 const { Pool } = require("pg");
 
-// =============================================================================
-// GoF State Pattern — import the state machine
-// BookingStateMachine validates that a status transition is allowed before
-// we touch the database. e.g. you cannot move from "Completed" → "Cancelled".
-// =============================================================================
 const BookingStateMachine = require("./patterns/state/BookingStateMachine");
 const { PaymentStrategyFactory } = require("./patterns/strategy/PaymentStrategies");
 const {
@@ -18,54 +13,24 @@ const {
 } = require("./patterns/observer/NotificationManager");
 const UserFactory = require("./patterns/factory/UserFactory");
 
-// Runtime interaction map:
-// - REST endpoints accept booking/payment requests from frontend pages.
-// - State pattern validates every status transition.
-// - Factory Method creates role-specific booking actors.
-// - Strategy handles payment processing when status moves to "Paid".
-// - Observer emits notification logs when booking events are broadcast.
-
-// =============================================================================
-// Payment Methods — stored in a JSON file for easy viewing and editing.
-// The file lives at backend/data/payment-methods.json.
-// This is simpler than PostgreSQL and makes it easy to inspect or reset data.
-// =============================================================================
-const PAYMENT_METHODS_FILE = path.join(__dirname, "..", "data", "payment-methods.json");
-
-// Reads the payment methods array from disk. Returns [] if the file is missing.
-function readPaymentMethods() {
-  try {
-    return JSON.parse(fs.readFileSync(PAYMENT_METHODS_FILE, "utf8"));
-  } catch {
-    return [];
-  }
-}
-
-// Writes the payment methods array back to disk, pretty-printed.
-function writePaymentMethods(data) {
-  const dir = path.dirname(PAYMENT_METHODS_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(PAYMENT_METHODS_FILE, JSON.stringify(data, null, 2), "utf8");
-}
-
-function findPaymentMethodById(methodId) {
-  if (!methodId) {
-    return null;
-  }
-  const methods = readPaymentMethods();
-  return methods.find((method) => method.id === methodId) || null;
-}
-
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://synergy_user:synergy_pass@localhost:5432/synergy";
 
-// All valid booking statuses — must stay in sync with the State Pattern classes.
-// "Pending Payment" is the intermediate state between Confirmed and Paid.
+const DATA_DIR = path.join(__dirname, "..", "data");
+const PAYMENT_METHODS_FILE = path.join(DATA_DIR, "payment-methods.json");
+const CONSULTANT_REGISTRATIONS_FILE = path.join(DATA_DIR, "consultant-registrations.json");
+const SYSTEM_POLICIES_FILE = path.join(DATA_DIR, "system-policies.json");
+
+const DEFAULT_POLICIES = {
+  cancellationWindowHours: 24,
+  pricingMultiplier: 1,
+  notificationsEnabled: true,
+  refundPolicy: "Paid bookings cancelled before the session are refunded automatically."
+};
+
 const STATUS_VALUES = [
   "Requested",
   "Confirmed",
@@ -79,6 +44,15 @@ const STATUS_SQL = STATUS_VALUES.map((status) => `'${status}'`).join(", ");
 const VALID_STATUSES = new Set(STATUS_VALUES);
 const VALID_ACTORS = new Set(["client", "consultant", "admin", "system"]);
 
+const ALLOWED_METHOD_TYPES = [
+  "Credit Card",
+  "Debit Card",
+  "Bank Transfer",
+  "PayPal"
+];
+
+const VALID_REGISTRATION_STATUSES = new Set(["Pending", "Approved", "Rejected"]);
+
 const pool = new Pool({ connectionString: DATABASE_URL });
 const streamClients = new Set();
 const userFactory = new UserFactory();
@@ -89,6 +63,370 @@ notificationManager.attach(new SmsNotifier());
 notificationManager.attach(new PushNotifier());
 
 app.use(express.json({ limit: "1mb" }));
+
+function ensureDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
+function readJsonFile(filePath, fallbackValue) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return fallbackValue;
+  }
+}
+
+function writeJsonFile(filePath, data) {
+  ensureDir(path.dirname(filePath));
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+}
+
+function ensureDataFiles() {
+  ensureDir(DATA_DIR);
+
+  if (!fs.existsSync(PAYMENT_METHODS_FILE)) {
+    writeJsonFile(PAYMENT_METHODS_FILE, []);
+  }
+  if (!fs.existsSync(CONSULTANT_REGISTRATIONS_FILE)) {
+    writeJsonFile(CONSULTANT_REGISTRATIONS_FILE, []);
+  }
+  if (!fs.existsSync(SYSTEM_POLICIES_FILE)) {
+    writeJsonFile(SYSTEM_POLICIES_FILE, DEFAULT_POLICIES);
+  }
+}
+
+function readPaymentMethods() {
+  return readJsonFile(PAYMENT_METHODS_FILE, []);
+}
+
+function writePaymentMethods(methods) {
+  writeJsonFile(PAYMENT_METHODS_FILE, methods);
+}
+
+function readConsultantRegistrations() {
+  return readJsonFile(CONSULTANT_REGISTRATIONS_FILE, []);
+}
+
+function writeConsultantRegistrations(registrations) {
+  writeJsonFile(CONSULTANT_REGISTRATIONS_FILE, registrations);
+}
+
+function readSystemPolicies() {
+  const rawPolicies = readJsonFile(SYSTEM_POLICIES_FILE, DEFAULT_POLICIES);
+  return {
+    ...DEFAULT_POLICIES,
+    ...rawPolicies
+  };
+}
+
+function writeSystemPolicies(policies) {
+  writeJsonFile(SYSTEM_POLICIES_FILE, policies);
+}
+
+function toPublicPaymentMethod(method) {
+  if (!method) {
+    return null;
+  }
+  return {
+    id: method.id,
+    type: method.type,
+    label: method.label,
+    createdAt: method.createdAt,
+    updatedAt: method.updatedAt || null
+  };
+}
+
+function findPaymentMethodById(methodId) {
+  if (!methodId) {
+    return null;
+  }
+  const methods = readPaymentMethods();
+  return methods.find((method) => method.id === methodId) || null;
+}
+
+function sanitizeText(value, maxLen = 120) {
+  return String(value || "").trim().slice(0, maxLen);
+}
+
+function sanitizeDate(value) {
+  const dateText = String(value || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateText)) {
+    return dateText;
+  }
+  return "";
+}
+
+function sanitizeSlotTime(value) {
+  const raw = String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, " ");
+
+  const match = raw.match(/^(0?[1-9]|1[0-2]):([0-5][0-9])\s(AM|PM)$/);
+  if (!match) {
+    return "";
+  }
+
+  const hour = String(Number(match[1])).padStart(2, "0");
+  return `${hour}:${match[2]} ${match[3]}`;
+}
+
+function parseBookingDateTime(dateText, timeText) {
+  const normalizedDate = sanitizeDate(dateText);
+  const normalizedTime = sanitizeSlotTime(timeText);
+
+  if (!normalizedDate || !normalizedTime) {
+    return null;
+  }
+
+  const [timePart, meridian] = normalizedTime.split(" ");
+  const [hh, mm] = timePart.split(":").map(Number);
+
+  let hours = hh;
+  if (meridian === "AM" && hours === 12) {
+    hours = 0;
+  }
+  if (meridian === "PM" && hours !== 12) {
+    hours += 12;
+  }
+
+  const [year, month, day] = normalizedDate.split("-").map(Number);
+  return new Date(year, month - 1, day, hours, mm, 0, 0);
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
+function isFutureExpiry(expiryText) {
+  const match = String(expiryText || "").trim().match(/^(0[1-9]|1[0-2])\/(\d{2})$/);
+  if (!match) {
+    return false;
+  }
+
+  const expiryMonth = Number(match[1]);
+  const expiryYear = 2000 + Number(match[2]);
+  const expiryDate = new Date(expiryYear, expiryMonth, 0, 23, 59, 59, 999);
+  return expiryDate.getTime() >= Date.now();
+}
+
+function buildTransactionId(prefix) {
+  const timePart = Date.now().toString().slice(-6);
+  const randomPart = Math.random().toString(36).slice(2, 8).toUpperCase();
+  return `${prefix}-${timePart}-${randomPart}`;
+}
+
+function parsePriceAmount(rawPrice) {
+  const parsed = Number(String(rawPrice || "").replace(/[^0-9.]/g, ""));
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return parsed.toFixed(2);
+  }
+  return String(rawPrice || "0");
+}
+
+function applyPricingPolicy(rawPrice, pricingMultiplier) {
+  const parsed = Number(String(rawPrice || "").replace(/[^0-9.]/g, ""));
+  const multiplier = Number(pricingMultiplier);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return String(rawPrice || "0");
+  }
+  if (!Number.isFinite(multiplier) || multiplier <= 0) {
+    return `$${parsed.toFixed(2)}`;
+  }
+
+  return `$${(parsed * multiplier).toFixed(2)}`;
+}
+
+function sanitizeStatus(status) {
+  if (VALID_STATUSES.has(status)) {
+    return status;
+  }
+  return "Requested";
+}
+
+function sanitizeActor(actor) {
+  if (VALID_ACTORS.has(actor)) {
+    return actor;
+  }
+  return "system";
+}
+
+function sanitizeRegistrationStatus(status) {
+  const normalized = String(status || "").trim();
+  if (VALID_REGISTRATION_STATUSES.has(normalized)) {
+    return normalized;
+  }
+  return "Pending";
+}
+
+function normalizePoliciesPayload(rawPayload) {
+  const payload = rawPayload || {};
+  const currentPolicies = readSystemPolicies();
+
+  let cancellationWindowHours = Number(payload.cancellationWindowHours);
+  if (!Number.isFinite(cancellationWindowHours) || cancellationWindowHours < 0) {
+    cancellationWindowHours = Number(currentPolicies.cancellationWindowHours);
+  }
+
+  let pricingMultiplier = Number(payload.pricingMultiplier);
+  if (!Number.isFinite(pricingMultiplier) || pricingMultiplier <= 0) {
+    pricingMultiplier = Number(currentPolicies.pricingMultiplier);
+  }
+
+  const rawNotifications = payload.notificationsEnabled;
+  let notificationsEnabled = currentPolicies.notificationsEnabled;
+  if (typeof rawNotifications === "boolean") {
+    notificationsEnabled = rawNotifications;
+  } else if (rawNotifications === "true") {
+    notificationsEnabled = true;
+  } else if (rawNotifications === "false") {
+    notificationsEnabled = false;
+  }
+
+  const refundPolicy = sanitizeText(
+    payload.refundPolicy || currentPolicies.refundPolicy,
+    300
+  );
+
+  return {
+    cancellationWindowHours: Math.min(cancellationWindowHours, 168),
+    pricingMultiplier: Number(pricingMultiplier.toFixed(2)),
+    notificationsEnabled,
+    refundPolicy: refundPolicy || DEFAULT_POLICIES.refundPolicy
+  };
+}
+
+function validatePaymentMethodPayload(input) {
+  const payload = input || {};
+  const type = sanitizeText(payload.type, 40);
+  const details = payload.details || {};
+
+  if (!ALLOWED_METHOD_TYPES.includes(type)) {
+    return {
+      error: `type must be one of: ${ALLOWED_METHOD_TYPES.join(", ")}.`
+    };
+  }
+
+  if (type === "Credit Card" || type === "Debit Card") {
+    const cardholderName = sanitizeText(details.cardholderName, 60);
+    const cardNumber = String(details.cardNumber || "").replace(/\D/g, "");
+    const expiry = String(details.expiry || "").trim();
+    const cvv = String(details.cvv || "").replace(/\D/g, "");
+
+    if (!cardholderName) {
+      return { error: "Cardholder name is required." };
+    }
+    if (!/^\d{16}$/.test(cardNumber)) {
+      return { error: "Card number must be exactly 16 digits." };
+    }
+    if (!isFutureExpiry(expiry)) {
+      return { error: "Expiry must use MM/YY format and be a future date." };
+    }
+    if (!/^\d{3,4}$/.test(cvv)) {
+      return { error: "CVV must be 3 or 4 digits." };
+    }
+
+    const last4 = cardNumber.slice(-4);
+    const label =
+      sanitizeText(payload.label, 80) || `${cardholderName} - ending in ${last4}`;
+
+    return {
+      type,
+      label,
+      details: {
+        cardholderName,
+        cardNumber,
+        last4,
+        expiry,
+        cvv
+      }
+    };
+  }
+
+  if (type === "Bank Transfer") {
+    const bankName = sanitizeText(details.bankName, 60);
+    const accountNumber = String(details.accountNumber || "").replace(/\D/g, "");
+    const routingNumber = String(details.routingNumber || "").replace(/\D/g, "");
+
+    if (!bankName) {
+      return { error: "Bank name is required for bank transfer." };
+    }
+    if (!/^\d{6,17}$/.test(accountNumber)) {
+      return { error: "Account number must be 6 to 17 digits." };
+    }
+    if (!/^\d{9}$/.test(routingNumber)) {
+      return { error: "Routing number must be exactly 9 digits." };
+    }
+
+    const last4 = accountNumber.slice(-4);
+    const label = sanitizeText(payload.label, 80) || `${bankName} (Acct ••••${last4})`;
+
+    return {
+      type,
+      label,
+      details: {
+        bankName,
+        accountNumber,
+        routingNumber,
+        last4
+      }
+    };
+  }
+
+  if (type === "PayPal") {
+    const paypalEmail = sanitizeText(details.paypalEmail, 80);
+    if (!isValidEmail(paypalEmail)) {
+      return { error: "A valid PayPal email is required." };
+    }
+
+    const label = sanitizeText(payload.label, 80) || paypalEmail;
+
+    return {
+      type,
+      label,
+      details: {
+        paypalEmail
+      }
+    };
+  }
+
+  return { error: "Unsupported payment type." };
+}
+
+function buildUserId(role) {
+  const randomPart = Math.random().toString(36).slice(2, 7);
+  return `${role}-${Date.now()}-${randomPart}`;
+}
+
+function toInternalEmail(displayName, role) {
+  const slug = String(displayName || "unknown")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ".")
+    .replace(/^\.+|\.+$/g, "");
+  return `${slug || "unknown"}@${role}.synergy.local`;
+}
+
+function createBookingActors(payload) {
+  const client = userFactory.createUser(
+    "client",
+    buildUserId("client"),
+    payload.clientName,
+    payload.clientEmail
+  );
+
+  const consultant = userFactory.createUser(
+    "consultant",
+    buildUserId("consultant"),
+    payload.consultantName,
+    toInternalEmail(payload.consultantName, "consultant"),
+    { expertise: payload.service }
+  );
+
+  return { client, consultant };
+}
 
 function wait(ms) {
   return new Promise((resolve) => {
@@ -118,67 +456,15 @@ function mapBookingRow(row) {
     bookingDate: bookingDateValue,
     bookingTime: row.booking_time,
     status: row.status,
+    paymentStatus: row.payment_status || null,
+    paymentTransactionId: row.payment_transaction_id || null,
+    paymentProcessedAt: row.payment_processed_at || null,
+    refundTransactionId: row.refund_transaction_id || null,
+    refundProcessedAt: row.refund_processed_at || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     updatedBy: row.updated_by
   };
-}
-
-function sanitizeStatus(status) {
-  if (VALID_STATUSES.has(status)) {
-    return status;
-  }
-  return "Requested";
-}
-
-function sanitizeActor(actor) {
-  if (VALID_ACTORS.has(actor)) {
-    return actor;
-  }
-  return "system";
-}
-
-function buildUserId(role) {
-  const randomPart = Math.random().toString(36).slice(2, 7);
-  return `${role}-${Date.now()}-${randomPart}`;
-}
-
-function toInternalEmail(displayName, role) {
-  const slug = String(displayName || "unknown")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ".")
-    .replace(/^\.+|\.+$/g, "");
-  return `${slug || "unknown"}@${role}.synergy.local`;
-}
-
-function createBookingActors(payload) {
-  // Factory Method integration point:
-  // server.js does not instantiate concrete user classes directly.
-  // It asks UserFactory for each role-specific object.
-  const client = userFactory.createUser(
-    "client",
-    buildUserId("client"),
-    payload.clientName,
-    payload.clientEmail
-  );
-
-  const consultant = userFactory.createUser(
-    "consultant",
-    buildUserId("consultant"),
-    payload.consultantName,
-    toInternalEmail(payload.consultantName, "consultant"),
-    { expertise: payload.service }
-  );
-
-  return { client, consultant };
-}
-
-function parsePriceAmount(rawPrice) {
-  const parsed = Number(String(rawPrice || "").replace(/[^0-9.]/g, ""));
-  if (Number.isFinite(parsed) && parsed > 0) {
-    return parsed.toFixed(2);
-  }
-  return String(rawPrice || "0");
 }
 
 async function ensureSchema() {
@@ -219,20 +505,36 @@ async function ensureSchema() {
      CHECK (status IN (${STATUS_SQL}))`
   );
 
-  // Add booking_ref and customer_id columns for display-friendly prefixed IDs.
-  await pool.query(
-    `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_ref TEXT`
-  );
-  await pool.query(
-    `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_id TEXT`
-  );
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_ref TEXT`);
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_id TEXT`);
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_status TEXT`);
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_transaction_id TEXT`);
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_processed_at TIMESTAMPTZ`);
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS refund_transaction_id TEXT`);
+  await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS refund_processed_at TIMESTAMPTZ`);
 
-  // Backfill any rows that existed before these columns were added.
   await pool.query(
     `UPDATE bookings
      SET booking_ref = 'bk_' || id,
          customer_id = 'cu_' || id
      WHERE booking_ref IS NULL`
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS availability_slots (
+      id SERIAL PRIMARY KEY,
+      consultant_name TEXT NOT NULL,
+      slot_date DATE NOT NULL,
+      slot_time TEXT NOT NULL,
+      is_available BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`
+  );
+
+  await pool.query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_availability_unique
+     ON availability_slots(consultant_name, slot_date, slot_time)`
   );
 
   await pool.query(
@@ -262,19 +564,23 @@ async function withDbRetries(maxRetries, retryDelayMs, fn) {
 }
 
 function broadcastBookingEvent(type, booking, metadata = null) {
-  notificationManager.sendNotification(`booking.${type}`, {
-    bookingId: booking?.id || null,
-    status: booking?.status || null,
-    updatedBy: booking?.updatedBy || null,
-    metadata: metadata || undefined
-  });
+  const policies = readSystemPolicies();
+
+  if (policies.notificationsEnabled) {
+    notificationManager.sendNotification(`booking.${type}`, {
+      bookingId: booking?.id || null,
+      status: booking?.status || null,
+      updatedBy: booking?.updatedBy || null,
+      metadata: metadata || undefined
+    });
+  }
 
   if (!streamClients.size) {
     return;
   }
 
   const payload = JSON.stringify(
-    metadata ? { type: type, booking: booking, metadata: metadata } : { type: type, booking: booking }
+    metadata ? { type, booking, metadata } : { type, booking }
   );
   const eventChunk = `event: booking\ndata: ${payload}\n\n`;
 
@@ -302,6 +608,11 @@ app.get("/api/bookings", async (_request, response) => {
          booking_date::text AS booking_date,
          booking_time,
          status,
+         payment_status,
+         payment_transaction_id,
+         payment_processed_at,
+         refund_transaction_id,
+         refund_processed_at,
          created_at,
          updated_at,
          updated_by
@@ -328,16 +639,24 @@ app.post("/api/bookings", async (request, response) => {
     bookingTime
   } = request.body || {};
 
+  const safeBookingDate = sanitizeDate(bookingDate);
+  const safeBookingTime = sanitizeSlotTime(bookingTime);
+
   if (
     !service ||
     !price ||
     !clientName ||
     !clientEmail ||
     !consultantName ||
-    !bookingDate ||
-    !bookingTime
+    !safeBookingDate ||
+    !safeBookingTime
   ) {
     response.status(400).json({ error: "Missing required booking fields." });
+    return;
+  }
+
+  if (!isValidEmail(clientEmail)) {
+    response.status(400).json({ error: "Client email format is invalid." });
     return;
   }
 
@@ -357,9 +676,54 @@ app.post("/api/bookings", async (request, response) => {
       return;
     }
 
+    const slotResult = await pool.query(
+      `SELECT id, is_available
+       FROM availability_slots
+       WHERE consultant_name = $1
+         AND slot_date = $2
+         AND slot_time = $3
+       LIMIT 1`,
+      [actors.consultant.name, safeBookingDate, safeBookingTime]
+    );
+
+    if (!slotResult.rows.length) {
+      response.status(422).json({
+        error: "Selected consultant/time is not available. Please choose an available slot."
+      });
+      return;
+    }
+
+    if (!slotResult.rows[0].is_available) {
+      response.status(409).json({
+        error: "This time slot is no longer available."
+      });
+      return;
+    }
+
+    const conflictResult = await pool.query(
+      `SELECT id
+       FROM bookings
+       WHERE consultant_name = $1
+         AND booking_date = $2
+         AND booking_time = $3
+         AND status NOT IN ('Rejected', 'Cancelled', 'Completed')
+       LIMIT 1`,
+      [actors.consultant.name, safeBookingDate, safeBookingTime]
+    );
+
+    if (conflictResult.rows.length) {
+      response.status(409).json({
+        error: "Consultant is already booked for this date/time."
+      });
+      return;
+    }
+
     const now = Date.now();
     const bookingRef = `bk_${now}`;
     const customerId = `cu_${now}${Math.random().toString(36).slice(2, 6)}`;
+
+    const policies = readSystemPolicies();
+    const adjustedPrice = applyPricingPolicy(price, policies.pricingMultiplier);
 
     const result = await pool.query(
       `INSERT INTO bookings (
@@ -373,9 +737,10 @@ app.post("/api/bookings", async (request, response) => {
          booking_date,
          booking_time,
          status,
+         payment_status,
          updated_by
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Requested', 'client')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Requested', NULL, 'client')
        RETURNING
          id,
          booking_ref,
@@ -388,24 +753,40 @@ app.post("/api/bookings", async (request, response) => {
          booking_date::text AS booking_date,
          booking_time,
          status,
+         payment_status,
+         payment_transaction_id,
+         payment_processed_at,
+         refund_transaction_id,
+         refund_processed_at,
          created_at,
          updated_at,
          updated_by`,
       [
         bookingRef,
         customerId,
-        service,
-        price,
+        sanitizeText(service, 120),
+        adjustedPrice,
         actors.client.name,
         actors.client.email,
         actors.consultant.name,
-        bookingDate,
-        bookingTime
+        safeBookingDate,
+        safeBookingTime
       ]
     );
 
+    await pool.query(
+      `UPDATE availability_slots
+       SET is_available = FALSE,
+           updated_at = NOW()
+       WHERE id = $1`,
+      [slotResult.rows[0].id]
+    );
+
     const booking = mapBookingRow(result.rows[0]);
-    broadcastBookingEvent("created", booking);
+    const metadata = {
+      pricingMultiplier: policies.pricingMultiplier
+    };
+    broadcastBookingEvent("created", booking, metadata);
     response.status(201).json(booking);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -427,18 +808,20 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
   const paymentMethodType = request.body?.paymentMethodType;
 
   try {
-    // -------------------------------------------------------------------------
-    // GoF State Pattern — validate the transition BEFORE updating the database.
-    //
-    // Step 1: Fetch the booking's current status from the DB.
-    // Step 2: Ask the BookingStateMachine if the transition is allowed.
-    // Step 3: If not allowed, return a 422 error with a clear message.
-    // Step 4: If allowed, proceed with the UPDATE query as normal.
-    // -------------------------------------------------------------------------
-
-    // Step 1: Get the current status
     const currentRow = await pool.query(
-      "SELECT status, price FROM bookings WHERE id = $1",
+      `SELECT
+         status,
+         price,
+         consultant_name,
+         booking_date::text AS booking_date,
+         booking_time,
+         payment_status,
+         payment_transaction_id,
+         payment_processed_at,
+         refund_transaction_id,
+         refund_processed_at
+       FROM bookings
+       WHERE id = $1`,
       [bookingId]
     );
 
@@ -447,21 +830,51 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
       return;
     }
 
-    const currentStatus = currentRow.rows[0].status;
-    const currentPrice = currentRow.rows[0].price;
+    const current = currentRow.rows[0];
+    const currentStatus = current.status;
 
-    // Step 2 & 3: Validate the transition using the State Pattern
     try {
       BookingStateMachine.transition(currentStatus, nextStatus);
     } catch (transitionError) {
-      // The state machine threw — this transition is not allowed
-      response.status(422).json({
-        error: transitionError.message
-      });
+      response.status(422).json({ error: transitionError.message });
       return;
     }
 
+    if (nextStatus === "Cancelled" && actor === "client") {
+      const policies = readSystemPolicies();
+      const bookingAt = parseBookingDateTime(current.booking_date, current.booking_time);
+      const minWindowMs = Number(policies.cancellationWindowHours) * 60 * 60 * 1000;
+
+      if (
+        bookingAt &&
+        Number.isFinite(minWindowMs) &&
+        minWindowMs > 0 &&
+        bookingAt.getTime() - Date.now() < minWindowMs
+      ) {
+        response.status(422).json({
+          error: `Cancellations must be made at least ${policies.cancellationWindowHours} hours before the session.`
+        });
+        return;
+      }
+    }
+
     let paymentReceipt = null;
+    let refundReceipt = null;
+
+    let nextPaymentStatus = current.payment_status || null;
+    let nextPaymentTransactionId = current.payment_transaction_id || null;
+    let nextPaymentProcessedAt = current.payment_processed_at || null;
+    let nextRefundTransactionId = current.refund_transaction_id || null;
+    let nextRefundProcessedAt = current.refund_processed_at || null;
+
+    if (nextStatus === "Pending Payment") {
+      nextPaymentStatus = "Pending";
+      nextPaymentTransactionId = null;
+      nextPaymentProcessedAt = null;
+      nextRefundTransactionId = null;
+      nextRefundProcessedAt = null;
+    }
+
     if (nextStatus === "Paid") {
       if (!paymentMethodType || !paymentMethodId) {
         response.status(400).json({
@@ -471,17 +884,13 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
       }
 
       if (actor !== "client") {
-        response.status(403).json({
-          error: "Only the client can complete payment."
-        });
+        response.status(403).json({ error: "Only the client can complete payment." });
         return;
       }
 
       const savedMethod = findPaymentMethodById(paymentMethodId);
       if (!savedMethod) {
-        response.status(400).json({
-          error: "Selected payment method was not found."
-        });
+        response.status(400).json({ error: "Selected payment method was not found." });
         return;
       }
 
@@ -502,10 +911,11 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
         return;
       }
 
-      const paymentResult = paymentStrategy.process(parsePriceAmount(currentPrice), {
+      const paymentResult = paymentStrategy.process(parsePriceAmount(current.price), {
         methodId: savedMethod.id,
         methodType: savedMethod.type,
-        label: savedMethod.label
+        label: savedMethod.label,
+        details: savedMethod.details || {}
       });
 
       if (!paymentResult.success) {
@@ -515,22 +925,45 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
         return;
       }
 
-
       paymentReceipt = {
         transactionId: paymentResult.transactionId,
         methodType: savedMethod.type,
         methodLabel: savedMethod.label,
         processedAt: new Date().toISOString()
       };
+
+      nextPaymentStatus = "Success";
+      nextPaymentTransactionId = paymentReceipt.transactionId;
+      nextPaymentProcessedAt = paymentReceipt.processedAt;
+      nextRefundTransactionId = null;
+      nextRefundProcessedAt = null;
     }
 
-    // Step 4: Transition is valid — update the database
+    if (currentStatus === "Paid" && nextStatus === "Cancelled") {
+      const refundTransactionId = buildTransactionId("RF");
+      const refundedAt = new Date().toISOString();
+
+      refundReceipt = {
+        refundTransactionId,
+        refundedAt
+      };
+
+      nextPaymentStatus = "Refunded";
+      nextRefundTransactionId = refundTransactionId;
+      nextRefundProcessedAt = refundedAt;
+    }
+
     const result = await pool.query(
       `UPDATE bookings
        SET
          status = $1,
          updated_at = NOW(),
-         updated_by = $2
+         updated_by = $2,
+         payment_status = $4,
+         payment_transaction_id = $5,
+         payment_processed_at = $6,
+         refund_transaction_id = $7,
+         refund_processed_at = $8
        WHERE id = $3
        RETURNING
          id,
@@ -544,10 +977,24 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
          booking_date::text AS booking_date,
          booking_time,
          status,
+         payment_status,
+         payment_transaction_id,
+         payment_processed_at,
+         refund_transaction_id,
+         refund_processed_at,
          created_at,
          updated_at,
          updated_by`,
-      [nextStatus, actor, bookingId]
+      [
+        nextStatus,
+        actor,
+        bookingId,
+        nextPaymentStatus,
+        nextPaymentTransactionId,
+        nextPaymentProcessedAt,
+        nextRefundTransactionId,
+        nextRefundProcessedAt
+      ]
     );
 
     if (!result.rows.length) {
@@ -555,10 +1002,41 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
       return;
     }
 
+    if (nextStatus === "Cancelled" || nextStatus === "Rejected") {
+      await pool.query(
+        `UPDATE availability_slots
+         SET is_available = TRUE,
+             updated_at = NOW()
+         WHERE consultant_name = $1
+           AND slot_date = $2
+           AND slot_time = $3`,
+        [current.consultant_name, current.booking_date, current.booking_time]
+      );
+    }
+
     const booking = mapBookingRow(result.rows[0]);
-    const responsePayload = paymentReceipt ? { ...booking, payment: paymentReceipt } : booking;
-    const metadataPayload = paymentReceipt ? { payment: paymentReceipt } : null;
-    broadcastBookingEvent("updated", booking, metadataPayload);
+
+    const metadataPayload = {};
+    if (paymentReceipt) {
+      metadataPayload.payment = paymentReceipt;
+    }
+    if (refundReceipt) {
+      metadataPayload.refund = refundReceipt;
+    }
+
+    const hasMetadata = Object.keys(metadataPayload).length > 0;
+    const responsePayload = {
+      ...booking,
+      ...(paymentReceipt ? { payment: paymentReceipt } : {}),
+      ...(refundReceipt ? { refund: refundReceipt } : {})
+    };
+
+    broadcastBookingEvent(
+      "updated",
+      booking,
+      hasMetadata ? metadataPayload : null
+    );
+
     response.json(responsePayload);
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -567,63 +1045,329 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
   }
 });
 
-// =============================================================================
-// Payment Methods API
-// GET    /api/payment-methods      — list all saved methods
-// POST   /api/payment-methods      — add a new method { type, label }
-// DELETE /api/payment-methods/:id  — remove a method by id
-// =============================================================================
-
-// Must match exactly what the frontend dropdowns offer.
-// Spec requires: Credit Card, Debit Card, Bank Transfer, PayPal.
-const ALLOWED_METHOD_TYPES = [
-  "Credit Card",
-  "Debit Card",
-  "Bank Transfer",
-  "PayPal"
-];
-
 app.get("/api/payment-methods", (_request, response) => {
-  response.json(readPaymentMethods());
+  const methods = readPaymentMethods().map(toPublicPaymentMethod);
+  response.json(methods);
 });
 
 app.post("/api/payment-methods", (request, response) => {
-  const { type, label } = request.body || {};
-
-  if (!type || !label) {
-    response.status(400).json({ error: "type and label are required." });
-    return;
-  }
-  if (!ALLOWED_METHOD_TYPES.includes(type)) {
-    response.status(400).json({
-      error: `type must be one of: ${ALLOWED_METHOD_TYPES.join(", ")}.`
-    });
+  const normalized = validatePaymentMethodPayload(request.body);
+  if (normalized.error) {
+    response.status(400).json({ error: normalized.error });
     return;
   }
 
   const methods = readPaymentMethods();
   const newMethod = {
     id: `pm_${Date.now()}`,
-    type: type,
-    label: String(label).slice(0, 80), // cap label length
-    createdAt: new Date().toISOString()
+    type: normalized.type,
+    label: normalized.label,
+    details: normalized.details,
+    createdAt: new Date().toISOString(),
+    updatedAt: null
   };
+
   methods.push(newMethod);
   writePaymentMethods(methods);
-  response.status(201).json(newMethod);
+  response.status(201).json(toPublicPaymentMethod(newMethod));
+});
+
+app.patch("/api/payment-methods/:id", (request, response) => {
+  const { id } = request.params;
+  const methods = readPaymentMethods();
+  const index = methods.findIndex((method) => method.id === id);
+
+  if (index === -1) {
+    response.status(404).json({ error: "Payment method not found." });
+    return;
+  }
+
+  const currentMethod = methods[index];
+  const incoming = request.body || {};
+
+  const isLabelOnlyUpdate =
+    Object.prototype.hasOwnProperty.call(incoming, "label") &&
+    !Object.prototype.hasOwnProperty.call(incoming, "type") &&
+    !Object.prototype.hasOwnProperty.call(incoming, "details");
+
+  if (isLabelOnlyUpdate) {
+    currentMethod.label = sanitizeText(incoming.label, 80) || currentMethod.label;
+    currentMethod.updatedAt = new Date().toISOString();
+    methods[index] = currentMethod;
+    writePaymentMethods(methods);
+    response.json(toPublicPaymentMethod(currentMethod));
+    return;
+  }
+
+  const mergedPayload = {
+    type: incoming.type || currentMethod.type,
+    label: Object.prototype.hasOwnProperty.call(incoming, "label")
+      ? incoming.label
+      : currentMethod.label,
+    details: {
+      ...(currentMethod.details || {}),
+      ...((incoming.details && typeof incoming.details === "object") ? incoming.details : {})
+    }
+  };
+
+  const normalized = validatePaymentMethodPayload(mergedPayload);
+  if (normalized.error) {
+    response.status(400).json({ error: normalized.error });
+    return;
+  }
+
+  methods[index] = {
+    ...currentMethod,
+    type: normalized.type,
+    label: normalized.label,
+    details: normalized.details,
+    updatedAt: new Date().toISOString()
+  };
+
+  writePaymentMethods(methods);
+  response.json(toPublicPaymentMethod(methods[index]));
 });
 
 app.delete("/api/payment-methods/:id", (request, response) => {
   const { id } = request.params;
   const methods = readPaymentMethods();
-  const idx = methods.findIndex((m) => m.id === id);
+  const idx = methods.findIndex((method) => method.id === id);
+
   if (idx === -1) {
     response.status(404).json({ error: "Payment method not found." });
     return;
   }
+
   methods.splice(idx, 1);
   writePaymentMethods(methods);
   response.status(204).end();
+});
+
+app.get("/api/availability", async (request, response) => {
+  const consultantName = sanitizeText(request.query.consultantName, 120);
+  const bookingDate = sanitizeDate(request.query.bookingDate);
+
+  const clauses = [];
+  const values = [];
+
+  if (consultantName) {
+    values.push(consultantName);
+    clauses.push(`consultant_name = $${values.length}`);
+  }
+
+  if (bookingDate) {
+    values.push(bookingDate);
+    clauses.push(`slot_date = $${values.length}`);
+  }
+
+  const whereClause = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
+
+  try {
+    const result = await pool.query(
+      `SELECT
+         id,
+         consultant_name,
+         slot_date::text AS slot_date,
+         slot_time,
+         is_available,
+         created_at,
+         updated_at
+       FROM availability_slots
+       ${whereClause}
+       ORDER BY slot_date ASC, slot_time ASC`,
+      values
+    );
+
+    response.json(result.rows.map((row) => ({
+      id: row.id,
+      consultantName: row.consultant_name,
+      bookingDate: row.slot_date,
+      bookingTime: row.slot_time,
+      isAvailable: row.is_available,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    })));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to fetch availability", error);
+    response.status(500).json({ error: "Failed to fetch availability." });
+  }
+});
+
+app.post("/api/availability", async (request, response) => {
+  const consultantName = sanitizeText(request.body?.consultantName, 120);
+  const bookingDate = sanitizeDate(request.body?.bookingDate);
+  const bookingTime = sanitizeSlotTime(request.body?.bookingTime);
+
+  if (!consultantName || !bookingDate || !bookingTime) {
+    response.status(400).json({
+      error: "consultantName, bookingDate, and bookingTime are required."
+    });
+    return;
+  }
+
+  const slotDate = parseBookingDateTime(bookingDate, bookingTime);
+  if (!slotDate || slotDate.getTime() < Date.now()) {
+    response.status(422).json({
+      error: "Availability must be set for a future date/time."
+    });
+    return;
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO availability_slots (
+         consultant_name,
+         slot_date,
+         slot_time,
+         is_available,
+         updated_at
+       )
+       VALUES ($1, $2, $3, TRUE, NOW())
+       ON CONFLICT (consultant_name, slot_date, slot_time)
+       DO UPDATE SET
+         is_available = TRUE,
+         updated_at = NOW()
+       RETURNING
+         id,
+         consultant_name,
+         slot_date::text AS slot_date,
+         slot_time,
+         is_available,
+         created_at,
+         updated_at`,
+      [consultantName, bookingDate, bookingTime]
+    );
+
+    const row = result.rows[0];
+    response.status(201).json({
+      id: row.id,
+      consultantName: row.consultant_name,
+      bookingDate: row.slot_date,
+      bookingTime: row.slot_time,
+      isAvailable: row.is_available,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to create availability slot", error);
+    response.status(500).json({ error: "Failed to create availability slot." });
+  }
+});
+
+app.delete("/api/availability/:id", async (request, response) => {
+  const availabilityId = Number(request.params.id);
+  if (!Number.isInteger(availabilityId) || availabilityId <= 0) {
+    response.status(400).json({ error: "Invalid availability id." });
+    return;
+  }
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM availability_slots
+       WHERE id = $1
+       RETURNING id`,
+      [availabilityId]
+    );
+
+    if (!result.rows.length) {
+      response.status(404).json({ error: "Availability slot not found." });
+      return;
+    }
+
+    response.status(204).end();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to delete availability slot", error);
+    response.status(500).json({ error: "Failed to delete availability slot." });
+  }
+});
+
+app.get("/api/consultants/registrations", (_request, response) => {
+  const registrations = readConsultantRegistrations().sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+  response.json(registrations);
+});
+
+app.post("/api/consultants/registrations", (request, response) => {
+  const name = sanitizeText(request.body?.name, 80);
+  const email = sanitizeText(request.body?.email, 120).toLowerCase();
+  const expertise = sanitizeText(request.body?.expertise, 120) || "general";
+
+  if (!name || !email) {
+    response.status(400).json({ error: "name and email are required." });
+    return;
+  }
+  if (!isValidEmail(email)) {
+    response.status(400).json({ error: "email format is invalid." });
+    return;
+  }
+
+  const registrations = readConsultantRegistrations();
+  const duplicate = registrations.find((item) => item.email === email && item.status !== "Rejected");
+  if (duplicate) {
+    response.status(409).json({ error: "A registration already exists for this email." });
+    return;
+  }
+
+  const registration = {
+    id: `reg_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    name,
+    email,
+    expertise,
+    status: "Pending",
+    createdAt: new Date().toISOString(),
+    reviewedAt: null,
+    reviewedBy: null
+  };
+
+  registrations.push(registration);
+  writeConsultantRegistrations(registrations);
+  response.status(201).json(registration);
+});
+
+app.patch("/api/consultants/registrations/:id", (request, response) => {
+  const { id } = request.params;
+  const status = sanitizeRegistrationStatus(request.body?.status);
+  const actor = sanitizeActor(request.body?.actor);
+
+  if (status === "Pending") {
+    response.status(400).json({ error: "status must be Approved or Rejected." });
+    return;
+  }
+  if (actor !== "admin") {
+    response.status(403).json({ error: "Only admin can review consultant registrations." });
+    return;
+  }
+
+  const registrations = readConsultantRegistrations();
+  const index = registrations.findIndex((item) => item.id === id);
+  if (index === -1) {
+    response.status(404).json({ error: "Consultant registration not found." });
+    return;
+  }
+
+  registrations[index] = {
+    ...registrations[index],
+    status,
+    reviewedAt: new Date().toISOString(),
+    reviewedBy: actor
+  };
+
+  writeConsultantRegistrations(registrations);
+  response.json(registrations[index]);
+});
+
+app.get("/api/policies", (_request, response) => {
+  response.json(readSystemPolicies());
+});
+
+app.put("/api/policies", (request, response) => {
+  const nextPolicies = normalizePoliciesPayload(request.body);
+  writeSystemPolicies(nextPolicies);
+  response.json(nextPolicies);
 });
 
 app.get("/api/bookings/stream", (request, response) => {
@@ -648,9 +1392,12 @@ app.get("/", (_request, response) => {
 });
 
 async function startServer() {
+  ensureDataFiles();
+
   await withDbRetries(30, 2000, async () => {
     await pool.query("SELECT 1");
   });
+
   await ensureSchema();
 
   app.listen(PORT, () => {

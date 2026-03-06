@@ -13,26 +13,122 @@ document.addEventListener("DOMContentLoaded", () => {
   const bookingTimeInput = document.getElementById("bookingTime");
   const serviceButtons = document.querySelectorAll(".service-book-btn");
   const timeSlotButtons = document.querySelectorAll(".time-slot-btn");
+  const slotAvailabilityHint = document.getElementById("slotAvailabilityHint");
 
   if (bookingDateInput) {
     bookingDateInput.min = new Date().toISOString().split("T")[0];
   }
 
+  function normalizeTime(value) {
+    const raw = String(value || "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s+/g, " ");
+
+    const match = raw.match(/^(0?[1-9]|1[0-2]):([0-5][0-9])\s(AM|PM)$/);
+    if (!match) {
+      return "";
+    }
+
+    const hour = String(Number(match[1])).padStart(2, "0");
+    return `${hour}:${match[2]} ${match[3]}`;
+  }
+
+  function setHint(message) {
+    if (slotAvailabilityHint) {
+      slotAvailabilityHint.innerText = message;
+    }
+  }
+
+  function clearTimeSelection() {
+    bookingTimeInput.value = "";
+    timeSlotButtons.forEach((slotButton) => {
+      slotButton.classList.remove("active");
+    });
+  }
+
+  function disableAllSlots() {
+    clearTimeSelection();
+    timeSlotButtons.forEach((slotButton) => {
+      slotButton.disabled = true;
+    });
+  }
+
+  function applyAvailability(availableTimes) {
+    clearTimeSelection();
+
+    let enabledCount = 0;
+    timeSlotButtons.forEach((slotButton) => {
+      const normalized = normalizeTime(slotButton.innerText);
+      const enabled = availableTimes.has(normalized);
+      slotButton.disabled = !enabled;
+      if (enabled) {
+        enabledCount += 1;
+      }
+    });
+
+    if (!enabledCount) {
+      setHint("No available slots for this consultant on that date.");
+      return;
+    }
+
+    setHint(`${enabledCount} slot(s) available. Select one to continue.`);
+  }
+
+  async function refreshAvailability() {
+    const consultantName = consultantNameSelect.value;
+    const bookingDate = bookingDateInput.value;
+
+    if (!consultantName || !bookingDate) {
+      disableAllSlots();
+      setHint("Choose a consultant and date to load available slots.");
+      return;
+    }
+
+    setHint("Loading available slots...");
+
+    try {
+      const params = new URLSearchParams({
+        consultantName,
+        bookingDate
+      });
+
+      const response = await fetch(`/api/availability?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error("Could not load consultant availability.");
+      }
+
+      const slots = await response.json();
+      const availableTimes = new Set(
+        slots
+          .filter((slot) => slot && slot.isAvailable)
+          .map((slot) => normalizeTime(slot.bookingTime))
+          .filter(Boolean)
+      );
+
+      applyAvailability(availableTimes);
+    } catch (error) {
+      disableAllSlots();
+      setHint(error.message || "Failed to load availability.");
+    }
+  }
+
   function openBookingModal() {
     bookingModal.hidden = false;
     document.body.style.overflow = "hidden";
+    disableAllSlots();
+    setHint("Choose a consultant and date to load available slots.");
   }
 
   function resetBookingForm() {
     if (bookingForm) {
       bookingForm.reset();
     }
-    bookingTimeInput.value = "";
-    timeSlotButtons.forEach((slotButton) => {
-      slotButton.classList.remove("active");
-    });
+
     serviceNameElement.innerText = "--";
     servicePriceElement.innerText = "--";
+    disableAllSlots();
+    setHint("Choose a consultant and date to load available slots.");
   }
 
   function closeBookingModal() {
@@ -62,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return false;
     }
     if (!bookingTimeInput.value) {
-      alert("Select a time slot.");
+      alert("Select an available time slot.");
       return false;
     }
     return true;
@@ -73,17 +169,31 @@ document.addEventListener("DOMContentLoaded", () => {
       serviceNameElement.innerText = button.dataset.service || "--";
       servicePriceElement.innerText = button.dataset.price || "--";
       openBookingModal();
+      refreshAvailability();
     });
   });
 
   timeSlotButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      if (button.disabled) {
+        return;
+      }
+
       timeSlotButtons.forEach((slotButton) => {
         slotButton.classList.remove("active");
       });
+
       button.classList.add("active");
-      bookingTimeInput.value = button.innerText.trim();
+      bookingTimeInput.value = normalizeTime(button.innerText.trim());
     });
+  });
+
+  consultantNameSelect.addEventListener("change", () => {
+    refreshAvailability();
+  });
+
+  bookingDateInput.addEventListener("change", () => {
+    refreshAvailability();
   });
 
   confirmBookingButton.addEventListener("click", async () => {
@@ -109,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "booking.html";
     } catch (error) {
       alert(error.message || "Failed to submit booking.");
+      await refreshAvailability();
     } finally {
       confirmBookingButton.disabled = false;
     }

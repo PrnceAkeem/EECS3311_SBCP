@@ -32,7 +32,7 @@
   <main class="page-shell">
     <div class="heading">
       <h1>Payment History</h1>
-      <h2>All your transactions in one place</h2>
+      <h2>Pending, successful, and refunded payment events</h2>
     </div>
   </main>
 
@@ -42,14 +42,16 @@
         <tr>
           <th>BK-ID</th>
           <th>Service</th>
-          <th>Price</th>
-          <th>Date</th>
-          <th>Status</th>
+          <th>Amount</th>
+          <th>Payment Status</th>
+          <th>Payment Txn</th>
+          <th>Refund Txn</th>
+          <th>Last Updated</th>
         </tr>
       </thead>
       <tbody id="payHistoryBody">
         <tr>
-          <td colspan="5" class="empty-bookings">Loading&hellip;</td>
+          <td colspan="7" class="empty-bookings">Loading&hellip;</td>
         </tr>
       </tbody>
     </table>
