@@ -26,9 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let unsubscribe = null;
 
-  // ==========================================================================
   // Small utilities
-  // ==========================================================================
 
   function escapeHtml(value) {
     return String(value)
@@ -61,9 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return t ? `${d} ${t}` : d;
   }
 
-  // ==========================================================================
   // Table row builders
-  // ==========================================================================
 
   // Which buttons appear depends entirely on the booking's current status.
   // Cancel is available while the booking has not been finalized.
@@ -107,9 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return row;
   }
 
-  // ==========================================================================
   // Metric cards
-  // ==========================================================================
 
   function updateMetricCards(bookings) {
     const total   = bookings.length;
@@ -200,8 +194,8 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.addEventListener("click", (e) => { if (e.target === modal) closePaymentModal(); });
     document.getElementById("payModalClose").addEventListener("click", closePaymentModal);
 
-    // Fetch saved methods — check modalId before touching the DOM so stale
-    // responses from a previously closed modal do nothing.
+    //Fetch saved methods — check modalId before touching the DOM so stale
+    //responses from a previously closed modal do nothing.
     fetch("/api/payment-methods")
       .then((r) => r.json())
       .then((methods) => {
@@ -333,9 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modal) modal.remove();
   }
 
-  // ==========================================================================
   // Table click handler (cancel and pay buttons)
-  // ==========================================================================
 
   bookingsTableBody.addEventListener("click", async (event) => {
     const btn = event.target.closest("button[data-action]");

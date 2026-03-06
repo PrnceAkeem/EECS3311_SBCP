@@ -2,19 +2,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Interaction map:
   // - This page owns payment method CRUD against backend /api/payment-methods.
   // - booking.js reads these saved methods during the client payment modal flow.
+
   // DOM references
   const tableBody  = document.getElementById("methodsTableBody");
   const openBtn    = document.getElementById("openAddMethodBtn");
   const modal      = document.getElementById("addMethodModal");
   const closeBtn   = document.getElementById("addMethodClose");
   const typeSelect = document.getElementById("methodTypeSelect");
-  const ccFields   = document.getElementById("ccFields");
-  const btFields   = document.getElementById("btFields");
-  const itFields   = document.getElementById("itFields");   // Interac e-Transfer
+  const cardFields = document.getElementById("cardFields"); // Credit Card + Debit Card
+  const btFields   = document.getElementById("btFields");   // Bank Transfer
+  const ppFields   = document.getElementById("ppFields");   // PayPal
   const saveBtn    = document.getElementById("saveMethodBtn");
   const errorMsg   = document.getElementById("addMethodError");
 
+  // ==========================================================================
   // Utilities
+  // ==========================================================================
 
   function escapeHtml(value) {
     return String(value)
@@ -28,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function formatDate(isoString) {
     const d = new Date(isoString);
     if (isNaN(d)) return "-";
-    return d.toLocaleDateString("en-CA"); // produces YYYY-MM-DD
+    return d.toLocaleDateString("en-CA"); // YYYY-MM-DD
   }
 
   function showError(message) {
@@ -41,7 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
     errorMsg.style.display = "none";
   }
 
+  // ==========================================================================
   // Load and render the payment methods table
+  // ==========================================================================
 
   async function loadMethods() {
     tableBody.innerHTML = '<tr><td colspan="4" class="empty-bookings">Loading&hellip;</td></tr>';
@@ -55,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTable(methods) {
-    // Full replacement — no appending, so no risk of duplicates
+    // Full innerHTML replacement — no risk of duplicate rows
     if (!methods.length) {
       tableBody.innerHTML = '<tr><td colspan="4" class="empty-bookings">No payment methods saved yet. Add one below.</td></tr>';
       return;
@@ -76,7 +81,9 @@ document.addEventListener("DOMContentLoaded", () => {
     `).join("");
   }
 
+  // ==========================================================================
   // Delete a saved method
+  // ==========================================================================
 
   tableBody.addEventListener("click", async (event) => {
     const btn = event.target.closest('button[data-action="delete"]');
@@ -90,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await fetch(`/api/payment-methods/${encodeURIComponent(methodId)}`, {
         method: "DELETE"
       });
-      // 204 No Content is the success response from the server
       if (!response.ok && response.status !== 204) {
         throw new Error("Failed to remove payment method.");
       }
@@ -101,19 +107,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ==========================================================================
   // Modal open / close
+  // ==========================================================================
 
   function openModal() {
-    // Reset all fields and hide sub-sections before showing the modal
+    // Reset all fields and hide sub-sections before showing
     typeSelect.value = "";
-    ccFields.style.display = "none";
-    btFields.style.display = "none";
-    itFields.style.display = "none";
-    document.getElementById("ccName").value  = "";
-    document.getElementById("ccLast4").value = "";
-    document.getElementById("btBank").value  = "";
-    document.getElementById("btNick").value  = "";
-    document.getElementById("itEmail").value = "";
+    cardFields.style.display = "none";
+    btFields.style.display   = "none";
+    ppFields.style.display   = "none";
+    document.getElementById("cardName").value  = "";
+    document.getElementById("cardLast4").value = "";
+    document.getElementById("btBank").value    = "";
+    document.getElementById("btNick").value    = "";
+    document.getElementById("ppEmail").value   = "";
     clearError();
     modal.style.display = "flex";
   }
@@ -128,19 +136,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target === modal) closeModal(); // backdrop click closes modal
   });
 
-  // Show the right sub-fields whenever the type dropdown changes
+  // Show the right sub-fields when the type dropdown changes.
+  // Credit Card and Debit Card share the same card fields (name + last 4).
   typeSelect.addEventListener("change", () => {
-    ccFields.style.display = typeSelect.value === "Credit Card"  ? "block" : "none";
-    btFields.style.display = typeSelect.value === "Bank Transfer" ? "block" : "none";
-    itFields.style.display = typeSelect.value === "Interac e-Transfer" ? "block" : "none";
+    const t = typeSelect.value;
+    cardFields.style.display = (t === "Credit Card" || t === "Debit Card") ? "block" : "none";
+    btFields.style.display   = (t === "Bank Transfer") ? "block" : "none";
+    ppFields.style.display   = (t === "PayPal")        ? "block" : "none";
     clearError();
   });
 
+  // ==========================================================================
   // Save a new payment method
   //
   // We build a human-readable "label" from the form inputs and POST
   // { type, label } to the backend. No real card numbers or credentials
   // are stored — this is a simulation for demo/grading purposes.
+  // ==========================================================================
 
   saveBtn.addEventListener("click", async () => {
     clearError();
@@ -153,9 +165,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let label = "";
 
-    if (type === "Credit Card") {
-      const name  = document.getElementById("ccName").value.trim();
-      const last4 = document.getElementById("ccLast4").value.trim();
+    if (type === "Credit Card" || type === "Debit Card") {
+      // Credit and Debit share the same form fields
+      const name  = document.getElementById("cardName").value.trim();
+      const last4 = document.getElementById("cardLast4").value.trim();
       if (!name || !last4) {
         showError("Please enter the cardholder name and last 4 digits.");
         return;
@@ -175,11 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       label = `${bank} (${nick})`;
 
-    } else if (type === "Interac e-Transfer") {
-      // Interac only needs a registered email address
-      const email = document.getElementById("itEmail").value.trim();
+    } else if (type === "PayPal") {
+      // PayPal only needs a registered email address
+      const email = document.getElementById("ppEmail").value.trim();
       if (!email) {
-        showError("Please enter your Interac email address.");
+        showError("Please enter your PayPal email address.");
         return;
       }
       label = email;
@@ -205,6 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Load the table on page load
+  // Initial load
   loadMethods();
 });

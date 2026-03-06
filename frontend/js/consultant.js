@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // - transitions booking statuses via BookingStore (PATCH)
   // - stays in sync via BookingStore.subscribe (SSE)
   const tableBody = document.getElementById("consultantBookingsBody");
-  const messageElement = document.getElementById("consultantMessage");
+  const toastEl = document.getElementById("consultantToast");
   // All possible statuses — "Pending Payment" added to match the State Pattern.
   const STATUS_OPTIONS = [
     "Requested",
@@ -16,9 +16,24 @@ document.addEventListener("DOMContentLoaded", () => {
     "Completed"
   ];
   let unsubscribe = null;
+  let isRendering = false;
+  let toastTimer = null;
 
   if (!tableBody || !window.BookingStore) {
     return;
+  }
+
+  function showToast(message) {
+    toastEl.innerText = message;
+    toastEl.classList.add("toast-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("toast-visible"), 3000);
+  }
+
+  // Formats a raw SERIAL integer as BK-001 / CUS-001 — matches booking.html convention.
+  function formatId(prefix, rawId) {
+    const n = Number(rawId);
+    return Number.isInteger(n) ? `${prefix}-${String(n).padStart(3, "0")}` : `${prefix}-${rawId}`;
   }
 
   function getStatusClass(status) {
@@ -45,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function createEmptyRow() {
     const row = document.createElement("tr");
-    row.innerHTML = '<td colspan="8" class="empty-row">No bookings are available yet.</td>';
+    row.innerHTML = '<td colspan="9" class="empty-row">No bookings are available yet.</td>';
     return row;
   }
 
@@ -75,7 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function createBookingRow(booking) {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${escapeHtml(booking.id)}</td>
+      <td>${escapeHtml(formatId("BK", booking.id))}</td>
+      <td>${escapeHtml(formatId("CUS", booking.id))}</td>
       <td>${escapeHtml(booking.clientName || "-")}</td>
       <td>${escapeHtml(booking.service || "-")}</td>
       <td>${escapeHtml(booking.consultantName || "-")}</td>
@@ -95,6 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function renderBookings() {
+    // Guard against concurrent renders triggered by both SSE and the save handler.
+    if (isRendering) return;
+    isRendering = true;
     tableBody.innerHTML = "";
 
     try {
@@ -109,8 +128,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     } catch (error) {
       const row = document.createElement("tr");
-      row.innerHTML = `<td colspan="8" class="empty-row">${escapeHtml(error.message || "Failed to load bookings.")}</td>`;
+      row.innerHTML = `<td colspan="9" class="empty-row">${escapeHtml(error.message || "Failed to load bookings.")}</td>`;
       tableBody.appendChild(row);
+    } finally {
+      isRendering = false;
     }
   }
 
@@ -135,10 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
         selectElement.value,
         "consultant"
       );
-      messageElement.innerText = `Booking #${bookingId} updated to ${updatedBooking.status}.`;
-      renderBookings();
+      showToast(`Booking updated to ${updatedBooking.status}.`);
+      // SSE will trigger renderBookings() automatically on the backend broadcast.
+      // Calling it here too would cause the duplication bug — rely on SSE only.
     } catch (error) {
-      messageElement.innerText = error.message || "Could not update booking status.";
+      showToast(error.message || "Could not update booking status.");
     } finally {
       saveButton.disabled = false;
     }

@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "pm_1772790562992",
+    "type": "Credit Card",
+    "label": "Rick Flare - ending in 8520",
+    "createdAt": "2026-03-06T09:49:22.992Z"
+  },
+  {
+    "id": "pm_1772790589522",
+    "type": "Debit Card",
+    "label": "Chris Tucker - ending in 4242",
+    "createdAt": "2026-03-06T09:49:49.522Z"
+  },
+  {
+    "id": "pm_1772790612661",
+    "type": "Bank Transfer",
+    "label": "Zion Williams (852135)",
+    "createdAt": "2026-03-06T09:50:12.661Z"
+  },
+  {
+    "id": "pm_1772790638289",
+    "type": "PayPal",
+    "label": "OsamBenLadin",
+    "createdAt": "2026-03-06T09:50:38.289Z"
+  }
+]

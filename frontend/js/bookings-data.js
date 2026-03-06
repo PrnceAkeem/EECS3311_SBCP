@@ -136,7 +136,7 @@
     });
 
     stream.onerror = function onError() {
-      // EventSource auto-reconnects. Keeping handler prevents noisy uncaught errors.
+      //EventSource auto-reconnects. Keeping handler prevents noisy uncaught errors.
     };
 
     return function unsubscribeSse() {

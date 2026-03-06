@@ -74,19 +74,21 @@
             <select id="methodTypeSelect" class="form-select">
               <option value="">Select a type&hellip;</option>
               <option value="Credit Card">Credit Card</option>
+              <option value="Debit Card">Debit Card</option>
               <option value="Bank Transfer">Bank Transfer</option>
-              <option value="Interac e-Transfer">Interac e-Transfer</option>
+              <option value="PayPal">PayPal</option>
             </select>
           </label>
 
-          <div id="ccFields" style="display:none;">
+          <!-- Credit Card and Debit Card share the same fields -->
+          <div id="cardFields" style="display:none;">
             <label class="form-label">
               Cardholder Name
-              <input type="text" id="ccName" class="form-input" placeholder="e.g. Prince Akeem" maxlength="60" />
+              <input type="text" id="cardName" class="form-input" placeholder="e.g. Prince Akeem" maxlength="60" />
             </label>
             <label class="form-label">
               Last 4 Digits
-              <input type="text" id="ccLast4" class="form-input" placeholder="e.g. 4242" maxlength="4" />
+              <input type="text" id="cardLast4" class="form-input" placeholder="e.g. 4242" maxlength="4" />
             </label>
           </div>
 
@@ -101,11 +103,11 @@
             </label>
           </div>
 
-          <!-- Interac e-Transfer only needs a registered email address -->
-          <div id="itFields" style="display:none;">
+          <!-- PayPal only needs a registered email address -->
+          <div id="ppFields" style="display:none;">
             <label class="form-label">
-              Interac Email
-              <input type="email" id="itEmail" class="form-input" placeholder="e.g. you@example.com" maxlength="80" />
+              PayPal Email
+              <input type="email" id="ppEmail" class="form-input" placeholder="e.g. you@paypal.com" maxlength="80" />
             </label>
           </div>
 
