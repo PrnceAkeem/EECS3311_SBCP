@@ -124,14 +124,5 @@ The following use cases from the diagram are deferred to Phase 2:
 - Validate Availability sub-flow on UC9
 - Real email/SMS/push delivery (Observer notifiers log to console only)
 
-## Team Contributions
-
-| Name | Role | Key Work |
-|------|------|----------|
-| [Team Member 1] | Backend | State Pattern, BookingStateMachine, PostgreSQL schema |
-| [Team Member 2] | Backend | Observer Pattern, Strategy Pattern, Factory Pattern, server.js wiring |
-| Jaheim Daniels | Frontend | Client/Consultant/Admin dashboards, booking flow, payment modal |
-| [Team Member 4] | Frontend | Payment Methods UI, Docker setup, bookings-data.js bridge |
-
 ## Repository
 GitHub: [https://github.com/PrnceAkeem/EECS3311_SBCP]
