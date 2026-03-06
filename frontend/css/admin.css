@@ -10,16 +10,12 @@
 .page-head h1 {
   font-size: 2rem;
   margin-bottom: 0.35rem;
+  text-align: center;
 }
 
-.page-head p {
+.page-subtitle {
   color: var(--muted);
-}
-
-.page-message {
-  min-height: 1.5rem;
-  color: var(--muted);
-  margin-bottom: 0.8rem;
+  text-align: center;
 }
 
 .table-card {
@@ -63,4 +59,28 @@
 .empty-row {
   text-align: center;
   color: var(--muted);
+}
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.1rem;
+  color: var(--text);
+  box-shadow: var(--shadow);
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(0.4rem);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  font-size: 0.9rem;
+  max-width: 320px;
+}
+
+.toast.toast-visible {
+  opacity: 1;
+  transform: translateY(0);
 }

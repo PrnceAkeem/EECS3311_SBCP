@@ -22,24 +22,18 @@
     <a class="logout-btn" href="./index.html">Logout</a>
   </header>
 
-  <nav class="subnav" aria-label="Admin navigation">
-    <a class="subnav-link active" href="./admin.html">Admin Dashboard</a>
-    <a class="subnav-link" href="./booking.html">Client Bookings View</a>
-  </nav>
-
   <main class="management-page">
     <div class="page-head">
-      <h1>🛡️ Admin Dashboard</h1>
-      <p>Review and update booking requests.</p>
+      <h1>Admin Dashboard</h1>
+      <p class="page-subtitle">Review and update all booking requests.</p>
     </div>
-
-    <p id="adminMessage" class="page-message" aria-live="polite"></p>
 
     <div class="table-card">
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>BK-ID</th>
+            <th>CUS-ID</th>
             <th>Client</th>
             <th>Service</th>
             <th>Consultant</th>
@@ -53,6 +47,8 @@
       </table>
     </div>
   </main>
+
+  <div id="adminToast" class="toast" aria-live="polite"></div>
 
   <script src="./js/bookings-data.js" defer></script>
   <script src="./js/admin.js" defer></script>
