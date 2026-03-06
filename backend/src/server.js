@@ -108,6 +108,8 @@ function mapBookingRow(row) {
 
   return {
     id: row.id,
+    bookingRef: row.booking_ref || null,
+    customerId: row.customer_id || null,
     service: row.service,
     price: row.price,
     clientName: row.client_name,
@@ -217,6 +219,22 @@ async function ensureSchema() {
      CHECK (status IN (${STATUS_SQL}))`
   );
 
+  // Add booking_ref and customer_id columns for display-friendly prefixed IDs.
+  await pool.query(
+    `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_ref TEXT`
+  );
+  await pool.query(
+    `ALTER TABLE bookings ADD COLUMN IF NOT EXISTS customer_id TEXT`
+  );
+
+  // Backfill any rows that existed before these columns were added.
+  await pool.query(
+    `UPDATE bookings
+     SET booking_ref = 'bk_' || id,
+         customer_id = 'cu_' || id
+     WHERE booking_ref IS NULL`
+  );
+
   await pool.query(
     `CREATE INDEX IF NOT EXISTS idx_bookings_created_at
      ON bookings(created_at DESC)`
@@ -274,6 +292,8 @@ app.get("/api/bookings", async (_request, response) => {
     const result = await pool.query(
       `SELECT
          id,
+         booking_ref,
+         customer_id,
          service,
          price,
          client_name,
@@ -337,8 +357,14 @@ app.post("/api/bookings", async (request, response) => {
       return;
     }
 
+    const now = Date.now();
+    const bookingRef = `bk_${now}`;
+    const customerId = `cu_${now}${Math.random().toString(36).slice(2, 6)}`;
+
     const result = await pool.query(
       `INSERT INTO bookings (
+         booking_ref,
+         customer_id,
          service,
          price,
          client_name,
@@ -349,9 +375,11 @@ app.post("/api/bookings", async (request, response) => {
          status,
          updated_by
        )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'Requested', 'client')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Requested', 'client')
        RETURNING
          id,
+         booking_ref,
+         customer_id,
          service,
          price,
          client_name,
@@ -364,6 +392,8 @@ app.post("/api/bookings", async (request, response) => {
          updated_at,
          updated_by`,
       [
+        bookingRef,
+        customerId,
         service,
         price,
         actors.client.name,
@@ -504,6 +534,8 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
        WHERE id = $3
        RETURNING
          id,
+         booking_ref,
+         customer_id,
          service,
          price,
          client_name,
@@ -543,12 +575,12 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
 // =============================================================================
 
 // Must match exactly what the frontend dropdowns offer.
-// We support both PayPal and Interac e-Transfer so old and new UI variants work.
+// Spec requires: Credit Card, Debit Card, Bank Transfer, PayPal.
 const ALLOWED_METHOD_TYPES = [
   "Credit Card",
+  "Debit Card",
   "Bank Transfer",
-  "PayPal",
-  "Interac e-Transfer"
+  "PayPal"
 ];
 
 app.get("/api/payment-methods", (_request, response) => {

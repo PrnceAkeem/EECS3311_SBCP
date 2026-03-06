@@ -83,7 +83,7 @@
   width: min(1240px, 95%);
   margin: 1rem auto 2rem;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 /* ============================================================

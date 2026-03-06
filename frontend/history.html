@@ -40,38 +40,23 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Method</th>
-          <th>Amount</th>
+          <th>BK-ID</th>
+          <th>Service</th>
+          <th>Price</th>
           <th>Date</th>
           <th>Status</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="payHistoryBody">
         <tr>
-          <td>1</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
-          <td class="empty-cell">-</td>
+          <td colspan="5" class="empty-bookings">Loading&hellip;</td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <script src="./js/bookings-data.js" defer></script>
+  <script src="./js/history.js" defer></script>
 </body>
 
 </html>

@@ -22,24 +22,18 @@
     <a class="logout-btn" href="./index.html">Logout</a>
   </header>
 
-  <nav class="subnav" aria-label="Consultant navigation">
-    <a class="subnav-link active" href="./consultant.html">Consultant Dashboard</a>
-    <a class="subnav-link" href="./booking.html">Client Bookings View</a>
-  </nav>
-
   <main class="management-page">
     <div class="page-head">
-      <h1>🧑‍💼 Consultant Dashboard</h1>
-      <p>Manage your assigned booking requests.</p>
+      <h1>Consultant Dashboard</h1>
+      <p class="page-subtitle">Manage your assigned booking requests.</p>
     </div>
-
-    <p id="consultantMessage" class="page-message" aria-live="polite"></p>
 
     <div class="table-card">
       <table>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>BK-ID</th>
+            <th>CUS-ID</th>
             <th>Client</th>
             <th>Service</th>
             <th>Consultant</th>
@@ -53,6 +47,8 @@
       </table>
     </div>
   </main>
+
+  <div id="consultantToast" class="toast" aria-live="polite"></div>
 
   <script src="./js/bookings-data.js" defer></script>
   <script src="./js/consultant.js" defer></script>
