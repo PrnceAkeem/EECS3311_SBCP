@@ -7,7 +7,7 @@ Winter 2026
 This is a multi-role booking system with three user-facing flows:
 - Client: create bookings, cancel, pay for confirmed bookings
 - Consultant: review and update booking statuses
-- Admin: review and update booking statuses
+- Admin: Approve Consultant Registration and Define System Policies(basic)
 
 The frontend is static HTML/CSS/JS served by Express. The backend is a Node.js API using PostgreSQL for bookings and a JSON file for saved payment methods.
 
