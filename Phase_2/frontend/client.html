@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synergy Consulting: Client</title>
+  <link rel="icon" href="./images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/client.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand-link" href="client.html">
+      <img src="./images/logo.png" alt="Synergy Consulting logo">
+      <span>Synergy Consulting</span>
+    </a>
+    <a class="logout-btn" href="./index.html">Logout</a>
+  </header>
+
+  <nav class="subnav" aria-label="Client navigation">
+    <a class="subnav-link active" href="client.html">Browse Services</a>
+    <a class="subnav-link" href="booking.html">My Bookings</a>
+    <a class="subnav-link" href="history.html">Payments</a>
+    <a class="subnav-link" href="methods.html">Pay Methods</a>
+  </nav>
+
+  <main class="page-shell">
+    <div class="heading">
+      <h1>Browse Consulting Services</h1>
+      <h2>Explore our available services and request a booking with our experts to assist you</h2>
+    </div>
+
+    <section class="services-grid">
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">TECH</p>
+          <h3 class="service-title">Software Architecture Review</h3>
+          <p class="service-description">Deep technical evaluation of your system architecture.</p>
+          <p class="service-price">$150</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Software Architecture Review" data-price="$150">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">TECH</p>
+          <h3 class="service-title">Cloud Migration Consulting</h3>
+          <p class="service-description">Guidance for secure and scalable cloud adoption.</p>
+          <p class="service-price">$200</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Cloud Migration Consulting" data-price="$200">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">CAREER</p>
+          <h3 class="service-title">Career Path Consulting</h3>
+          <p class="service-description">Guidance for choosing the right career path based on interests and experience.</p>
+          <p class="service-price">$50</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Career Path Consulting" data-price="$50">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">CAREER</p>
+          <h3 class="service-title">Technical Interview Prep</h3>
+          <p class="service-description">Ace your interviews with personalized coaching, mock sessions, and problem-solving guidance.</p>
+          <p class="service-price">$100</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Technical Interview Prep" data-price="$100">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">BUSINESS</p>
+          <h3 class="service-title">Startup Strategy Session</h3>
+          <p class="service-description">Strategic guidance for early-stage startups to validate ideas and scale effectively.</p>
+          <p class="service-price">$200</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Startup Strategy Session" data-price="$200">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">TECH</p>
+          <h3 class="service-title">Code Review &amp; Mentorship</h3>
+          <p class="service-description">Personalized code reviews and one-on-one mentorship to elevate your technical skills.</p>
+          <p class="service-price">$60</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Code Review &amp; Mentorship" data-price="$60">Book</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="bookingModal" hidden>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="bookingModalLabel">
+      <div class="modal-header">
+        <h2 class="modal-title" id="bookingModalLabel">Book Service</h2>
+        <button type="button" class="modal-close-button" id="closeBookingModal" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <p class="modal-meta"><strong>Service:</strong> <span id="serviceName">--</span></p>
+        <p class="modal-meta"><strong>Price:</strong> <span id="servicePrice">--</span></p>
+
+        <form id="bookingForm" class="modal-form">
+          <div>
+            <label for="clientName" class="form-label">Your Name</label>
+            <input type="text" class="input-field" id="clientName" placeholder="Enter your name">
+          </div>
+
+          <div>
+            <label for="clientEmail" class="form-label">Email</label>
+            <input type="email" class="input-field" id="clientEmail" placeholder="Enter your email">
+          </div>
+
+          <div>
+            <label for="consultantName" class="form-label">Consultant Name</label>
+            <select class="input-field" id="consultantName" name="consultantName">
+              <option value="" selected disabled>Select a consultant</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="bookingDate" class="form-label">Preferred Date</label>
+            <input type="date" class="input-field" id="bookingDate">
+          </div>
+
+          <div>
+            <label class="form-label">Select Time Slot</label>
+            <p class="modal-meta" id="slotAvailabilityHint">Choose a consultant and date to load available slots.</p>
+            <div id="timeSlots" class="time-slot-grid">
+              <button type="button" class="time-slot-btn">09:00 AM</button>
+              <button type="button" class="time-slot-btn">10:00 AM</button>
+              <button type="button" class="time-slot-btn">11:00 AM</button>
+              <button type="button" class="time-slot-btn">12:00 PM</button>
+              <button type="button" class="time-slot-btn">01:00 PM</button>
+              <button type="button" class="time-slot-btn">02:00 PM</button>
+              <button type="button" class="time-slot-btn">03:00 PM</button>
+              <button type="button" class="time-slot-btn">04:00 PM</button>
+              <button type="button" class="time-slot-btn">05:00 PM</button>
+            </div>
+            <input type="hidden" id="bookingTime" name="bookingTime">
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="action-btn secondary" id="cancelBookingButton">Cancel</button>
+        <button type="button" class="action-btn" id="confirmBookingButton">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./js/bookings-data.js" defer></script>
+  <script src="./js/client.js" defer></script>
+</body>
+
+</html>

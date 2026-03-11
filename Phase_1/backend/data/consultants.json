@@ -19,5 +19,12 @@
     "email": "brian.flys@consultant.synergy.local",
     "expertise": "Career Coaching",
     "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "con_4",
+    "name": "Kari novva",
+    "email": "nova@consultant.synergy.local",
+    "expertise": "Cloud Mitigation",
+    "createdAt": "2026-03-06T21:40:13.481Z"
   }
 ]

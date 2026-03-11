@@ -1,0 +1,6 @@
+{
+  "cancellationWindowHours": 24,
+  "pricingMultiplier": 1,
+  "notificationsEnabled": true,
+  "refundPolicy": "Paid bookings cancelled before the session are refunded automatically."
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "con_1",
+    "name": "John Smith",
+    "email": "john.smith@consultant.synergy.local",
+    "expertise": "Software Architecture",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "con_2",
+    "name": "Angela Fox",
+    "email": "angela.fox@consultant.synergy.local",
+    "expertise": "Technical Interviews",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "con_3",
+    "name": "Brian Flys",
+    "email": "brian.flys@consultant.synergy.local",
+    "expertise": "Career Coaching",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "con_4",
+    "name": "Kari novva",
+    "email": "nova@consultant.synergy.local",
+    "expertise": "Cloud Mitigation",
+    "createdAt": "2026-03-06T21:40:13.481Z"
+  }
+]

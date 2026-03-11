@@ -1,10 +1,14 @@
-# Service Booking and Consulting Platform
+# Phase 2 — Service Booking & Consulting Platform
 Group 8, EECS 3311 Software Design
 York University, Lassonde School of Engineering
 Winter 2026
 
-## What This Project Does
-A multi-role booking system with three user-facing flows:
+## What This Phase Does
+
+Phase 2 extends Phase 1 with a fully modular backend, payment processing, refund handling,
+consultant availability management, consultant registration approvals, and admin system policies.
+
+Three user roles are supported:
 - **Client** — browse services, create bookings, cancel, pay for confirmed sessions, view payment history
 - **Consultant** — manage availability slots, confirm/reject/complete bookings
 - **Admin** — manage the consultant directory, approve registrations, configure system policies, oversee all bookings
@@ -13,51 +17,17 @@ The frontend is static HTML/CSS/JS served by Express. The backend is a Node.js/E
 
 ---
 
-## Project Structure
-
-```
-EECS3311_SBCP/
-├── Phase_1/               Phase 1 submission (original monolithic server)
-├── Phase_2/               Phase 2 submission (modular backend — see below)
-│   ├── backend/
-│   │   ├── src/
-│   │   │   ├── server.js              Entry point (~46 lines)
-│   │   │   ├── config.js              Constants and defaults
-│   │   │   ├── db.js                  DB pool, schema, retries
-│   │   │   ├── dataStore.js           JSON file I/O
-│   │   │   ├── helpers.js             Sanitize / validate / transform
-│   │   │   ├── sse.js                 SSE stream + Observer broadcast
-│   │   │   ├── patterns/
-│   │   │   │   ├── state/             State pattern
-│   │   │   │   ├── strategy/          Strategy pattern
-│   │   │   │   ├── observer/          Observer pattern
-│   │   │   │   └── factory/           Factory pattern
-│   │   │   └── routes/
-│   │   │       ├── bookings.js
-│   │   │       ├── paymentMethods.js
-│   │   │       ├── consultants.js
-│   │   │       ├── availability.js
-│   │   │       └── policies.js
-│   │   ├── data/                      Persistent JSON files
-│   │   └── db/init.sql                PostgreSQL schema
-│   ├── frontend/                      Static HTML/CSS/JS
-│   └── docker-compose.yml
-└── README.md
-```
-
----
-
-## How to Run (Phase 2)
+## How to Run
 
 Requires Docker Desktop to be running.
 
 ```bash
-cd Phase_2
+# from the Phase_2/ directory
 docker compose up --build
 ```
 
-| URL | Description |
-|-----|-------------|
+| URL | What it is |
+|-----|-----------|
 | `http://localhost:3000` | App (login page) |
 | `http://localhost:3000/health` | Health check |
 
@@ -76,7 +46,50 @@ docker compose down -v    # stop + delete DB volume
 
 ---
 
-## How It Works
+## Backend Module Structure
+
+The original single `server.js` (1600+ lines) has been split into focused modules.
+When debugging, go directly to the file responsible for the area that broke.
+
+```
+backend/src/
+├── server.js              Entry point — mounts routes, starts server (~46 lines)
+├── config.js              All constants and default values (PORT, file paths, status lists)
+├── db.js                  DB pool, ensureSchema(), withDbRetries()
+├── dataStore.js           JSON file I/O (payment methods, consultants, registrations, policies)
+├── helpers.js             Input sanitization, validators, price/date transforms, mapBookingRow
+├── sse.js                 SSE stream set + broadcastBookingEvent() (Observer wiring)
+├── patterns/
+│   ├── state/             State pattern — BookingStateMachine + per-state classes
+│   ├── strategy/          Strategy pattern — PaymentStrategies + PaymentStrategyFactory
+│   ├── observer/          Observer pattern — NotificationManager, Email/SMS/Push notifiers
+│   └── factory/           Factory pattern — UserFactory, Client, Consultant, Admin
+└── routes/
+    ├── bookings.js        GET/POST /api/bookings, PATCH /:id/status, GET /stream
+    ├── paymentMethods.js  GET/POST/PATCH/DELETE /api/payment-methods
+    ├── consultants.js     GET/POST /api/consultants + registration approval endpoints
+    ├── availability.js    GET/POST/DELETE /api/availability
+    └── policies.js        GET/PUT /api/policies
+```
+
+### Where to look when something breaks
+
+| Symptom | File to check |
+|---------|---------------|
+| Booking won't save to DB | `routes/bookings.js` → POST handler |
+| Status change rejected | `routes/bookings.js` → PATCH handler + `patterns/state/` |
+| Payment fails | `routes/bookings.js` → "Paid" block + `patterns/strategy/` |
+| Refund not issued | `routes/bookings.js` → "Paid → Cancelled" block |
+| SSE not pushing updates | `sse.js` → `broadcastBookingEvent()` |
+| Notifications not logging | `sse.js` + `patterns/observer/` |
+| Consultant not appearing | `dataStore.js` → `readConsultants()` / `normalizeConsultants()` |
+| Policy not applying | `routes/policies.js` + `helpers.js` → `normalizePoliciesPayload()` |
+| DB schema out of sync | `db.js` → `ensureSchema()` |
+| Validation error unclear | `helpers.js` → `validatePaymentMethodPayload()` or sanitize functions |
+
+---
+
+## Request Flow
 
 ```
 Client browser
@@ -100,7 +113,7 @@ booking.js payment modal
       |
       | JSON over HTTP
       v
-backend/src/server.js  (Express — routing only)
+backend/src/server.js  (Express — routes only, no logic)
       |
       ├── routes/bookings.js       State + Strategy + Factory + Observer
       ├── routes/paymentMethods.js
@@ -159,7 +172,7 @@ backend/data/*.json    (payment-methods, consultants, registrations, policies)
 
 ## Booking Status Model
 
-Transitions enforced by the State Pattern (`patterns/state/BookingStateMachine.js`):
+Transitions are enforced by the State Pattern (`patterns/state/BookingStateMachine.js`).
 
 ```
 Requested ──► Confirmed ──► Pending Payment ──► Paid ──► Completed
@@ -167,20 +180,18 @@ Requested ──► Confirmed ──► Pending Payment ──► Paid ──►
     └──► Rejected  └──► Cancelled  └──► Cancelled └──► Cancelled (triggers refund)
 ```
 
-Terminal states — no further transitions: `Completed`, `Rejected`, `Cancelled`
+Terminal states — no further transitions allowed: `Completed`, `Rejected`, `Cancelled`
 
 ---
 
 ## GoF Design Patterns
 
-All four patterns are implemented in `Phase_2/backend/src/patterns/` and wired through the route handlers.
-
 | Pattern | File | When It Runs |
 |---------|------|-------------|
-| **State** | `patterns/state/BookingStateMachine.js` | Every `PATCH /api/bookings/:id/status` — rejects illegal transitions before touching the DB |
-| **Strategy** | `patterns/strategy/PaymentStrategies.js` | When status moves to `Paid` — `PaymentStrategyFactory.create(methodType)` picks the right handler (Credit Card, Debit, Bank Transfer, PayPal) |
-| **Observer** | `patterns/observer/NotificationManager.js` | After every status change — `broadcastBookingEvent()` fans out to Email, SMS, and Push notifiers and all connected SSE clients |
-| **Factory** | `patterns/factory/UserFactory.js` | On `POST /api/bookings` — `UserFactory.createUser()` builds typed `Client` and `Consultant` objects for the booking |
+| **State** | `patterns/state/BookingStateMachine.js` | Every `PATCH /api/bookings/:id/status` — rejects illegal transitions |
+| **Strategy** | `patterns/strategy/PaymentStrategies.js` | When status moves to `Paid` — picks the right payment handler (Credit Card, Debit, Bank Transfer, PayPal) |
+| **Observer** | `patterns/observer/NotificationManager.js` | After every status change — `broadcastBookingEvent()` fans out to Email, SMS, and Push notifiers + SSE clients |
+| **Factory** | `patterns/factory/UserFactory.js` | On `POST /api/bookings` — builds typed `Client` and `Consultant` objects for the booking |
 
 ---
 

@@ -25,5 +25,18 @@
     },
     "createdAt": "2026-03-06T20:11:53.388Z",
     "updatedAt": null
+  },
+  {
+    "id": "pm_1772839115847",
+    "type": "Bank Transfer",
+    "label": "Bank (Acct ••••4567)",
+    "details": {
+      "bankName": "Bank",
+      "accountNumber": "12324567",
+      "routingNumber": "123456798",
+      "last4": "4567"
+    },
+    "createdAt": "2026-03-06T23:18:35.847Z",
+    "updatedAt": null
   }
 ]

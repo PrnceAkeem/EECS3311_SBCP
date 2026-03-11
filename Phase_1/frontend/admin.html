@@ -42,7 +42,16 @@
         </label>
         <label class="form-label">
           Expertise
-          <input id="consultantExpertiseInput" class="input-field" type="text" maxlength="120" placeholder="Cloud migration" />
+          <select id="consultantExpertiseInput" class="input-field">
+            <option value="" selected disabled>Select expertise</option>
+            <option value="Software Architecture">Software Architecture</option>
+            <option value="Technical Interviews">Technical Interviews</option>
+            <option value="Career Coaching">Career Coaching</option>
+            <option value="Cloud Migration">Cloud Migration</option>
+            <option value="Startup Strategy">Startup Strategy</option>
+            <option value="Code Review">Code Review</option>
+            <option value="General Consulting">General Consulting</option>
+          </select>
         </label>
         <button type="button" id="addConsultantBtn" class="action-btn">Add Consultant</button>
       </div>

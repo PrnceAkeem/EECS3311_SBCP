@@ -141,8 +141,45 @@ function writeConsultantRegistrations(registrations) {
   writeJsonFile(CONSULTANT_REGISTRATIONS_FILE, registrations);
 }
 
+function consultantIdNumber(consultantId) {
+  const match = String(consultantId || "").trim().match(/^con_(\d+)$/i);
+  if (!match) {
+    return null;
+  }
+
+  const parsed = Number(match[1]);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+  return parsed;
+}
+
+function normalizeConsultants(rawConsultants) {
+  const input = Array.isArray(rawConsultants) ? rawConsultants : [];
+
+  return input
+    .map((consultant) => ({
+      name: sanitizeText(consultant?.name, 80),
+      email: sanitizeText(consultant?.email, 120).toLowerCase(),
+      expertise: sanitizeText(consultant?.expertise, 120) || "general",
+      createdAt: consultant?.createdAt || new Date().toISOString()
+    }))
+    .filter((consultant) => consultant.name)
+    .map((consultant, index) => ({
+      id: `con_${index + 1}`,
+      ...consultant
+    }));
+}
+
 function readConsultants() {
-  return readJsonFile(CONSULTANTS_FILE, DEFAULT_CONSULTANTS);
+  const rawConsultants = readJsonFile(CONSULTANTS_FILE, DEFAULT_CONSULTANTS);
+  const normalizedConsultants = normalizeConsultants(rawConsultants);
+
+  if (JSON.stringify(rawConsultants) !== JSON.stringify(normalizedConsultants)) {
+    writeConsultants(normalizedConsultants);
+  }
+
+  return normalizedConsultants;
 }
 
 function writeConsultants(consultants) {
@@ -1266,7 +1303,11 @@ app.get("/api/consultants", (_request, response) => {
   const consultants = readConsultants()
     .map(toPublicConsultant)
     .filter(Boolean)
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      const aId = consultantIdNumber(a.id) || Number.MAX_SAFE_INTEGER;
+      const bId = consultantIdNumber(b.id) || Number.MAX_SAFE_INTEGER;
+      return aId - bId;
+    });
 
   response.json(consultants);
 });
@@ -1313,7 +1354,7 @@ app.post("/api/consultants", (request, response) => {
   }
 
   const consultant = {
-    id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    id: `con_${consultants.length + 1}`,
     name,
     email,
     expertise,
@@ -1559,7 +1600,7 @@ app.patch("/api/consultants/registrations/:id", (request, response) => {
 
     if (!alreadyExists) {
       consultants.push({
-        id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        id: `con_${consultants.length + 1}`,
         name: approvedRegistration.name,
         email: approvedRegistration.email,
         expertise: approvedRegistration.expertise || "general",
