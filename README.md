@@ -51,7 +51,6 @@ PostgreSQL (bookings) + backend/data/payment-methods.json
 
 ## Backend Responsibilities
 `backend/src/server.js` is the runtime entry point and does all of the following:
-- Serves static frontend files
 - Exposes REST endpoints for bookings and payment methods
 - Validates status transitions with the State Pattern
 - Applies payment processing rules with the Strategy Pattern
@@ -79,18 +78,32 @@ Allowed transitions enforced by backend State Pattern:
 - `Completed`, `Rejected`, and `Cancelled` are terminal states
 
 ## Run With Docker
-This project runs with two containers:
-- `synergy-db` (PostgreSQL)
-- `synergy-app` (Node + Express API + static frontend)
 
-Start:
+The system runs with **three containers**:
+
+| Container | Role |
+|---|---|
+| `synergy-db` | PostgreSQL database |
+| `synergy-backend` | Node.js / Express REST API + AI chatbot endpoint |
+| `synergy-frontend` | nginx — serves static files and proxies `/api/` to backend |
+
+### Setup
+
+1. Copy the environment template and add your Gemini API key:
 ```bash
-docker compose up --build
+cp .env.example .env
+# Then open .env and set GEMINI_API_KEY=your_key_here
 ```
 
-Open:
-- App: `http://localhost:3000`
-- Health check: `http://localhost:3000/health`
+2. Start all containers:
+```bash
+docker compose up --build   # first run or after code changes
+docker compose up           # subsequent runs
+```
+
+3. Open the app:
+- **App:** `http://localhost:3000`
+- **Health check:** `http://localhost:3000/health`
 
 Stop:
 ```bash
@@ -101,6 +114,12 @@ Stop and remove DB volume:
 ```bash
 docker compose down -v
 ```
+
+### AI Customer Assistant
+
+The AI chatbot is available to clients on the Browse Services page. Click the 💬 bubble in the bottom-right corner to open it. It is powered by the Google Gemini API (`gemini-flash-lite-latest`) and answers questions about the platform, booking process, payment methods, and policies.
+
+See `CHATBOT-DOC.md` for full documentation.
 
 ## GoF Design Patterns
 
@@ -113,12 +132,19 @@ All four patterns are implemented in `backend/src/patterns/` and wired in `backe
 | Observer | `backend/src/patterns/observer/NotificationManager.js` | After every successful status change — `broadcastBookingEvent()` calls `notificationManager.sendNotification()` which forwards to Email, SMS, and Push notifiers |
 | Factory | `backend/src/patterns/factory/UserFactory.js` | On `POST /api/bookings` — `UserFactory.createUser()` builds typed Client and Consultant objects for the booking actors |
 
+## Phase 2 Additions
+
+- Completed frontend for all client, consultant, and admin workflows
+- Client refund flow: "Cancel & Refund" button on paid bookings — backend auto-generates a refund transaction ID
+- Three-container Docker deployment (db + backend + frontend/nginx)
+- AI Customer Assistant chatbot (Google Gemini) embedded in the client interface
+- See `PHASE2.md` for a full breakdown and `CHATBOT-DOC.md` for chatbot documentation
+
 ## Phase 1 Scope Note
 
 Phase 1 covers the booking lifecycle end-to-end with all four GoF patterns wired and testable.
-Current implementation includes availability management, consultant registration approvals,
-system policy configuration, payment processing, and refund handling.
-Observer notifications are functional in-app and currently log delivery actions to console.
+Includes availability management, consultant registration approvals, system policy configuration,
+payment processing, and refund handling. Observer notifications log delivery actions to console.
 
 ## Repository
 GitHub: [https://github.com/PrnceAkeem/EECS3311_SBCP]

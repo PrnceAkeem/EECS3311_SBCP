@@ -67,11 +67,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function createActionsCell(booking) {
     const buttons = [];
 
-    if (["Requested", "Confirmed", "Pending Payment"].includes(booking.status)) {
+    if (["Requested", "Confirmed", "Pending Payment", "Paid"].includes(booking.status)) {
+      const cancelLabel = booking.status === "Paid" ? "Cancel & Refund" : "Cancel";
       buttons.push(`
         <button type="button" class="table-action-btn cancel"
                 data-action="cancel" data-booking-id="${booking.id}">
-          Cancel
+          ${cancelLabel}
         </button>`);
     }
 
@@ -342,10 +343,19 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Cancel the booking
+    // Cancel the booking (with refund if already Paid)
+    const allBookings = await window.BookingStore.getBookings();
+    const target = allBookings.find(b => b.id === bookingId);
+    const isPaid = target && target.status === "Paid";
+    const confirmMsg = isPaid
+      ? "Cancel this booking? A refund will be issued automatically."
+      : "Are you sure you want to cancel this booking?";
+    if (!confirm(confirmMsg)) return;
+
     btn.disabled = true;
     try {
       await window.BookingStore.updateBookingStatus(bookingId, "Cancelled", "client");
+      if (isPaid) alert("Booking cancelled. Your refund has been processed — check Payment History for the refund transaction ID.");
       // Re-render immediately. The SSE callback will also fire, but isRendering
       // prevents a second concurrent fetch from running.
       renderBookings();

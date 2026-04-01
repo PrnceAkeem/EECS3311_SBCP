@@ -6,7 +6,6 @@ COPY backend/package*.json ./backend/
 RUN cd backend && npm ci --omit=dev
 
 COPY backend ./backend
-COPY frontend ./frontend
 
 EXPOSE 3000
 

@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const { Pool } = require("pg");
+// Google Gemini is called via the REST API — no extra package needed.
 
 const BookingStateMachine = require("./patterns/state/BookingStateMachine");
 const { PaymentStrategyFactory } = require("./patterns/strategy/PaymentStrategies");
@@ -18,6 +19,7 @@ const PORT = Number(process.env.PORT || 3000);
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://synergy_user:synergy_pass@localhost:5432/synergy";
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 
 const DATA_DIR = path.join(__dirname, "..", "data");
 const PAYMENT_METHODS_FILE = path.join(DATA_DIR, "payment-methods.json");
@@ -1594,6 +1596,106 @@ app.get("/api/bookings/stream", (request, response) => {
   request.on("close", () => {
     streamClients.delete(response);
   });
+});
+
+// ─── AI Customer Assistant ────────────────────────────────────────────────────
+// POST /api/chat
+// Accepts { message: string } and returns { reply: string }.
+// The AI is given only public platform context — no personal user data or
+// private booking details are ever forwarded to the model.
+app.post("/api/chat", async (request, response) => {
+  const { message } = request.body || {};
+
+  if (!message || typeof message !== "string" || message.trim().length === 0) {
+    return response.status(400).json({ error: "message is required" });
+  }
+
+  if (!GEMINI_API_KEY) {
+    return response
+      .status(503)
+      .json({ error: "AI assistant is not configured (missing API key)" });
+  }
+
+  // Build public platform context — read from JSON files, never from the DB
+  const consultants = readConsultants();
+  const policies = readSystemPolicies();
+
+  const consultantList = consultants
+    .map((c) => `  • ${c.name} — ${c.expertise}`)
+    .join("\n");
+
+  const systemPrompt = `You are a helpful customer assistant for Synergy, a Service Booking & Consulting Platform.
+
+PLATFORM OVERVIEW:
+Synergy connects clients with professional consultants for services such as software architecture consulting, career coaching, technical interviews, and more.
+
+BOOKING PROCESS:
+1. Browse the available consultants and services on the platform.
+2. Select a consultant and an available time slot, then submit a booking request.
+3. Wait for the consultant to accept or reject your request.
+4. Once confirmed, process your payment to secure the session.
+5. Attend the consulting session. The consultant will mark it as completed afterward.
+
+BOOKING STATES:
+Requested → Confirmed → Pending Payment → Paid → Completed
+A booking can also be Rejected or Cancelled at various stages.
+
+AVAILABLE CONSULTANTS (public information only):
+${consultantList || "  No consultants are currently listed."}
+
+PAYMENT METHODS ACCEPTED:
+  • Credit Card (16-digit card number, expiry date, CVV)
+  • Debit Card (same validation as credit card)
+  • PayPal (PayPal email address)
+  • Bank Transfer (account number and routing number)
+
+CANCELLATION & REFUND POLICY:
+  • Cancellation window: ${policies.cancellationWindowHours} hours before the session.
+  • Refund policy: ${policies.refundPolicy}
+
+IMPORTANT RULES FOR YOUR RESPONSES:
+- Answer only questions about the platform, its services, booking process, payment, and policies.
+- Do NOT reveal or ask for any personal information, payment card details, or private booking data.
+- Do NOT perform any actions on behalf of the user (e.g., creating or cancelling bookings).
+- If asked something outside the platform scope, politely redirect the user.
+- Keep answers concise and helpful.`;
+
+  try {
+    const geminiUrl =
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${GEMINI_API_KEY}`;
+
+    const geminiResponse = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: "user", parts: [{ text: message.trim() }] }],
+        generationConfig: { maxOutputTokens: 512 }
+      })
+    });
+
+    if (!geminiResponse.ok) {
+      const errBody = await geminiResponse.text();
+      // eslint-disable-next-line no-console
+      console.error("Gemini API error:", geminiResponse.status, errBody);
+      return response
+        .status(502)
+        .json({ error: "AI assistant encountered an error. Please try again." });
+    }
+
+    const data = await geminiResponse.json();
+    const reply =
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "I'm sorry, I could not generate a response. Please try again.";
+
+    return response.json({ reply });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("AI chat error:", error.message);
+    return response
+      .status(502)
+      .json({ error: "AI assistant encountered an error. Please try again." });
+  }
 });
 
 const frontendPath = path.join(__dirname, "..", "..", "frontend");
