@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synergy Consulting: Client</title>
+  <link rel="icon" href="./images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/client.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand-link" href="client.html">
+      <img src="./images/logo.png" alt="Synergy Consulting logo">
+      <span>Synergy Consulting</span>
+    </a>
+    <a class="logout-btn" href="./index.html">Logout</a>
+  </header>
+
+  <nav class="subnav" aria-label="Client navigation">
+    <a class="subnav-link active" href="client.html">Browse Services</a>
+    <a class="subnav-link" href="booking.html">My Bookings</a>
+    <a class="subnav-link" href="history.html">Payments</a>
+    <a class="subnav-link" href="methods.html">Pay Methods</a>
+  </nav>
+
+  <main class="page-shell">
+    <div class="heading">
+      <h1>Browse Consulting Services</h1>
+      <h2>Explore our available services and request a booking with our experts to assist you</h2>
+    </div>
+
+    <section class="services-grid">
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">TECH</p>
+          <h3 class="service-title">Software Architecture Review</h3>
+          <p class="service-description">Deep technical evaluation of your system architecture.</p>
+          <p class="service-price">$150</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Software Architecture Review" data-price="$150">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">TECH</p>
+          <h3 class="service-title">Cloud Migration Consulting</h3>
+          <p class="service-description">Guidance for secure and scalable cloud adoption.</p>
+          <p class="service-price">$200</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Cloud Migration Consulting" data-price="$200">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">CAREER</p>
+          <h3 class="service-title">Career Path Consulting</h3>
+          <p class="service-description">Guidance for choosing the right career path based on interests and experience.</p>
+          <p class="service-price">$50</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Career Path Consulting" data-price="$50">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">CAREER</p>
+          <h3 class="service-title">Technical Interview Prep</h3>
+          <p class="service-description">Ace your interviews with personalized coaching, mock sessions, and problem-solving guidance.</p>
+          <p class="service-price">$100</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Technical Interview Prep" data-price="$100">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">BUSINESS</p>
+          <h3 class="service-title">Startup Strategy Session</h3>
+          <p class="service-description">Strategic guidance for early-stage startups to validate ideas and scale effectively.</p>
+          <p class="service-price">$200</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Startup Strategy Session" data-price="$200">Book</button>
+        </div>
+      </article>
+
+      <article class="service-card">
+        <div class="service-meta">
+          <p class="service-tag">TECH</p>
+          <h3 class="service-title">Code Review &amp; Mentorship</h3>
+          <p class="service-description">Personalized code reviews and one-on-one mentorship to elevate your technical skills.</p>
+          <p class="service-price">$60</p>
+        </div>
+        <div class="service-actions">
+          <button class="action-btn service-book-btn" data-service="Code Review &amp; Mentorship" data-price="$60">Book</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="bookingModal" hidden>
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="bookingModalLabel">
+      <div class="modal-header">
+        <h2 class="modal-title" id="bookingModalLabel">Book Service</h2>
+        <button type="button" class="modal-close-button" id="closeBookingModal" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-content">
+        <p class="modal-meta"><strong>Service:</strong> <span id="serviceName">--</span></p>
+        <p class="modal-meta"><strong>Price:</strong> <span id="servicePrice">--</span></p>
+
+        <form id="bookingForm" class="modal-form">
+          <div>
+            <label for="clientName" class="form-label">Your Name</label>
+            <input type="text" class="input-field" id="clientName" placeholder="Enter your name">
+          </div>
+
+          <div>
+            <label for="clientEmail" class="form-label">Email</label>
+            <input type="email" class="input-field" id="clientEmail" placeholder="Enter your email">
+          </div>
+
+          <div>
+            <label for="consultantName" class="form-label">Consultant Name</label>
+            <select class="input-field" id="consultantName" name="consultantName">
+              <option value="" selected disabled>Select a consultant</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="bookingDate" class="form-label">Preferred Date</label>
+            <input type="date" class="input-field" id="bookingDate">
+          </div>
+
+          <div>
+            <label class="form-label">Select Time Slot</label>
+            <p class="modal-meta" id="slotAvailabilityHint">Choose a consultant and date to load available slots.</p>
+            <div id="timeSlots" class="time-slot-grid">
+              <button type="button" class="time-slot-btn">09:00 AM</button>
+              <button type="button" class="time-slot-btn">10:00 AM</button>
+              <button type="button" class="time-slot-btn">11:00 AM</button>
+              <button type="button" class="time-slot-btn">12:00 PM</button>
+              <button type="button" class="time-slot-btn">01:00 PM</button>
+              <button type="button" class="time-slot-btn">02:00 PM</button>
+              <button type="button" class="time-slot-btn">03:00 PM</button>
+              <button type="button" class="time-slot-btn">04:00 PM</button>
+              <button type="button" class="time-slot-btn">05:00 PM</button>
+            </div>
+            <input type="hidden" id="bookingTime" name="bookingTime">
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="action-btn secondary" id="cancelBookingButton">Cancel</button>
+        <button type="button" class="action-btn" id="confirmBookingButton">Confirm Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI Customer Assistant Chat Widget ─────────────────────────────── -->
+  <div id="chat-bubble" title="AI Assistant" onclick="toggleChat()">💬</div>
+
+  <div id="chat-window" hidden>
+    <div id="chat-header">
+      <span>Synergy AI Assistant</span>
+      <button id="chat-close" onclick="toggleChat()" aria-label="Close chat">&times;</button>
+    </div>
+    <div id="chat-messages" role="log" aria-live="polite">
+      <div class="chat-msg bot">Hi! I can help you with bookings, payments, and platform questions. Ask me anything!</div>
+    </div>
+    <div id="chat-input-row">
+      <input id="chat-input" type="text" placeholder="Type a message…" autocomplete="off"
+             onkeydown="if(event.key==='Enter')sendChat()">
+      <button id="chat-send" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <style>
+    #chat-bubble {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 54px; height: 54px; border-radius: 50%;
+      background: #2563eb; color: #fff; font-size: 24px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.25);
+      z-index: 1000; user-select: none;
+    }
+    #chat-window {
+      position: fixed; bottom: 96px; right: 28px;
+      width: 340px; max-height: 480px;
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.15);
+      display: flex; flex-direction: column; z-index: 1000;
+      font-family: inherit;
+    }
+    #chat-window[hidden] { display: none !important; }
+    #chat-header {
+      background: #2563eb; color: #fff;
+      padding: 12px 16px; border-radius: 12px 12px 0 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 14px;
+    }
+    #chat-close {
+      background: none; border: none; color: #fff;
+      font-size: 20px; cursor: pointer; line-height: 1; padding: 0;
+    }
+    #chat-messages {
+      flex: 1; overflow-y: auto; padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .chat-msg {
+      max-width: 85%; padding: 9px 13px;
+      border-radius: 16px; font-size: 13px; line-height: 1.5;
+      word-break: break-word;
+    }
+    .chat-msg.bot {
+      background: #f1f5f9; color: #1e293b;
+      align-self: flex-start; border-bottom-left-radius: 4px;
+    }
+    .chat-msg.user {
+      background: #2563eb; color: #fff;
+      align-self: flex-end; border-bottom-right-radius: 4px;
+    }
+    .chat-msg.typing { color: #94a3b8; font-style: italic; }
+    #chat-input-row {
+      display: flex; border-top: 1px solid #e2e8f0; padding: 10px;
+      gap: 8px;
+    }
+    #chat-input {
+      flex: 1; border: 1px solid #cbd5e1; border-radius: 8px;
+      padding: 8px 12px; font-size: 13px; outline: none;
+      font-family: inherit;
+    }
+    #chat-input:focus { border-color: #2563eb; }
+    #chat-send {
+      background: #2563eb; color: #fff; border: none;
+      border-radius: 8px; padding: 8px 14px; cursor: pointer;
+      font-size: 13px; font-weight: 600; font-family: inherit;
+    }
+    #chat-send:disabled { opacity: .5; cursor: not-allowed; }
+  </style>
+
+  <script>
+    function toggleChat() {
+      const win = document.getElementById('chat-window');
+      win.hidden = !win.hidden;
+      if (!win.hidden) document.getElementById('chat-input').focus();
+    }
+
+    async function sendChat() {
+      const input = document.getElementById('chat-input');
+      const messages = document.getElementById('chat-messages');
+      const sendBtn = document.getElementById('chat-send');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      sendBtn.disabled = true;
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'chat-msg user';
+      userMsg.textContent = text;
+      messages.appendChild(userMsg);
+
+      const typingMsg = document.createElement('div');
+      typingMsg.className = 'chat-msg bot typing';
+      typingMsg.textContent = 'Thinking…';
+      messages.appendChild(typingMsg);
+      messages.scrollTop = messages.scrollHeight;
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        typingMsg.className = 'chat-msg bot';
+        typingMsg.textContent = data.reply || data.error || 'Sorry, something went wrong.';
+      } catch {
+        typingMsg.className = 'chat-msg bot';
+        typingMsg.textContent = 'Could not reach the assistant. Please try again.';
+      }
+
+      sendBtn.disabled = false;
+      messages.scrollTop = messages.scrollHeight;
+      input.focus();
+    }
+  </script>
+
+  <script src="./js/bookings-data.js" defer></script>
+  <script src="./js/client.js" defer></script>
+</body>
+
+</html>

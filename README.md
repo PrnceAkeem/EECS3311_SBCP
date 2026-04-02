@@ -1,199 +1,150 @@
-# Phase 2 — Service Booking & Consulting Platform
-Group 8, EECS 3311 Software Design
-York University, Lassonde School of Engineering
+# Service Booking and Consulting Platform
+Group 8, EECS 3311 Software Design  
+York University, Lassonde School of Engineering  
 Winter 2026
 
-## What This Phase Does
+## What This Project Does
+This is a multi-role booking system with three user-facing flows:
+- Client: create bookings, cancel, pay for confirmed bookings
+- Consultant: review and update booking statuses
+- Admin: review and update booking statuses
 
-Phase 2 extends Phase 1 with a fully modular backend, payment processing, refund handling,
-consultant availability management, consultant registration approvals, and admin system policies.
+The frontend is static HTML/CSS/JS served by Express. The backend is a Node.js API using PostgreSQL for bookings and a JSON file for saved payment methods.
 
-Three user roles are supported:
-- **Client** — browse services, create bookings, cancel, pay for confirmed sessions, view payment history
-- **Consultant** — manage availability slots, confirm/reject/complete bookings
-- **Admin** — manage the consultant directory, approve registrations, configure system policies, oversee all bookings
-
-The frontend is static HTML/CSS/JS served by Express. The backend is a Node.js/Express API backed by PostgreSQL (bookings + availability) and JSON files (payment methods, consultants, policies).
-
----
-
-## How to Run
-
-Requires Docker Desktop to be running.
-
-```bash
-# from the Phase_2/ directory
-docker compose up --build
-```
-
-| URL | What it is |
-|-----|-----------|
-| `http://localhost:3000` | App (login page) |
-| `http://localhost:3000/health` | Health check |
-
-```bash
-docker compose down       # stop
-docker compose down -v    # stop + delete DB volume
-```
-
-### Demo login credentials
-
-| Role | Email | Password |
-|------|-------|----------|
-| Client | client@synergy.ca | pass12345 |
-| Consultant | consultant@synergy.ca | pass12345 |
-| Admin | admin@synergy.ca | pass12345 |
-
----
-
-## Backend Module Structure
-
-The original single `server.js` (1600+ lines) has been split into focused modules.
-When debugging, go directly to the file responsible for the area that broke.
-
-```
-backend/src/
-├── server.js              Entry point — mounts routes, starts server (~46 lines)
-├── config.js              All constants and default values (PORT, file paths, status lists)
-├── db.js                  DB pool, ensureSchema(), withDbRetries()
-├── dataStore.js           JSON file I/O (payment methods, consultants, registrations, policies)
-├── helpers.js             Input sanitization, validators, price/date transforms, mapBookingRow
-├── sse.js                 SSE stream set + broadcastBookingEvent() (Observer wiring)
-├── patterns/
-│   ├── state/             State pattern — BookingStateMachine + per-state classes
-│   ├── strategy/          Strategy pattern — PaymentStrategies + PaymentStrategyFactory
-│   ├── observer/          Observer pattern — NotificationManager, Email/SMS/Push notifiers
-│   └── factory/           Factory pattern — UserFactory, Client, Consultant, Admin
-└── routes/
-    ├── bookings.js        GET/POST /api/bookings, PATCH /:id/status, GET /stream
-    ├── paymentMethods.js  GET/POST/PATCH/DELETE /api/payment-methods
-    ├── consultants.js     GET/POST /api/consultants + registration approval endpoints
-    ├── availability.js    GET/POST/DELETE /api/availability
-    └── policies.js        GET/PUT /api/policies
-```
-
-### Where to look when something breaks
-
-| Symptom | File to check |
-|---------|---------------|
-| Booking won't save to DB | `routes/bookings.js` → POST handler |
-| Status change rejected | `routes/bookings.js` → PATCH handler + `patterns/state/` |
-| Payment fails | `routes/bookings.js` → "Paid" block + `patterns/strategy/` |
-| Refund not issued | `routes/bookings.js` → "Paid → Cancelled" block |
-| SSE not pushing updates | `sse.js` → `broadcastBookingEvent()` |
-| Notifications not logging | `sse.js` + `patterns/observer/` |
-| Consultant not appearing | `dataStore.js` → `readConsultants()` / `normalizeConsultants()` |
-| Policy not applying | `routes/policies.js` + `helpers.js` → `normalizePoliciesPayload()` |
-| DB schema out of sync | `db.js` → `ensureSchema()` |
-| Validation error unclear | `helpers.js` → `validatePaymentMethodPayload()` or sanitize functions |
-
----
-
-## Request Flow
-
-```
+## How It Actually Works
+```text
 Client browser
       |
       | fetch() / EventSource
       v
-frontend/js/bookings-data.js  (window.BookingStore)
-  getBookings()         -> GET   /api/bookings
-  addBooking()          -> POST  /api/bookings
-  updateBookingStatus() -> PATCH /api/bookings/:id/status
-  subscribe()           -> GET   /api/bookings/stream  (SSE)
+frontend/js/bookings-data.js (window.BookingStore)  <-- main bridge
+  - getBookings()         -> GET   /api/bookings
+  - addBooking()          -> POST  /api/bookings
+  - updateBookingStatus() -> PATCH /api/bookings/:id/status
+  - subscribe()           -> GET   /api/bookings/stream (SSE)
 
-frontend/js/methods.js  (direct fetch)
-  loadMethods()         -> GET    /api/payment-methods
-  save method           -> POST   /api/payment-methods
-  delete method         -> DELETE /api/payment-methods/:id
+frontend/js/methods.js (direct fetch)
+  - loadMethods()         -> GET    /api/payment-methods
+  - save method           -> POST   /api/payment-methods
+  - delete method         -> DELETE /api/payment-methods/:id
 
-booking.js payment modal
-  fetch saved methods   -> GET  /api/payment-methods
-  pay for booking       -> PATCH /api/bookings/:id/status  (via BookingStore)
+booking.js payment modal (direct fetch exception)
+  - fetch saved methods   -> GET /api/payment-methods
+  - payment status update -> PATCH /api/bookings/:id/status via BookingStore
       |
       | JSON over HTTP
       v
-backend/src/server.js  (Express — routes only, no logic)
-      |
-      ├── routes/bookings.js       State + Strategy + Factory + Observer
-      ├── routes/paymentMethods.js
-      ├── routes/consultants.js
-      ├── routes/availability.js
-      └── routes/policies.js
+backend/src/server.js (Express)
+  - State Pattern    -> validates status transitions
+  - Factory Pattern  -> builds role-based booking actors
+  - Observer Pattern -> broadcasts booking events (SSE + notifiers)
+  - Strategy Pattern -> processes payment when status becomes Paid
       |
       v
-PostgreSQL (bookings, availability_slots)
-backend/data/*.json    (payment-methods, consultants, registrations, policies)
+PostgreSQL (bookings) + backend/data/payment-methods.json
 ```
 
----
+## Frontend Request Ownership
+- `client.js`, `admin.js`, and `consultant.js` use `window.BookingStore` for booking API operations.
+- `methods.js` owns payment method CRUD with direct `fetch()` calls.
+- `booking.js` primarily uses `window.BookingStore` for bookings, but directly fetches payment methods for the payment modal.
+
+## Backend Responsibilities
+`backend/src/server.js` is the runtime entry point and does all of the following:
+- Exposes REST endpoints for bookings and payment methods
+- Validates status transitions with the State Pattern
+- Applies payment processing rules with the Strategy Pattern
+- Creates role objects through the Factory Pattern
+- Broadcasts live booking updates over Server-Sent Events (Observer-based notifications)
 
 ## API Endpoints
-
 ### Bookings
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/bookings` | List all bookings |
-| POST | `/api/bookings` | Create a booking |
-| PATCH | `/api/bookings/:id/status` | Update booking status |
-| GET | `/api/bookings/stream` | SSE stream for live updates |
+- `GET /api/bookings` - list all bookings
+- `POST /api/bookings` - create a booking
+- `PATCH /api/bookings/:id/status` - update booking status
+- `GET /api/bookings/stream` - SSE stream for live booking events
 
 ### Payment Methods
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/payment-methods` | List saved methods |
-| POST | `/api/payment-methods` | Add a method |
-| PATCH | `/api/payment-methods/:id` | Edit label or details |
-| DELETE | `/api/payment-methods/:id` | Remove a method |
-
-### Consultants
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/consultants` | List all consultants |
-| POST | `/api/consultants` | Add consultant (admin) |
-| GET | `/api/consultants/registrations` | List self-registrations |
-| POST | `/api/consultants/registrations` | Submit a registration |
-| PATCH | `/api/consultants/registrations/:id` | Approve or reject (admin) |
-
-### Availability
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/availability` | List slots (filter by consultant/date) |
-| POST | `/api/availability` | Add a slot |
-| DELETE | `/api/availability/:id` | Remove a slot |
-
-### Policies
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/policies` | Get system policies |
-| PUT | `/api/policies` | Update system policies (admin) |
-
----
+- `GET /api/payment-methods` - list saved methods
+- `POST /api/payment-methods` - add a method (`{ type, label }`)
+- `DELETE /api/payment-methods/:id` - remove a method
 
 ## Booking Status Model
+Allowed transitions enforced by backend State Pattern:
+- `Requested -> Confirmed | Rejected | Cancelled`
+- `Confirmed -> Pending Payment | Cancelled`
+- `Pending Payment -> Paid | Cancelled`
+- `Paid -> Completed | Cancelled`
+- `Completed`, `Rejected`, and `Cancelled` are terminal states
 
-Transitions are enforced by the State Pattern (`patterns/state/BookingStateMachine.js`).
+## Run With Docker
 
+The system runs with **three containers**:
+
+| Container | Role |
+|---|---|
+| `synergy-db` | PostgreSQL database |
+| `synergy-backend` | Node.js / Express REST API + AI chatbot endpoint |
+| `synergy-frontend` | nginx — serves static files and proxies `/api/` to backend |
+
+### Setup
+
+1. Copy the environment template and add your Gemini API key:
+```bash
+cp .env.example .env
+# Then open .env and set GEMINI_API_KEY=your_key_here
 ```
-Requested ──► Confirmed ──► Pending Payment ──► Paid ──► Completed
-    │              │               │              │
-    └──► Rejected  └──► Cancelled  └──► Cancelled └──► Cancelled (triggers refund)
+
+2. Start all containers:
+```bash
+docker compose up --build   # first run or after code changes
+docker compose up           # subsequent runs
 ```
 
-Terminal states — no further transitions allowed: `Completed`, `Rejected`, `Cancelled`
+3. Open the app:
+- **App:** `http://localhost:3000`
+- **Health check:** `http://localhost:3000/health`
 
----
+Stop:
+```bash
+docker compose down
+```
+
+Stop and remove DB volume:
+```bash
+docker compose down -v
+```
+
+### AI Customer Assistant
+
+The AI chatbot is available to clients on the Browse Services page. Click the 💬 bubble in the bottom-right corner to open it. It is powered by the Google Gemini API (`gemini-flash-lite-latest`) and answers questions about the platform, booking process, payment methods, and policies.
+
+See `CHATBOT-DOC.md` for full documentation.
 
 ## GoF Design Patterns
 
-| Pattern | File | When It Runs |
-|---------|------|-------------|
-| **State** | `patterns/state/BookingStateMachine.js` | Every `PATCH /api/bookings/:id/status` — rejects illegal transitions |
-| **Strategy** | `patterns/strategy/PaymentStrategies.js` | When status moves to `Paid` — picks the right payment handler (Credit Card, Debit, Bank Transfer, PayPal) |
-| **Observer** | `patterns/observer/NotificationManager.js` | After every status change — `broadcastBookingEvent()` fans out to Email, SMS, and Push notifiers + SSE clients |
-| **Factory** | `patterns/factory/UserFactory.js` | On `POST /api/bookings` — builds typed `Client` and `Consultant` objects for the booking |
+All four patterns are implemented in `backend/src/patterns/` and wired in `backend/src/server.js`.
 
----
+| Pattern | File | Where It Fires |
+|---------|------|----------------|
+| State | `backend/src/patterns/state/BookingStateMachine.js` | Every `PATCH /api/bookings/:id/status` call — validates the requested transition is legal before applying it |
+| Strategy | `backend/src/patterns/strategy/PaymentStrategies.js` | When status moves to `Paid` — `PaymentStrategyFactory.create(methodType)` selects the right payment handler and returns a transaction ID |
+| Observer | `backend/src/patterns/observer/NotificationManager.js` | After every successful status change — `broadcastBookingEvent()` calls `notificationManager.sendNotification()` which forwards to Email, SMS, and Push notifiers |
+| Factory | `backend/src/patterns/factory/UserFactory.js` | On `POST /api/bookings` — `UserFactory.createUser()` builds typed Client and Consultant objects for the booking actors |
+
+## Phase 2 Additions
+
+- Completed frontend for all client, consultant, and admin workflows
+- Client refund flow: "Cancel & Refund" button on paid bookings — backend auto-generates a refund transaction ID
+- Three-container Docker deployment (db + backend + frontend/nginx)
+- AI Customer Assistant chatbot (Google Gemini) embedded in the client interface
+- See `PHASE2.md` for a full breakdown and `CHATBOT-DOC.md` for chatbot documentation
+
+## Phase 1 Scope Note
+
+Phase 1 covers the booking lifecycle end-to-end with all four GoF patterns wired and testable.
+Includes availability management, consultant registration approvals, system policy configuration,
+payment processing, and refund handling. Observer notifications log delivery actions to console.
 
 ## Repository
 GitHub: [https://github.com/PrnceAkeem/EECS3311_SBCP]

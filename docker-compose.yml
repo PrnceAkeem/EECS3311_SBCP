@@ -1,0 +1,51 @@
+services:
+
+  # ── 1. Database ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: synergy-db
+    environment:
+      POSTGRES_DB: synergy
+      POSTGRES_USER: synergy_user
+      POSTGRES_PASSWORD: synergy_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U synergy_user -d synergy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── 2. Backend (Node.js / Express API) ───────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: synergy-backend
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://synergy_user:synergy_pass@db:5432/synergy
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    volumes:
+      # Persist JSON data files (payment methods, consultants, etc.) across restarts.
+      - ./backend/data:/app/backend/data
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── 3. Frontend (nginx serving static files + API proxy) ─────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: synergy-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
