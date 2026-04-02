@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synergy Consulting: Admin</title>
+  <link rel="icon" href="./images/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/admin.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <a class="brand-link" href="./admin.html">
+      <img src="./images/logo.png" alt="Synergy Consulting logo">
+      <span>Synergy Consulting</span>
+    </a>
+    <a class="logout-btn" href="./index.html">Logout</a>
+  </header>
+
+  <main class="management-page">
+    <div class="page-head">
+      <h1>Admin Dashboard</h1>
+      <p class="page-subtitle">Approve consultants, define policies, and monitor bookings.</p>
+    </div>
+
+    <section class="table-card section-card">
+      <h2>Consultant Directory</h2>
+      <p class="page-subtitle">Add consultants here so they appear in consultant availability and booking flows.</p>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Consultant Name
+          <input id="consultantNameInput" class="input-field" type="text" maxlength="80" placeholder="Jane Doe" />
+        </label>
+        <label class="form-label">
+          Email
+          <input id="consultantEmailInput" class="input-field" type="email" maxlength="120" placeholder="jane@example.com" />
+        </label>
+        <label class="form-label">
+          Expertise
+          <input id="consultantExpertiseInput" class="input-field" type="text" maxlength="120" placeholder="Cloud migration" />
+        </label>
+        <button type="button" id="addConsultantBtn" class="action-btn">Add Consultant</button>
+      </div>
+      <div class="table-wrap compact-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Consultant ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Expertise</th>
+            </tr>
+          </thead>
+          <tbody id="consultantDirectoryBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>Consultant Registration Approvals</h2>
+      <div class="table-wrap compact-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Registration ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Expertise</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="registrationTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>System Policies</h2>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Cancellation Window (hours)
+          <input id="policyCancellationWindow" class="input-field" type="number" min="0" max="168" />
+        </label>
+        <label class="form-label">
+          Pricing Multiplier
+          <input id="policyPricingMultiplier" class="input-field" type="number" min="0.1" max="5" step="0.01" />
+        </label>
+        <label class="form-label">
+          Notifications Enabled
+          <select id="policyNotificationsEnabled" class="input-field">
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </select>
+        </label>
+        <label class="form-label">
+          Refund Policy
+          <input id="policyRefundPolicy" class="input-field" type="text" maxlength="300" />
+        </label>
+        <button type="button" id="savePoliciesBtn" class="action-btn">Save Policies</button>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
+      <h2>Booking Lifecycle Oversight</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>BK-ID</th>
+            <th>CUS-ID</th>
+            <th>Client</th>
+            <th>Service</th>
+            <th>Consultant</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Current Status</th>
+            <th>Update Status</th>
+          </tr>
+        </thead>
+        <tbody id="adminBookingsBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="adminToast" class="toast" aria-live="polite"></div>
+
+  <script src="./js/bookings-data.js" defer></script>
+  <script src="./js/admin.js" defer></script>
+</body>
+
+</html>
