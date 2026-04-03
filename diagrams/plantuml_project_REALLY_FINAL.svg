@@ -1,0 +1,754 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="957px" preserveAspectRatio="none" style="width:7057px;height:957px;background:#FFFFFF;" version="1.1" viewBox="0 0 7057 957" width="7057px" zoomAndPan="magnify"><defs/><g><rect fill="none" height="42.5938" id="_title" style="stroke:none;stroke-width:1.0;" width="533" x="3255.08" y="5"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="332" x="3355.58" y="22.9951">Synergy — Unified Backend Class Diagram</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="523" x="3260.08" y="39.292">(Domain Entities · Strategy · State · Observer · Factory · Singleton)</text><!--MD5=[7a85ee1228ef42c7536b08fd3dd5839f]
+cluster Domain Entities--><g id="cluster_Domain Entities"><path d="M164.66,274.5938 L286.66,274.5938 A3.75,3.75 0 0 1 289.16,277.0938 L296.16,296.8906 L716.66,296.8906 A2.5,2.5 0 0 1 719.16,299.3906 L719.16,776.5938 A2.5,2.5 0 0 1 716.66,779.0938 L164.66,779.0938 A2.5,2.5 0 0 1 162.16,776.5938 L162.16,277.0938 A2.5,2.5 0 0 1 164.66,274.5938 " fill="#E8E8E8" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="162.16" x2="296.16" y1="296.8906" y2="296.8906"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="121" x="166.16" y="289.5889">Domain Entities</text></g><!--MD5=[f6eac66af90b73b5f87374e075fa2471]
+cluster Strategy Pattern (Payment Processing)--><g id="cluster_Strategy Pattern (Payment Processing)"><path d="M745.66,357.5938 L1054.66,357.5938 A3.75,3.75 0 0 1 1057.16,360.0938 L1064.16,379.8906 L2069.66,379.8906 A2.5,2.5 0 0 1 2072.16,382.3906 L2072.16,934.5938 A2.5,2.5 0 0 1 2069.66,937.0938 L745.66,937.0938 A2.5,2.5 0 0 1 743.16,934.5938 L743.16,360.0938 A2.5,2.5 0 0 1 745.66,357.5938 " fill="#FFEFD5" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="743.16" x2="1064.16" y1="379.8906" y2="379.8906"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="308" x="747.16" y="372.5889">Strategy Pattern (Payment Processing)</text></g><!--MD5=[eb85ae1d308b08292c51d24f14c5f8fe]
+cluster State Pattern (Booking Lifecycle)--><g id="cluster_State Pattern (Booking Lifecycle)"><path d="M2098.66,345.0938 L2358.66,345.0938 A3.75,3.75 0 0 1 2361.16,347.5938 L2368.16,367.3906 L3529.66,367.3906 A2.5,2.5 0 0 1 3532.16,369.8906 L3532.16,947.5938 A2.5,2.5 0 0 1 3529.66,950.0938 L2098.66,950.0938 A2.5,2.5 0 0 1 2096.16,947.5938 L2096.16,347.5938 A2.5,2.5 0 0 1 2098.66,345.0938 " fill="#E0F0FF" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="2096.16" x2="2368.16" y1="367.3906" y2="367.3906"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="259" x="2100.16" y="360.0889">State Pattern (Booking Lifecycle)</text></g><!--MD5=[8efaf334d89aee29f68d385a4cbba122]
+cluster Observer Pattern (Notifications)--><g id="cluster_Observer Pattern (Notifications)"><path d="M6046.66,66.0938 L6299.66,66.0938 A3.75,3.75 0 0 1 6302.16,68.5938 L6309.16,88.3906 L7047.66,88.3906 A2.5,2.5 0 0 1 7050.16,90.8906 L7050.16,744.5938 A2.5,2.5 0 0 1 7047.66,747.0938 L6046.66,747.0938 A2.5,2.5 0 0 1 6044.16,744.5938 L6044.16,68.5938 A2.5,2.5 0 0 1 6046.66,66.0938 " fill="#F0FFE0" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="6044.16" x2="6309.16" y1="88.3906" y2="88.3906"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="252" x="6048.16" y="81.0889">Observer Pattern (Notifications)</text></g><!--MD5=[ecc83e4c712aa56c5e7f16605911b058]
+cluster Factory Method Pattern (User Creation)--><g id="cluster_Factory Method Pattern (User Creation)"><path d="M3558.66,338.5938 L3871.66,338.5938 A3.75,3.75 0 0 1 3874.16,341.0938 L3881.16,360.8906 L4276.66,360.8906 A2.5,2.5 0 0 1 4279.16,363.3906 L4279.16,757.0938 A2.5,2.5 0 0 1 4276.66,759.5938 L3558.66,759.5938 A2.5,2.5 0 0 1 3556.16,757.0938 L3556.16,341.0938 A2.5,2.5 0 0 1 3558.66,338.5938 " fill="#FFF0F0" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="3556.16" x2="3881.16" y1="360.8906" y2="360.8906"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="312" x="3560.16" y="353.5889">Factory Method Pattern (User Creation)</text></g><!--MD5=[f64bd3d67e7e4845ca6b513d37a3b211]
+cluster Singleton Pattern (System Policies) & Service Layer--><g id="cluster_Singleton Pattern (System Policies) &amp; Service Layer"><path d="M4305.66,59.5938 L4714.66,59.5938 A3.75,3.75 0 0 1 4717.16,62.0938 L4724.16,81.8906 L6017.66,81.8906 A2.5,2.5 0 0 1 6020.16,84.3906 L6020.16,561.5938 A2.5,2.5 0 0 1 6017.66,564.0938 L4305.66,564.0938 A2.5,2.5 0 0 1 4303.16,561.5938 L4303.16,62.0938 A2.5,2.5 0 0 1 4305.66,59.5938 " fill="#F5F0FF" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="4303.16" x2="4724.16" y1="81.8906" y2="81.8906"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="408" x="4307.16" y="74.5889">Singleton Pattern (System Policies) &amp; Service Layer</text></g><!--MD5=[c6c2aa411a70f0170997fbec83374a43]
+class Booking--><g id="elem_Booking"><rect codeLine="12" fill="#F1F1F1" height="232.0391" id="Booking" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="172" x="531.16" y="309.5938"/><ellipse cx="590.41" cy="327.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M593.3788,333.6211 Q592.8006,333.918 592.16,334.0586 Q591.5194,334.2148 590.8163,334.2148 Q588.3163,334.2148 586.9881,332.5742 Q585.6756,330.918 585.6756,327.793 Q585.6756,324.668 586.9881,323.0117 Q588.3163,321.3555 590.8163,321.3555 Q591.5194,321.3555 592.16,321.5117 Q592.8163,321.668 593.3788,321.9648 L593.3788,324.6836 Q592.7538,324.1055 592.16,323.8398 Q591.5663,323.5586 590.9413,323.5586 Q589.5975,323.5586 588.91,324.6367 Q588.2225,325.6992 588.2225,327.793 Q588.2225,329.8867 588.91,330.9648 Q589.5975,332.0273 590.9413,332.0273 Q591.5663,332.0273 592.16,331.7617 Q592.7538,331.4805 593.3788,330.9023 L593.3788,333.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="49" x="608.91" y="325.7324">«Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="45" x="610.91" y="338.7729">Booking</text><line style="stroke:#181818;stroke-width:0.5;" x1="532.16" x2="702.16" y1="346.3672" y2="346.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="36" x="537.16" y="360.5776">-id: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="86" x="537.16" y="373.3823">-clientId: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="109" x="537.16" y="386.187">-clientName: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="138" x="537.16" y="398.9917">-consultantName: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="93" x="537.16" y="411.7964">-slotDate: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="537.16" y="424.6011">-slotTime: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="82" x="537.16" y="437.4058">-status: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="132" x="537.16" y="450.2104">-paymentStatus: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="120" x="537.16" y="463.0151">-transactionId: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="160" x="537.16" y="475.8198">-refundTransactionId: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="154" x="537.16" y="488.6245">-refundProcessedAt: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="78" x="537.16" y="501.4292">-price: double</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="78" x="537.16" y="514.2339">-notes: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="537.16" y="527.0386">-createdAt: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="532.16" x2="702.16" y1="533.6328" y2="533.6328"/></g><!--MD5=[dbb8b4f13c7b21394f9d757e58732f45]
+class Service--><g id="elem_Service"><rect codeLine="29" fill="#F1F1F1" height="129.6016" id="Service" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="121" x="178.66" y="360.5938"/><ellipse cx="213.46" cy="378.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M216.4288,384.6211 Q215.8506,384.918 215.21,385.0586 Q214.5694,385.2148 213.8663,385.2148 Q211.3663,385.2148 210.0381,383.5742 Q208.7256,381.918 208.7256,378.793 Q208.7256,375.668 210.0381,374.0117 Q211.3663,372.3555 213.8663,372.3555 Q214.5694,372.3555 215.21,372.5117 Q215.8663,372.668 216.4288,372.9648 L216.4288,375.6836 Q215.8038,375.1055 215.21,374.8398 Q214.6163,374.5586 213.9913,374.5586 Q212.6475,374.5586 211.96,375.6367 Q211.2725,376.6992 211.2725,378.793 Q211.2725,380.8867 211.96,381.9648 Q212.6475,383.0273 213.9913,383.0273 Q214.6163,383.0273 215.21,382.7617 Q215.8038,382.4805 216.4288,381.9023 L216.4288,384.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="49" x="229.86" y="376.7324">«Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="42" x="233.36" y="389.7729">Service</text><line style="stroke:#181818;stroke-width:0.5;" x1="179.66" x2="298.66" y1="397.3672" y2="397.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="36" x="184.66" y="411.5776">-id: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="78" x="184.66" y="424.3823">-name: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="70" x="184.66" y="437.187">-type: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="73" x="184.66" y="449.9917">-duration: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="106" x="184.66" y="462.7964">-basePrice: double</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="109" x="184.66" y="475.6011">-description: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="179.66" x2="298.66" y1="482.1953" y2="482.1953"/></g><!--MD5=[3a8ca752e09f63d84c5e5fc413558943]
+class AvailabilitySlot--><g id="elem_AvailabilitySlot"><rect codeLine="38" fill="#F1F1F1" height="116.7969" id="AvailabilitySlot" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="150" x="258.16" y="639.5938"/><ellipse cx="289.81" cy="657.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M292.7787,663.6211 Q292.2006,663.918 291.56,664.0586 Q290.9194,664.2148 290.2162,664.2148 Q287.7162,664.2148 286.3881,662.5742 Q285.0756,660.918 285.0756,657.793 Q285.0756,654.668 286.3881,653.0117 Q287.7162,651.3555 290.2162,651.3555 Q290.9194,651.3555 291.56,651.5117 Q292.2162,651.668 292.7787,651.9648 L292.7787,654.6836 Q292.1537,654.1055 291.56,653.8398 Q290.9662,653.5586 290.3412,653.5586 Q288.9975,653.5586 288.31,654.6367 Q287.6225,655.6992 287.6225,657.793 Q287.6225,659.8867 288.31,660.9648 Q288.9975,662.0273 290.3412,662.0273 Q290.9662,662.0273 291.56,661.7617 Q292.1537,661.4805 292.7787,660.9023 L292.7787,663.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="49" x="323.51" y="655.7324">«Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="81" x="307.51" y="668.7729">AvailabilitySlot</text><line style="stroke:#181818;stroke-width:0.5;" x1="259.16" x2="407.16" y1="676.3672" y2="676.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="36" x="264.16" y="690.5776">-id: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="138" x="264.16" y="703.3823">-consultantName: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="93" x="264.16" y="716.187">-slotDate: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="264.16" y="728.9917">-slotTime: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="117" x="264.16" y="741.7964">-isAvailable: boolean</text><line style="stroke:#181818;stroke-width:0.5;" x1="259.16" x2="407.16" y1="748.3906" y2="748.3906"/></g><!--MD5=[f6c77495e12a05eb94081b0ac09e8b1a]
+class PaymentMethod--><g id="elem_PaymentMethod"><rect codeLine="46" fill="#F1F1F1" height="129.6016" id="PaymentMethod" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="128" x="523.16" y="633.0938"/><ellipse cx="540.86" cy="651.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M543.8288,657.1211 Q543.2506,657.418 542.61,657.5586 Q541.9694,657.7148 541.2663,657.7148 Q538.7663,657.7148 537.4381,656.0742 Q536.1256,654.418 536.1256,651.293 Q536.1256,648.168 537.4381,646.5117 Q538.7663,644.8555 541.2663,644.8555 Q541.9694,644.8555 542.61,645.0117 Q543.2663,645.168 543.8288,645.4648 L543.8288,648.1836 Q543.2038,647.6055 542.61,647.3398 Q542.0163,647.0586 541.3913,647.0586 Q540.0475,647.0586 539.36,648.1367 Q538.6725,649.1992 538.6725,651.293 Q538.6725,653.3867 539.36,654.4648 Q540.0475,655.5273 541.3913,655.5273 Q542.0163,655.5273 542.61,655.2617 Q543.2038,654.9805 543.8288,654.4023 L543.8288,657.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="49" x="575.96" y="649.2324">«Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="90" x="555.46" y="662.2729">PaymentMethod</text><line style="stroke:#181818;stroke-width:0.5;" x1="524.16" x2="650.16" y1="669.8672" y2="669.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="36" x="529.16" y="684.0776">-id: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="82" x="529.16" y="696.8823">-userId: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="116" x="529.16" y="709.687">-methodType: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="73" x="529.16" y="722.4917">-label: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="86" x="529.16" y="735.2964">-details: Object</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="529.16" y="748.1011">-createdAt: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="524.16" x2="650.16" y1="754.6953" y2="754.6953"/></g><!--MD5=[4caf865113fb8fb9bd68454794ce6582]
+class ConsultantRegistration--><g id="elem_ConsultantRegistration"><rect codeLine="55" fill="#F1F1F1" height="129.6016" id="ConsultantRegistration" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="161" x="334.66" y="360.5938"/><ellipse cx="349.66" cy="378.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M352.6288,384.6211 Q352.0506,384.918 351.41,385.0586 Q350.7694,385.2148 350.0663,385.2148 Q347.5663,385.2148 346.2381,383.5742 Q344.9256,381.918 344.9256,378.793 Q344.9256,375.668 346.2381,374.0117 Q347.5663,372.3555 350.0663,372.3555 Q350.7694,372.3555 351.41,372.5117 Q352.0663,372.668 352.6288,372.9648 L352.6288,375.6836 Q352.0038,375.1055 351.41,374.8398 Q350.8163,374.5586 350.1913,374.5586 Q348.8475,374.5586 348.16,375.6367 Q347.4725,376.6992 347.4725,378.793 Q347.4725,380.8867 348.16,381.9648 Q348.8475,383.0273 350.1913,383.0273 Q350.8163,383.0273 351.41,382.7617 Q352.0038,382.4805 352.6288,381.9023 L352.6288,384.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="49" x="403.66" y="376.7324">«Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="129" x="363.66" y="389.7729">ConsultantRegistration</text><line style="stroke:#181818;stroke-width:0.5;" x1="335.66" x2="494.66" y1="397.3672" y2="397.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="36" x="340.66" y="411.5776">-id: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="78" x="340.66" y="424.3823">-name: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="77" x="340.66" y="437.187">-email: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="99" x="340.66" y="449.9917">-expertise: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="82" x="340.66" y="462.7964">-status: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="340.66" y="475.6011">-createdAt: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="335.66" x2="494.66" y1="482.1953" y2="482.1953"/></g><!--MD5=[86df7a6fab1c4b6b56ced8510e72833b]
+class PaymentStrategy--><g id="elem_PaymentStrategy"><rect codeLine="73" fill="#F1F1F1" height="91.1875" id="PaymentStrategy" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="298" x="1258.16" y="652.5938"/><ellipse cx="1342.91" cy="670.9805" fill="#A9DCDF" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1343.0194,666.3242 L1341.8631,671.4023 L1344.1912,671.4023 L1343.0194,666.3242 Z M1341.535,664.0898 L1344.5194,664.0898 L1347.8787,676.4805 L1345.4256,676.4805 L1344.66,673.418 L1341.3787,673.418 L1340.6287,676.4805 L1338.1912,676.4805 L1341.535,664.0898 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="124" x="1361.41" y="668.7324">«Abstract Strategy»</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacing" textLength="97" x="1374.91" y="681.7729">PaymentStrategy</text><line style="stroke:#181818;stroke-width:0.5;" x1="1259.16" x2="1555.16" y1="689.3672" y2="689.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="1259.16" x2="1555.16" y1="697.3672" y2="697.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacing" textLength="286" x="1264.16" y="711.5776">+process(amount: double, details: Object): Object</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="196" x="1264.16" y="724.3823">+validate(details: Object): boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="237" x="1264.16" y="737.187">#buildTransactionId(prefix: String): String</text></g><!--MD5=[6f2b73c3aed45695d915ae7bcdc92eeb]
+class CreditCardPayment--><g id="elem_CreditCardPayment"><rect codeLine="79" fill="#F1F1F1" height="78.3828" id="CreditCardPayment" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="298" x="1758.16" y="843.0938"/><ellipse cx="1840.91" cy="861.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1843.8787,867.1211 Q1843.3006,867.418 1842.66,867.5586 Q1842.0194,867.7148 1841.3162,867.7148 Q1838.8162,867.7148 1837.4881,866.0742 Q1836.1756,864.418 1836.1756,861.293 Q1836.1756,858.168 1837.4881,856.5117 Q1838.8162,854.8555 1841.3162,854.8555 Q1842.0194,854.8555 1842.66,855.0117 Q1843.3162,855.168 1843.8787,855.4648 L1843.8787,858.1836 Q1843.2537,857.6055 1842.66,857.3398 Q1842.0662,857.0586 1841.4412,857.0586 Q1840.0975,857.0586 1839.41,858.1367 Q1838.7225,859.1992 1838.7225,861.293 Q1838.7225,863.3867 1839.41,864.4648 Q1840.0975,865.5273 1841.4412,865.5273 Q1842.0662,865.5273 1842.66,865.2617 Q1843.2537,864.9805 1843.8787,864.4023 L1843.8787,867.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="128" x="1859.41" y="859.2324">«Concrete Strategy»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="1868.41" y="872.2729">CreditCardPayment</text><line style="stroke:#181818;stroke-width:0.5;" x1="1759.16" x2="2055.16" y1="879.8672" y2="879.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="1759.16" x2="2055.16" y1="887.8672" y2="887.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="196" x="1764.16" y="902.0776">+validate(details: Object): boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="286" x="1764.16" y="914.8823">+process(amount: double, details: Object): Object</text></g><!--MD5=[e4fab0d9b4f91dcacf4cd5080d7d3848]
+class DebitCardPayment--><g id="elem_DebitCardPayment"><rect codeLine="84" fill="#F1F1F1" height="78.3828" id="DebitCardPayment" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="298" x="759.16" y="843.0938"/><ellipse cx="841.91" cy="861.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M844.8788,867.1211 Q844.3006,867.418 843.66,867.5586 Q843.0194,867.7148 842.3163,867.7148 Q839.8163,867.7148 838.4881,866.0742 Q837.1756,864.418 837.1756,861.293 Q837.1756,858.168 838.4881,856.5117 Q839.8163,854.8555 842.3163,854.8555 Q843.0194,854.8555 843.66,855.0117 Q844.3163,855.168 844.8788,855.4648 L844.8788,858.1836 Q844.2538,857.6055 843.66,857.3398 Q843.0663,857.0586 842.4413,857.0586 Q841.0975,857.0586 840.41,858.1367 Q839.7225,859.1992 839.7225,861.293 Q839.7225,863.3867 840.41,864.4648 Q841.0975,865.5273 842.4413,865.5273 Q843.0663,865.5273 843.66,865.2617 Q844.2538,864.9805 844.8788,864.4023 L844.8788,867.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="128" x="860.41" y="859.2324">«Concrete Strategy»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="105" x="871.91" y="872.2729">DebitCardPayment</text><line style="stroke:#181818;stroke-width:0.5;" x1="760.16" x2="1056.16" y1="879.8672" y2="879.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="760.16" x2="1056.16" y1="887.8672" y2="887.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="196" x="765.16" y="902.0776">+validate(details: Object): boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="286" x="765.16" y="914.8823">+process(amount: double, details: Object): Object</text></g><!--MD5=[6c00861b0bf1b1261ff9871e0e9714bb]
+class BankTransferPayment--><g id="elem_BankTransferPayment"><rect codeLine="89" fill="#F1F1F1" height="78.3828" id="BankTransferPayment" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="298" x="1092.16" y="843.0938"/><ellipse cx="1173.91" cy="861.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1176.8787,867.1211 Q1176.3006,867.418 1175.66,867.5586 Q1175.0194,867.7148 1174.3162,867.7148 Q1171.8162,867.7148 1170.4881,866.0742 Q1169.1756,864.418 1169.1756,861.293 Q1169.1756,858.168 1170.4881,856.5117 Q1171.8162,854.8555 1174.3162,854.8555 Q1175.0194,854.8555 1175.66,855.0117 Q1176.3162,855.168 1176.8787,855.4648 L1176.8787,858.1836 Q1176.2537,857.6055 1175.66,857.3398 Q1175.0662,857.0586 1174.4412,857.0586 Q1173.0975,857.0586 1172.41,858.1367 Q1171.7225,859.1992 1171.7225,861.293 Q1171.7225,863.3867 1172.41,864.4648 Q1173.0975,865.5273 1174.4412,865.5273 Q1175.0662,865.5273 1175.66,865.2617 Q1176.2537,864.9805 1176.8787,864.4023 L1176.8787,867.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="128" x="1193.41" y="859.2324">«Concrete Strategy»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="126" x="1194.41" y="872.2729">BankTransferPayment</text><line style="stroke:#181818;stroke-width:0.5;" x1="1093.16" x2="1389.16" y1="879.8672" y2="879.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="1093.16" x2="1389.16" y1="887.8672" y2="887.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="196" x="1098.16" y="902.0776">+validate(details: Object): boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="286" x="1098.16" y="914.8823">+process(amount: double, details: Object): Object</text></g><!--MD5=[59f74f8178866f87d5e48546c7583e4d]
+class PayPalPayment--><g id="elem_PayPalPayment"><rect codeLine="94" fill="#F1F1F1" height="78.3828" id="PayPalPayment" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="298" x="1425.16" y="843.0938"/><ellipse cx="1507.91" cy="861.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1510.8787,867.1211 Q1510.3006,867.418 1509.66,867.5586 Q1509.0194,867.7148 1508.3162,867.7148 Q1505.8162,867.7148 1504.4881,866.0742 Q1503.1756,864.418 1503.1756,861.293 Q1503.1756,858.168 1504.4881,856.5117 Q1505.8162,854.8555 1508.3162,854.8555 Q1509.0194,854.8555 1509.66,855.0117 Q1510.3162,855.168 1510.8787,855.4648 L1510.8787,858.1836 Q1510.2537,857.6055 1509.66,857.3398 Q1509.0662,857.0586 1508.4412,857.0586 Q1507.0975,857.0586 1506.41,858.1367 Q1505.7225,859.1992 1505.7225,861.293 Q1505.7225,863.3867 1506.41,864.4648 Q1507.0975,865.5273 1508.4412,865.5273 Q1509.0662,865.5273 1509.66,865.2617 Q1510.2537,864.9805 1510.8787,864.4023 L1510.8787,867.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="128" x="1526.41" y="859.2324">«Concrete Strategy»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="86" x="1547.41" y="872.2729">PayPalPayment</text><line style="stroke:#181818;stroke-width:0.5;" x1="1426.16" x2="1722.16" y1="879.8672" y2="879.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="1426.16" x2="1722.16" y1="887.8672" y2="887.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="196" x="1431.16" y="902.0776">+validate(details: Object): boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="286" x="1431.16" y="914.8823">+process(amount: double, details: Object): Object</text></g><!--MD5=[51b16dd11317b57aedf246cf9664845e]
+class PaymentStrategyFactory--><g id="elem_PaymentStrategyFactory"><rect codeLine="99" fill="#F1F1F1" height="65.5781" id="PaymentStrategyFactory" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="311" x="1744.66" y="392.5938"/><ellipse cx="1759.66" cy="410.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M1762.6287,416.6211 Q1762.0506,416.918 1761.41,417.0586 Q1760.7694,417.2148 1760.0662,417.2148 Q1757.5662,417.2148 1756.2381,415.5742 Q1754.9256,413.918 1754.9256,410.793 Q1754.9256,407.668 1756.2381,406.0117 Q1757.5662,404.3555 1760.0662,404.3555 Q1760.7694,404.3555 1761.41,404.5117 Q1762.0662,404.668 1762.6287,404.9648 L1762.6287,407.6836 Q1762.0037,407.1055 1761.41,406.8398 Q1760.8162,406.5586 1760.1912,406.5586 Q1758.8475,406.5586 1758.16,407.6367 Q1757.4725,408.6992 1757.4725,410.793 Q1757.4725,412.8867 1758.16,413.9648 Q1758.8475,415.0273 1760.1912,415.0273 Q1760.8162,415.0273 1761.41,414.7617 Q1762.0037,414.4805 1762.6287,413.9023 L1762.6287,416.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="283" x="1771.66" y="408.7324">«Strategy Selector\nFactory Method Pattern»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="138" x="1844.16" y="421.7729">PaymentStrategyFactory</text><line style="stroke:#181818;stroke-width:0.5;" x1="1745.66" x2="2054.66" y1="429.3672" y2="429.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="1745.66" x2="2054.66" y1="437.3672" y2="437.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" text-decoration="underline" textLength="270" x="1750.66" y="451.5776">+create(methodType: String): PaymentStrategy</text></g><!--MD5=[6ac9c7d43e20783b54eac9a1397830d1]
+class BookingState--><g id="elem_BookingState"><rect codeLine="115" fill="#F1F1F1" height="142.4063" id="BookingState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="150" x="2763.16" y="627.0938"/><ellipse cx="2785.81" cy="645.4805" fill="#A9DCDF" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2785.9194,640.8242 L2784.7631,645.9023 L2787.0913,645.9023 L2785.9194,640.8242 Z M2784.435,638.5898 L2787.4194,638.5898 L2790.7788,650.9805 L2788.3256,650.9805 L2787.56,647.918 L2784.2788,647.918 L2783.5288,650.9805 L2781.0913,650.9805 L2784.435,638.5898 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="105" x="2799.51" y="643.2324">«Abstract State»</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacing" textLength="75" x="2814.51" y="656.2729">BookingState</text><line style="stroke:#181818;stroke-width:0.5;" x1="2764.16" x2="2912.16" y1="663.8672" y2="663.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2764.16" x2="2912.16" y1="671.8672" y2="671.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacing" textLength="110" x="2769.16" y="686.0776">+getName(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="102" x="2769.16" y="698.8823">+confirm(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="91" x="2769.16" y="711.687">+reject(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="2769.16" y="724.4917">+cancel(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="138" x="2769.16" y="737.2964">+awaitPayment(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="79" x="2769.16" y="750.1011">+pay(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="111" x="2769.16" y="762.9058">+complete(): String</text></g><!--MD5=[af71fd5d0393f6d0459de6c8f6774df6]
+class RequestedState--><g id="elem_RequestedState"><rect codeLine="125" fill="#F1F1F1" height="103.9922" id="RequestedState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="137" x="2590.66" y="830.0938"/><ellipse cx="2605.66" cy="848.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2608.6288,854.1211 Q2608.0506,854.418 2607.41,854.5586 Q2606.7694,854.7148 2606.0663,854.7148 Q2603.5663,854.7148 2602.2381,853.0742 Q2600.9256,851.418 2600.9256,848.293 Q2600.9256,845.168 2602.2381,843.5117 Q2603.5663,841.8555 2606.0663,841.8555 Q2606.7694,841.8555 2607.41,842.0117 Q2608.0663,842.168 2608.6288,842.4648 L2608.6288,845.1836 Q2608.0038,844.6055 2607.41,844.3398 Q2606.8163,844.0586 2606.1913,844.0586 Q2604.8475,844.0586 2604.16,845.1367 Q2603.4725,846.1992 2603.4725,848.293 Q2603.4725,850.3867 2604.16,851.4648 Q2604.8475,852.5273 2606.1913,852.5273 Q2606.8163,852.5273 2607.41,852.2617 Q2608.0038,851.9805 2608.6288,851.4023 L2608.6288,854.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="109" x="2617.66" y="846.2324">«Concrete State»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="90" x="2627.16" y="859.2729">RequestedState</text><line style="stroke:#181818;stroke-width:0.5;" x1="2591.66" x2="2726.66" y1="866.8672" y2="866.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2591.66" x2="2726.66" y1="874.8672" y2="874.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="2596.66" y="889.0776">+getName(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="102" x="2596.66" y="901.8823">+confirm(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="91" x="2596.66" y="914.687">+reject(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="2596.66" y="927.4917">+cancel(): String</text></g><!--MD5=[d00af852eeb0108c07a4aef1584ce73e]
+class ConfirmedState--><g id="elem_ConfirmedState"><rect codeLine="132" fill="#F1F1F1" height="91.1875" id="ConfirmedState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="150" x="2763.16" y="836.5938"/><ellipse cx="2784.01" cy="854.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2786.9787,860.6211 Q2786.4006,860.918 2785.76,861.0586 Q2785.1194,861.2148 2784.4162,861.2148 Q2781.9162,861.2148 2780.5881,859.5742 Q2779.2756,857.918 2779.2756,854.793 Q2779.2756,851.668 2780.5881,850.0117 Q2781.9162,848.3555 2784.4162,848.3555 Q2785.1194,848.3555 2785.76,848.5117 Q2786.4162,848.668 2786.9787,848.9648 L2786.9787,851.6836 Q2786.3537,851.1055 2785.76,850.8398 Q2785.1662,850.5586 2784.5412,850.5586 Q2783.1975,850.5586 2782.51,851.6367 Q2781.8225,852.6992 2781.8225,854.793 Q2781.8225,856.8867 2782.51,857.9648 Q2783.1975,859.0273 2784.5412,859.0273 Q2785.1662,859.0273 2785.76,858.7617 Q2786.3537,858.4805 2786.9787,857.9023 L2786.9787,860.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="109" x="2797.31" y="852.7324">«Concrete State»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="89" x="2807.31" y="865.7729">ConfirmedState</text><line style="stroke:#181818;stroke-width:0.5;" x1="2764.16" x2="2912.16" y1="873.3672" y2="873.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2764.16" x2="2912.16" y1="881.3672" y2="881.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="2769.16" y="895.5776">+getName(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="138" x="2769.16" y="908.3823">+awaitPayment(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="2769.16" y="921.187">+cancel(): String</text></g><!--MD5=[b23fa28497a1a49e2090ab583ec0bcb9]
+class PendingPaymentState--><g id="elem_PendingPaymentState"><rect codeLine="138" fill="#F1F1F1" height="91.1875" id="PendingPaymentState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="156" x="2948.16" y="836.5938"/><ellipse cx="2963.16" cy="854.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2966.1288,860.6211 Q2965.5506,860.918 2964.91,861.0586 Q2964.2694,861.2148 2963.5663,861.2148 Q2961.0663,861.2148 2959.7381,859.5742 Q2958.4256,857.918 2958.4256,854.793 Q2958.4256,851.668 2959.7381,850.0117 Q2961.0663,848.3555 2963.5663,848.3555 Q2964.2694,848.3555 2964.91,848.5117 Q2965.5663,848.668 2966.1288,848.9648 L2966.1288,851.6836 Q2965.5038,851.1055 2964.91,850.8398 Q2964.3163,850.5586 2963.6913,850.5586 Q2962.3475,850.5586 2961.66,851.6367 Q2960.9725,852.6992 2960.9725,854.793 Q2960.9725,856.8867 2961.66,857.9648 Q2962.3475,859.0273 2963.6913,859.0273 Q2964.3163,859.0273 2964.91,858.7617 Q2965.5038,858.4805 2966.1288,857.9023 L2966.1288,860.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="109" x="2984.66" y="852.7324">«Concrete State»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="124" x="2977.16" y="865.7729">PendingPaymentState</text><line style="stroke:#181818;stroke-width:0.5;" x1="2949.16" x2="3103.16" y1="873.3672" y2="873.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2949.16" x2="3103.16" y1="881.3672" y2="881.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="2954.16" y="895.5776">+getName(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="79" x="2954.16" y="908.3823">+pay(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="2954.16" y="921.187">+cancel(): String</text></g><!--MD5=[1b65497679c357f44fdce1bde2544c0b]
+class PaidState--><g id="elem_PaidState"><rect codeLine="144" fill="#F1F1F1" height="91.1875" id="PaidState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="137" x="3139.66" y="836.5938"/><ellipse cx="3154.66" cy="854.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3157.6288,860.6211 Q3157.0506,860.918 3156.41,861.0586 Q3155.7694,861.2148 3155.0663,861.2148 Q3152.5663,861.2148 3151.2381,859.5742 Q3149.9256,857.918 3149.9256,854.793 Q3149.9256,851.668 3151.2381,850.0117 Q3152.5663,848.3555 3155.0663,848.3555 Q3155.7694,848.3555 3156.41,848.5117 Q3157.0663,848.668 3157.6288,848.9648 L3157.6288,851.6836 Q3157.0038,851.1055 3156.41,850.8398 Q3155.8163,850.5586 3155.1913,850.5586 Q3153.8475,850.5586 3153.16,851.6367 Q3152.4725,852.6992 3152.4725,854.793 Q3152.4725,856.8867 3153.16,857.9648 Q3153.8475,859.0273 3155.1913,859.0273 Q3155.8163,859.0273 3156.41,858.7617 Q3157.0038,858.4805 3157.6288,857.9023 L3157.6288,860.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="109" x="3166.66" y="852.7324">«Concrete State»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="54" x="3194.16" y="865.7729">PaidState</text><line style="stroke:#181818;stroke-width:0.5;" x1="3140.66" x2="3275.66" y1="873.3672" y2="873.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="3140.66" x2="3275.66" y1="881.3672" y2="881.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="3145.66" y="895.5776">+getName(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="111" x="3145.66" y="908.3823">+complete(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="95" x="3145.66" y="921.187">+cancel(): String</text></g><!--MD5=[c15b6c8ed87235ab3d2a0f2efc1aac7c]
+class CompletedState--><g id="elem_CompletedState"><rect codeLine="150" fill="#F1F1F1" height="65.5781" id="CompletedState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="204" x="3312.16" y="849.0938"/><ellipse cx="3327.16" cy="867.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3330.1288,873.1211 Q3329.5506,873.418 3328.91,873.5586 Q3328.2694,873.7148 3327.5663,873.7148 Q3325.0663,873.7148 3323.7381,872.0742 Q3322.4256,870.418 3322.4256,867.293 Q3322.4256,864.168 3323.7381,862.5117 Q3325.0663,860.8555 3327.5663,860.8555 Q3328.2694,860.8555 3328.91,861.0117 Q3329.5663,861.168 3330.1288,861.4648 L3330.1288,864.1836 Q3329.5038,863.6055 3328.91,863.3398 Q3328.3163,863.0586 3327.6913,863.0586 Q3326.3475,863.0586 3325.66,864.1367 Q3324.9725,865.1992 3324.9725,867.293 Q3324.9725,869.3867 3325.66,870.4648 Q3326.3475,871.5273 3327.6913,871.5273 Q3328.3163,871.5273 3328.91,871.2617 Q3329.5038,870.9805 3330.1288,870.4023 L3330.1288,873.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="176" x="3339.16" y="865.2324">«Concrete State (Terminal)»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="91" x="3381.66" y="878.2729">CompletedState</text><line style="stroke:#181818;stroke-width:0.5;" x1="3313.16" x2="3515.16" y1="885.8672" y2="885.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="3313.16" x2="3515.16" y1="893.8672" y2="893.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="3318.16" y="908.0776">+getName(): String</text></g><!--MD5=[e061d8b94e2017e688928bf8b46b2da6]
+class RejectedState--><g id="elem_RejectedState"><rect codeLine="154" fill="#F1F1F1" height="65.5781" id="RejectedState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="204" x="2112.16" y="849.0938"/><ellipse cx="2127.16" cy="867.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2130.1288,873.1211 Q2129.5506,873.418 2128.91,873.5586 Q2128.2694,873.7148 2127.5663,873.7148 Q2125.0663,873.7148 2123.7381,872.0742 Q2122.4256,870.418 2122.4256,867.293 Q2122.4256,864.168 2123.7381,862.5117 Q2125.0663,860.8555 2127.5663,860.8555 Q2128.2694,860.8555 2128.91,861.0117 Q2129.5663,861.168 2130.1288,861.4648 L2130.1288,864.1836 Q2129.5038,863.6055 2128.91,863.3398 Q2128.3163,863.0586 2127.6913,863.0586 Q2126.3475,863.0586 2125.66,864.1367 Q2124.9725,865.1992 2124.9725,867.293 Q2124.9725,869.3867 2125.66,870.4648 Q2126.3475,871.5273 2127.6913,871.5273 Q2128.3163,871.5273 2128.91,871.2617 Q2129.5038,870.9805 2130.1288,870.4023 L2130.1288,873.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="176" x="2139.16" y="865.2324">«Concrete State (Terminal)»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="78" x="2188.16" y="878.2729">RejectedState</text><line style="stroke:#181818;stroke-width:0.5;" x1="2113.16" x2="2315.16" y1="885.8672" y2="885.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2113.16" x2="2315.16" y1="893.8672" y2="893.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="2118.16" y="908.0776">+getName(): String</text></g><!--MD5=[74903aa5fb3c14950f890875ecd87998]
+class CancelledState--><g id="elem_CancelledState"><rect codeLine="158" fill="#F1F1F1" height="65.5781" id="CancelledState" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="204" x="2351.16" y="849.0938"/><ellipse cx="2366.16" cy="867.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2369.1288,873.1211 Q2368.5506,873.418 2367.91,873.5586 Q2367.2694,873.7148 2366.5663,873.7148 Q2364.0663,873.7148 2362.7381,872.0742 Q2361.4256,870.418 2361.4256,867.293 Q2361.4256,864.168 2362.7381,862.5117 Q2364.0663,860.8555 2366.5663,860.8555 Q2367.2694,860.8555 2367.91,861.0117 Q2368.5663,861.168 2369.1288,861.4648 L2369.1288,864.1836 Q2368.5038,863.6055 2367.91,863.3398 Q2367.3163,863.0586 2366.6913,863.0586 Q2365.3475,863.0586 2364.66,864.1367 Q2363.9725,865.1992 2363.9725,867.293 Q2363.9725,869.3867 2364.66,870.4648 Q2365.3475,871.5273 2366.6913,871.5273 Q2367.3163,871.5273 2367.91,871.2617 Q2368.5038,870.9805 2369.1288,870.4023 L2369.1288,873.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="176" x="2378.16" y="865.2324">«Concrete State (Terminal)»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="85" x="2423.66" y="878.2729">CancelledState</text><line style="stroke:#181818;stroke-width:0.5;" x1="2352.16" x2="2554.16" y1="885.8672" y2="885.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2352.16" x2="2554.16" y1="893.8672" y2="893.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="110" x="2357.16" y="908.0776">+getName(): String</text></g><!--MD5=[0fac7eec695a31c5660bf329b4da3495]
+class BookingStateMachine--><g id="elem_BookingStateMachine"><rect codeLine="162" fill="#F1F1F1" height="91.1875" id="BookingStateMachine" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="390" x="2885.16" y="380.0938"/><ellipse cx="2995.91" cy="398.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M2998.8788,404.1211 Q2998.3006,404.418 2997.66,404.5586 Q2997.0194,404.7148 2996.3163,404.7148 Q2993.8163,404.7148 2992.4881,403.0742 Q2991.1756,401.418 2991.1756,398.293 Q2991.1756,395.168 2992.4881,393.5117 Q2993.8163,391.8555 2996.3163,391.8555 Q2997.0194,391.8555 2997.66,392.0117 Q2998.3163,392.168 2998.8788,392.4648 L2998.8788,395.1836 Q2998.2538,394.6055 2997.66,394.3398 Q2997.0663,394.0586 2996.4413,394.0586 Q2995.0975,394.0586 2994.41,395.1367 Q2993.7225,396.1992 2993.7225,398.293 Q2993.7225,400.3867 2994.41,401.4648 Q2995.0975,402.5273 2996.4413,402.5273 Q2997.0663,402.5273 2997.66,402.2617 Q2998.2538,401.9805 2998.8788,401.4023 L2998.8788,404.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="164" x="3014.41" y="396.2324">«Context / State Machine»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="121" x="3035.91" y="409.2729">BookingStateMachine</text><line style="stroke:#181818;stroke-width:0.5;" x1="2886.16" x2="3274.16" y1="416.8672" y2="416.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="2886.16" x2="3274.16" y1="424.8672" y2="424.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" text-decoration="underline" textLength="296" x="2891.16" y="439.0776">+getStateObject(statusString: String): BookingState</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" text-decoration="underline" textLength="344" x="2891.16" y="451.8823">+transition(currentStatus: String, nextStatus: String): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" text-decoration="underline" textLength="378" x="2891.16" y="464.687">+canTransition(currentStatus: String, nextStatus: String): boolean</text></g><!--MD5=[d40932010816485ec57b44b6eea2392a]
+class Observer--><g id="elem_Observer"><rect codeLine="183" fill="#F1F1F1" height="65.5781" id="Observer" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="301" x="6448.66" y="392.5938"/><ellipse cx="6533.41" cy="410.9805" fill="#A9DCDF" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M6533.5194,406.3242 L6532.3631,411.4023 L6534.6913,411.4023 L6533.5194,406.3242 Z M6532.035,404.0898 L6535.0194,404.0898 L6538.3788,416.4805 L6535.9256,416.4805 L6535.16,413.418 L6531.8788,413.418 L6531.1288,416.4805 L6528.6913,416.4805 L6532.035,404.0898 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="127" x="6551.91" y="408.7324">«Abstract Observer»</text><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacing" textLength="53" x="6588.91" y="421.7729">Observer</text><line style="stroke:#181818;stroke-width:0.5;" x1="6449.66" x2="6748.66" y1="429.3672" y2="429.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="6449.66" x2="6748.66" y1="437.3672" y2="437.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" font-style="italic" lengthAdjust="spacing" textLength="289" x="6454.66" y="451.5776">+update(eventName: String, payload: Object): void</text></g><!--MD5=[d0da0a299942266ebd64acf2b2e95fa4]
+class Subject--><g id="elem_Subject"><rect codeLine="187" fill="#F1F1F1" height="103.9922" id="Subject" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="293" x="6271.66" y="101.0938"/><ellipse cx="6350.41" cy="119.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M6353.3788,125.1211 Q6352.8006,125.418 6352.16,125.5586 Q6351.5194,125.7148 6350.8163,125.7148 Q6348.3163,125.7148 6346.9881,124.0742 Q6345.6756,122.418 6345.6756,119.293 Q6345.6756,116.168 6346.9881,114.5117 Q6348.3163,112.8555 6350.8163,112.8555 Q6351.5194,112.8555 6352.16,113.0117 Q6352.8163,113.168 6353.3788,113.4648 L6353.3788,116.1836 Q6352.7538,115.6055 6352.16,115.3398 Q6351.5663,115.0586 6350.9413,115.0586 Q6349.5975,115.0586 6348.91,116.1367 Q6348.2225,117.1992 6348.2225,119.293 Q6348.2225,121.3867 6348.91,122.4648 Q6349.5975,123.5273 6350.9413,123.5273 Q6351.5663,123.5273 6352.16,123.2617 Q6352.7538,122.9805 6353.3788,122.4023 L6353.3788,125.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="131" x="6368.91" y="117.2324">«Subject / Publisher»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="42" x="6413.41" y="130.2729">Subject</text><line style="stroke:#181818;stroke-width:0.5;" x1="6272.66" x2="6563.66" y1="137.8672" y2="137.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="161" x="6277.66" y="152.0776">-observers: List&lt;Observer&gt;</text><line style="stroke:#181818;stroke-width:0.5;" x1="6272.66" x2="6563.66" y1="158.6719" y2="158.6719"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="195" x="6277.66" y="172.8823">+attach(observer: Observer): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="198" x="6277.66" y="185.687">+detach(observer: Observer): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="281" x="6277.66" y="198.4917">#notify(eventName: String, payload: Object): void</text></g><!--MD5=[4040e4d8b7535b2d7e5e1edd9ac88ab2]
+class NotificationManager--><g id="elem_NotificationManager"><rect codeLine="194" fill="#F1F1F1" height="91.1875" id="NotificationManager" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="353" x="6060.66" y="380.0938"/><ellipse cx="6114.41" cy="398.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M6117.3788,404.1211 Q6116.8006,404.418 6116.16,404.5586 Q6115.5194,404.7148 6114.8163,404.7148 Q6112.3163,404.7148 6110.9881,403.0742 Q6109.6756,401.418 6109.6756,398.293 Q6109.6756,395.168 6110.9881,393.5117 Q6112.3163,391.8555 6114.8163,391.8555 Q6115.5194,391.8555 6116.16,392.0117 Q6116.8163,392.168 6117.3788,392.4648 L6117.3788,395.1836 Q6116.7538,394.6055 6116.16,394.3398 Q6115.5663,394.0586 6114.9413,394.0586 Q6113.5975,394.0586 6112.91,395.1367 Q6112.2225,396.1992 6112.2225,398.293 Q6112.2225,400.3867 6112.91,401.4648 Q6113.5975,402.5273 6114.9413,402.5273 Q6115.5663,402.5273 6116.16,402.2617 Q6116.7538,401.9805 6117.3788,401.4023 L6117.3788,404.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="241" x="6132.91" y="396.2324">«Concrete Subject\nObserver Pattern»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="112" x="6197.41" y="409.2729">NotificationManager</text><line style="stroke:#181818;stroke-width:0.5;" x1="6061.66" x2="6412.66" y1="416.8672" y2="416.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="125" x="6066.66" y="431.0776">-history: List&lt;Object&gt;</text><line style="stroke:#181818;stroke-width:0.5;" x1="6061.66" x2="6412.66" y1="437.6719" y2="437.6719"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="341" x="6066.66" y="451.8823">+sendNotification(eventName: String, payload: Object): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="157" x="6066.66" y="464.687">+getHistory(): List&lt;Object&gt;</text></g><!--MD5=[1a771fca33d7136c45a2b8e127540c32]
+class EmailNotifier--><g id="elem_EmailNotifier"><rect codeLine="200" fill="#F1F1F1" height="65.5781" id="EmailNotifier" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="301" x="6060.66" y="665.0938"/><ellipse cx="6143.41" cy="683.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M6146.3788,689.1211 Q6145.8006,689.418 6145.16,689.5586 Q6144.5194,689.7148 6143.8163,689.7148 Q6141.3163,689.7148 6139.9881,688.0742 Q6138.6756,686.418 6138.6756,683.293 Q6138.6756,680.168 6139.9881,678.5117 Q6141.3163,676.8555 6143.8163,676.8555 Q6144.5194,676.8555 6145.16,677.0117 Q6145.8163,677.168 6146.3788,677.4648 L6146.3788,680.1836 Q6145.7538,679.6055 6145.16,679.3398 Q6144.5663,679.0586 6143.9413,679.0586 Q6142.5975,679.0586 6141.91,680.1367 Q6141.2225,681.1992 6141.2225,683.293 Q6141.2225,685.3867 6141.91,686.4648 Q6142.5975,687.5273 6143.9413,687.5273 Q6144.5663,687.5273 6145.16,687.2617 Q6145.7538,686.9805 6146.3788,686.4023 L6146.3788,689.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="131" x="6161.91" y="681.2324">«Concrete Observer»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="72" x="6191.41" y="694.2729">EmailNotifier</text><line style="stroke:#181818;stroke-width:0.5;" x1="6061.66" x2="6360.66" y1="701.8672" y2="701.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="6061.66" x2="6360.66" y1="709.8672" y2="709.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="289" x="6066.66" y="724.0776">+update(eventName: String, payload: Object): void</text></g><!--MD5=[4a353d40c8a854705c535b39ed47cb50]
+class SmsNotifier--><g id="elem_SmsNotifier"><rect codeLine="204" fill="#F1F1F1" height="65.5781" id="SmsNotifier" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="301" x="6396.66" y="665.0938"/><ellipse cx="6479.41" cy="683.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M6482.3788,689.1211 Q6481.8006,689.418 6481.16,689.5586 Q6480.5194,689.7148 6479.8163,689.7148 Q6477.3163,689.7148 6475.9881,688.0742 Q6474.6756,686.418 6474.6756,683.293 Q6474.6756,680.168 6475.9881,678.5117 Q6477.3163,676.8555 6479.8163,676.8555 Q6480.5194,676.8555 6481.16,677.0117 Q6481.8163,677.168 6482.3788,677.4648 L6482.3788,680.1836 Q6481.7538,679.6055 6481.16,679.3398 Q6480.5663,679.0586 6479.9413,679.0586 Q6478.5975,679.0586 6477.91,680.1367 Q6477.2225,681.1992 6477.2225,683.293 Q6477.2225,685.3867 6477.91,686.4648 Q6478.5975,687.5273 6479.9413,687.5273 Q6480.5663,687.5273 6481.16,687.2617 Q6481.7538,686.9805 6482.3788,686.4023 L6482.3788,689.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="131" x="6497.91" y="681.2324">«Concrete Observer»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="67" x="6529.91" y="694.2729">SmsNotifier</text><line style="stroke:#181818;stroke-width:0.5;" x1="6397.66" x2="6696.66" y1="701.8672" y2="701.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="6397.66" x2="6696.66" y1="709.8672" y2="709.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="289" x="6402.66" y="724.0776">+update(eventName: String, payload: Object): void</text></g><!--MD5=[5e61f650ccd7aa0ff0a365005aea930e]
+class PushNotifier--><g id="elem_PushNotifier"><rect codeLine="208" fill="#F1F1F1" height="65.5781" id="PushNotifier" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="301" x="6732.66" y="665.0938"/><ellipse cx="6815.41" cy="683.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M6818.3788,689.1211 Q6817.8006,689.418 6817.16,689.5586 Q6816.5194,689.7148 6815.8163,689.7148 Q6813.3163,689.7148 6811.9881,688.0742 Q6810.6756,686.418 6810.6756,683.293 Q6810.6756,680.168 6811.9881,678.5117 Q6813.3163,676.8555 6815.8163,676.8555 Q6816.5194,676.8555 6817.16,677.0117 Q6817.8163,677.168 6818.3788,677.4648 L6818.3788,680.1836 Q6817.7538,679.6055 6817.16,679.3398 Q6816.5663,679.0586 6815.9413,679.0586 Q6814.5975,679.0586 6813.91,680.1367 Q6813.2225,681.1992 6813.2225,683.293 Q6813.2225,685.3867 6813.91,686.4648 Q6814.5975,687.5273 6815.9413,687.5273 Q6816.5663,687.5273 6817.16,687.2617 Q6817.7538,686.9805 6818.3788,686.4023 L6818.3788,689.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="131" x="6833.91" y="681.2324">«Concrete Observer»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="69" x="6864.91" y="694.2729">PushNotifier</text><line style="stroke:#181818;stroke-width:0.5;" x1="6733.66" x2="7032.66" y1="701.8672" y2="701.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="6733.66" x2="7032.66" y1="709.8672" y2="709.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="289" x="6738.66" y="724.0776">+update(eventName: String, payload: Object): void</text></g><!--MD5=[3fd616f346a44cd59a91eb10b19e157c]
+class User--><g id="elem_User"><rect codeLine="224" fill="#F1F1F1" height="103.9922" id="User" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="112" x="3572.16" y="373.5938"/><ellipse cx="3587.16" cy="391.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3590.1288,397.6211 Q3589.5506,397.918 3588.91,398.0586 Q3588.2694,398.2148 3587.5663,398.2148 Q3585.0663,398.2148 3583.7381,396.5742 Q3582.4256,394.918 3582.4256,391.793 Q3582.4256,388.668 3583.7381,387.0117 Q3585.0663,385.3555 3587.5663,385.3555 Q3588.2694,385.3555 3588.91,385.5117 Q3589.5663,385.668 3590.1288,385.9648 L3590.1288,388.6836 Q3589.5038,388.1055 3588.91,387.8398 Q3588.3163,387.5586 3587.6913,387.5586 Q3586.3475,387.5586 3585.66,388.6367 Q3584.9725,389.6992 3584.9725,391.793 Q3584.9725,393.8867 3585.66,394.9648 Q3586.3475,396.0273 3587.6913,396.0273 Q3588.3163,396.0273 3588.91,395.7617 Q3589.5038,395.4805 3590.1288,394.9023 L3590.1288,397.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="84" x="3599.16" y="389.7324">«Base Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="27" x="3627.66" y="402.7729">User</text><line style="stroke:#181818;stroke-width:0.5;" x1="3573.16" x2="3683.16" y1="410.3672" y2="410.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="56" x="3578.16" y="424.5776">-id: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="78" x="3578.16" y="437.3823">-name: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="77" x="3578.16" y="450.187">-email: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="100" x="3578.16" y="462.9917">-createdAt: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="3573.16" x2="3683.16" y1="469.5859" y2="469.5859"/></g><!--MD5=[ed6624c6556d5e7b1bd23032162d20b7]
+class Client--><g id="elem_Client"><rect codeLine="231" fill="#F1F1F1" height="78.3828" id="Client" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="138" x="3745.16" y="659.0938"/><ellipse cx="3760.16" cy="677.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3763.1288,683.1211 Q3762.5506,683.418 3761.91,683.5586 Q3761.2694,683.7148 3760.5663,683.7148 Q3758.0663,683.7148 3756.7381,682.0742 Q3755.4256,680.418 3755.4256,677.293 Q3755.4256,674.168 3756.7381,672.5117 Q3758.0663,670.8555 3760.5663,670.8555 Q3761.2694,670.8555 3761.91,671.0117 Q3762.5663,671.168 3763.1288,671.4648 L3763.1288,674.1836 Q3762.5038,673.6055 3761.91,673.3398 Q3761.3163,673.0586 3760.6913,673.0586 Q3759.3475,673.0586 3758.66,674.1367 Q3757.9725,675.1992 3757.9725,677.293 Q3757.9725,679.3867 3758.66,680.4648 Q3759.3475,681.5273 3760.6913,681.5273 Q3761.3163,681.5273 3761.91,681.2617 Q3762.5038,680.9805 3763.1288,680.4023 L3763.1288,683.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="110" x="3772.16" y="675.2324">«Concrete Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="32" x="3811.16" y="688.2729">Client</text><line style="stroke:#181818;stroke-width:0.5;" x1="3746.16" x2="3882.16" y1="695.8672" y2="695.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="68" x="3751.16" y="710.0776">-role: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="83" x="3751.16" y="722.8823">-bookings: List</text><line style="stroke:#181818;stroke-width:0.5;" x1="3746.16" x2="3882.16" y1="729.4766" y2="729.4766"/></g><!--MD5=[92b32dc37fe99582fa0c2dbc819b1229]
+class ConsultantUser--><g id="elem_ConsultantUser"><rect codeLine="236" fill="#F1F1F1" height="91.1875" id="ConsultantUser" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="138" x="3572.16" y="652.5938"/><ellipse cx="3587.16" cy="670.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3590.1288,676.6211 Q3589.5506,676.918 3588.91,677.0586 Q3588.2694,677.2148 3587.5663,677.2148 Q3585.0663,677.2148 3583.7381,675.5742 Q3582.4256,673.918 3582.4256,670.793 Q3582.4256,667.668 3583.7381,666.0117 Q3585.0663,664.3555 3587.5663,664.3555 Q3588.2694,664.3555 3588.91,664.5117 Q3589.5663,664.668 3590.1288,664.9648 L3590.1288,667.6836 Q3589.5038,667.1055 3588.91,666.8398 Q3588.3163,666.5586 3587.6913,666.5586 Q3586.3475,666.5586 3585.66,667.6367 Q3584.9725,668.6992 3584.9725,670.793 Q3584.9725,672.8867 3585.66,673.9648 Q3586.3475,675.0273 3587.6913,675.0273 Q3588.3163,675.0273 3588.91,674.7617 Q3589.5038,674.4805 3590.1288,673.9023 L3590.1288,676.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="110" x="3599.16" y="668.7324">«Concrete Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="88" x="3610.16" y="681.7729">ConsultantUser</text><line style="stroke:#181818;stroke-width:0.5;" x1="3573.16" x2="3709.16" y1="689.3672" y2="689.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="68" x="3578.16" y="703.5776">-role: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="99" x="3578.16" y="716.3823">-expertise: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="82" x="3578.16" y="729.187">-status: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="3573.16" x2="3709.16" y1="735.7813" y2="735.7813"/></g><!--MD5=[db6d18d8099558415abc41d00477ab92]
+class Admin--><g id="elem_Admin"><rect codeLine="242" fill="#F1F1F1" height="78.3828" id="Admin" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="167" x="3918.66" y="659.0938"/><ellipse cx="3946.71" cy="677.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3949.6788,683.1211 Q3949.1006,683.418 3948.46,683.5586 Q3947.8194,683.7148 3947.1163,683.7148 Q3944.6163,683.7148 3943.2881,682.0742 Q3941.9756,680.418 3941.9756,677.293 Q3941.9756,674.168 3943.2881,672.5117 Q3944.6163,670.8555 3947.1163,670.8555 Q3947.8194,670.8555 3948.46,671.0117 Q3949.1163,671.168 3949.6788,671.4648 L3949.6788,674.1836 Q3949.0538,673.6055 3948.46,673.3398 Q3947.8663,673.0586 3947.2413,673.0586 Q3945.8975,673.0586 3945.21,674.1367 Q3944.5225,675.1992 3944.5225,677.293 Q3944.5225,679.3867 3945.21,680.4648 Q3945.8975,681.5273 3947.2413,681.5273 Q3947.8663,681.5273 3948.46,681.2617 Q3949.0538,680.9805 3949.6788,680.4023 L3949.6788,683.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="110" x="3961.61" y="675.2324">«Concrete Entity»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="35" x="3999.11" y="688.2729">Admin</text><line style="stroke:#181818;stroke-width:0.5;" x1="3919.66" x2="4084.66" y1="695.8672" y2="695.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="68" x="3924.66" y="710.0776">-role: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="155" x="3924.66" y="722.8823">-permissions: List&lt;String&gt;</text><line style="stroke:#181818;stroke-width:0.5;" x1="3919.66" x2="4084.66" y1="729.4766" y2="729.4766"/></g><!--MD5=[aea28b81cae0a8aa60424a571cc2f050]
+class UserFactory--><g id="elem_UserFactory"><rect codeLine="247" fill="#F1F1F1" height="65.5781" id="UserFactory" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="544" x="3719.16" y="392.5938"/><ellipse cx="3847.91" cy="410.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M3850.8788,416.6211 Q3850.3006,416.918 3849.66,417.0586 Q3849.0194,417.2148 3848.3163,417.2148 Q3845.8163,417.2148 3844.4881,415.5742 Q3843.1756,413.918 3843.1756,410.793 Q3843.1756,407.668 3844.4881,406.0117 Q3845.8163,404.3555 3848.3163,404.3555 Q3849.0194,404.3555 3849.66,404.5117 Q3850.3163,404.668 3850.8788,404.9648 L3850.8788,407.6836 Q3850.2538,407.1055 3849.66,406.8398 Q3849.0663,406.5586 3848.4413,406.5586 Q3847.0975,406.5586 3846.41,407.6367 Q3845.7225,408.6992 3845.7225,410.793 Q3845.7225,412.8867 3846.41,413.9648 Q3847.0975,415.0273 3848.4413,415.0273 Q3849.0663,415.0273 3849.66,414.7617 Q3850.2538,414.4805 3850.8788,413.9023 L3850.8788,416.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="282" x="3866.41" y="408.7324">«Concrete Creator\nFactory Method Pattern»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="68" x="3973.41" y="421.7729">UserFactory</text><line style="stroke:#181818;stroke-width:0.5;" x1="3720.16" x2="4262.16" y1="429.3672" y2="429.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="3720.16" x2="4262.16" y1="437.3672" y2="437.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="532" x="3725.16" y="451.5776">+createUser(type: String, id: String, name: String, email: String, additionalInfo: Object): User</text></g><!--MD5=[faa9d7c248df64f313de696784577a38]
+class SystemPolicyManager--><g id="elem_SystemPolicyManager"><rect codeLine="264" fill="#F1F1F1" height="244.8438" id="SystemPolicyManager" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="291" x="4872.66" y="303.0938"/><ellipse cx="4901.61" cy="321.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M4904.5788,327.1211 Q4904.0006,327.418 4903.36,327.5586 Q4902.7194,327.7148 4902.0163,327.7148 Q4899.5163,327.7148 4898.1881,326.0742 Q4896.8756,324.418 4896.8756,321.293 Q4896.8756,318.168 4898.1881,316.5117 Q4899.5163,314.8555 4902.0163,314.8555 Q4902.7194,314.8555 4903.36,315.0117 Q4904.0163,315.168 4904.5788,315.4648 L4904.5788,318.1836 Q4903.9538,317.6055 4903.36,317.3398 Q4902.7663,317.0586 4902.1413,317.0586 Q4900.7975,317.0586 4900.11,318.1367 Q4899.4225,319.1992 4899.4225,321.293 Q4899.4225,323.3867 4900.11,324.4648 Q4900.7975,325.5273 4902.1413,325.5273 Q4902.7663,325.5273 4903.36,325.2617 Q4903.9538,324.9805 4904.5788,324.4023 L4904.5788,327.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="232" x="4916.71" y="319.2324">«Singleton Class\nSingleton Pattern»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="124" x="4970.71" y="332.2729">SystemPolicyManager</text><line style="stroke:#181818;stroke-width:0.5;" x1="4873.66" x2="5162.66" y1="339.8672" y2="339.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" text-decoration="underline" textLength="184" x="4878.66" y="354.0776">-instance: SystemPolicyManager</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="169" x="4878.66" y="366.8823">-cancellationWindowHours: int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="139" x="4878.66" y="379.687">-pricingMultiplier: double</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="171" x="4878.66" y="392.4917">-notificationsEnabled: boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="115" x="4878.66" y="405.2964">-refundPolicy: String</text><line style="stroke:#181818;stroke-width:0.5;" x1="4873.66" x2="5162.66" y1="411.8906" y2="411.8906"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="136" x="4878.66" y="426.1011">-SystemPolicyManager()</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" text-decoration="underline" textLength="215" x="4878.66" y="438.9058">+getInstance(): SystemPolicyManager</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="202" x="4878.66" y="451.7104">+getCancellationWindowHours(): int</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="266" x="4878.66" y="464.5151">+setCancellationWindowHours(hours: int): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="170" x="4878.66" y="477.3198">+getPricingMultiplier(): double</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="254" x="4878.66" y="490.1245">+setPricingMultiplier(multiplier: double): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="195" x="4878.66" y="502.9292">+isNotificationsEnabled(): boolean</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="279" x="4878.66" y="515.7339">+setNotificationsEnabled(enabled: boolean): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="148" x="4878.66" y="528.5386">+getRefundPolicy(): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="211" x="4878.66" y="541.3433">+setRefundPolicy(policy: String): void</text></g><!--MD5=[4b727814c7371d43f89ac9da1c0788a5]
+class BookingService--><g id="elem_BookingService"><rect codeLine="282" fill="#F1F1F1" height="103.9922" id="BookingService" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="445" x="5153.66" y="101.0938"/><ellipse cx="5325.91" cy="119.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M5328.8788,125.1211 Q5328.3006,125.418 5327.66,125.5586 Q5327.0194,125.7148 5326.3163,125.7148 Q5323.8163,125.7148 5322.4881,124.0742 Q5321.1756,122.418 5321.1756,119.293 Q5321.1756,116.168 5322.4881,114.5117 Q5323.8163,112.8555 5326.3163,112.8555 Q5327.0194,112.8555 5327.66,113.0117 Q5328.3163,113.168 5328.8788,113.4648 L5328.8788,116.1836 Q5328.2538,115.6055 5327.66,115.3398 Q5327.0663,115.0586 5326.4413,115.0586 Q5325.0975,115.0586 5324.41,116.1367 Q5323.7225,117.1992 5323.7225,119.293 Q5323.7225,121.3867 5324.41,122.4648 Q5325.0975,123.5273 5326.4413,123.5273 Q5327.0663,123.5273 5327.66,123.2617 Q5328.2538,122.9805 5328.8788,122.4023 L5328.8788,125.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="96" x="5344.41" y="117.2324">«Service Class»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="87" x="5348.91" y="130.2729">BookingService</text><line style="stroke:#181818;stroke-width:0.5;" x1="5154.66" x2="5597.66" y1="137.8672" y2="137.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="5154.66" x2="5597.66" y1="145.8672" y2="145.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="433" x="5159.66" y="160.0776">+createBooking(clientId: String, consultantId: String, slotId: String): Booking</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="225" x="5159.66" y="172.8823">+cancelBooking(bookingId: String): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="293" x="5159.66" y="185.687">+getBookingHistory(clientId: String): List&lt;Booking&gt;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="368" x="5159.66" y="198.4917">+transitionStatus(bookingId: String, nextStatus: String): Booking</text></g><!--MD5=[c8dfc610ff25b76ad9348780ed757e42]
+class ConsultantService--><g id="elem_ConsultantService"><rect codeLine="289" fill="#F1F1F1" height="103.9922" id="ConsultantService" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="546" x="4572.16" y="101.0938"/><ellipse cx="4789.41" cy="119.4805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M4792.3788,125.1211 Q4791.8006,125.418 4791.16,125.5586 Q4790.5194,125.7148 4789.8163,125.7148 Q4787.3163,125.7148 4785.9881,124.0742 Q4784.6756,122.418 4784.6756,119.293 Q4784.6756,116.168 4785.9881,114.5117 Q4787.3163,112.8555 4789.8163,112.8555 Q4790.5194,112.8555 4791.16,113.0117 Q4791.8163,113.168 4792.3788,113.4648 L4792.3788,116.1836 Q4791.7538,115.6055 4791.16,115.3398 Q4790.5663,115.0586 4789.9413,115.0586 Q4788.5975,115.0586 4787.91,116.1367 Q4787.2225,117.1992 4787.2225,119.293 Q4787.2225,121.3867 4787.91,122.4648 Q4788.5975,123.5273 4789.9413,123.5273 Q4790.5663,123.5273 4791.16,123.2617 Q4791.7538,122.9805 4792.3788,122.4023 L4792.3788,125.1211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="96" x="4813.41" y="117.2324">«Service Class»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="103" x="4809.91" y="130.2729">ConsultantService</text><line style="stroke:#181818;stroke-width:0.5;" x1="4573.16" x2="5117.16" y1="137.8672" y2="137.8672"/><line style="stroke:#181818;stroke-width:0.5;" x1="4573.16" x2="5117.16" y1="145.8672" y2="145.8672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="518" x="4578.16" y="160.0776">+registerConsultant(name: String, email: String, expertise: String): ConsultantRegistration</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="273" x="4578.16" y="172.8823">+approveConsultant(registrationId: String): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="259" x="4578.16" y="185.687">+rejectConsultant(registrationId: String): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="534" x="4578.16" y="198.4917">+updateAvailability(consultantName: String, slotDate: String, slotTime: String): AvailabilitySlot</text></g><!--MD5=[0ba305a5378c22e1df6974596bbc8d98]
+class ServiceCatalog--><g id="elem_ServiceCatalog"><rect codeLine="296" fill="#F1F1F1" height="91.1875" id="ServiceCatalog" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="217" x="4319.66" y="107.5938"/><ellipse cx="4377.91" cy="125.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M4380.8788,131.6211 Q4380.3006,131.918 4379.66,132.0586 Q4379.0194,132.2148 4378.3163,132.2148 Q4375.8163,132.2148 4374.4881,130.5742 Q4373.1756,128.918 4373.1756,125.793 Q4373.1756,122.668 4374.4881,121.0117 Q4375.8163,119.3555 4378.3163,119.3555 Q4379.0194,119.3555 4379.66,119.5117 Q4380.3163,119.668 4380.8788,119.9648 L4380.8788,122.6836 Q4380.2538,122.1055 4379.66,121.8398 Q4379.0663,121.5586 4378.4413,121.5586 Q4377.0975,121.5586 4376.41,122.6367 Q4375.7225,123.6992 4375.7225,125.793 Q4375.7225,127.8867 4376.41,128.9648 Q4377.0975,130.0273 4378.4413,130.0273 Q4379.0663,130.0273 4379.66,129.7617 Q4380.2538,129.4805 4380.8788,128.9023 L4380.8788,131.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="96" x="4396.41" y="123.7324">«Service Class»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="85" x="4401.91" y="136.7729">ServiceCatalog</text><line style="stroke:#181818;stroke-width:0.5;" x1="4320.66" x2="4535.66" y1="144.3672" y2="144.3672"/><line style="stroke:#181818;stroke-width:0.5;" x1="4320.66" x2="4535.66" y1="152.3672" y2="152.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="202" x="4325.66" y="166.5776">+addService(service: Service): void</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="171" x="4325.66" y="179.3823">+listServices(): List&lt;Service&gt;</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="205" x="4325.66" y="192.187">+findById(serviceId: String): Service</text></g><!--MD5=[b4344509f27ae0f96315e0892e10bf11]
+class CustomerAssistant--><g id="elem_CustomerAssistant"><rect codeLine="302" fill="#F1F1F1" height="116.7969" id="CustomerAssistant" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="370" x="5634.16" y="94.5938"/><ellipse cx="5730.41" cy="112.9805" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M5733.3788,118.6211 Q5732.8006,118.918 5732.16,119.0586 Q5731.5194,119.2148 5730.8163,119.2148 Q5728.3163,119.2148 5726.9881,117.5742 Q5725.6756,115.918 5725.6756,112.793 Q5725.6756,109.668 5726.9881,108.0117 Q5728.3163,106.3555 5730.8163,106.3555 Q5731.5194,106.3555 5732.16,106.5117 Q5732.8163,106.668 5733.3788,106.9648 L5733.3788,109.6836 Q5732.7538,109.1055 5732.16,108.8398 Q5731.5663,108.5586 5730.9413,108.5586 Q5729.5975,108.5586 5728.91,109.6367 Q5728.2225,110.6992 5728.2225,112.793 Q5728.2225,114.8867 5728.91,115.9648 Q5729.5975,117.0273 5730.9413,117.0273 Q5731.5663,117.0273 5732.16,116.7617 Q5732.7538,116.4805 5733.3788,115.9023 L5733.3788,118.6211 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacing" textLength="173" x="5748.91" y="110.7324">«Service Class\nAI Chatbot»</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="109" x="5780.91" y="123.7729">CustomerAssistant</text><line style="stroke:#181818;stroke-width:0.5;" x1="5635.16" x2="6003.16" y1="131.3672" y2="131.3672"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="117" x="5640.16" y="145.5776">-geminiApiUrl: String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="129" x="5640.16" y="158.3823">-maxOutputTokens: int</text><line style="stroke:#181818;stroke-width:0.5;" x1="5635.16" x2="6003.16" y1="164.9766" y2="164.9766"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="218" x="5640.16" y="179.187">+handleChat(message: String): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="354" x="5640.16" y="191.9917">-buildSystemPrompt(consultants: List, policies: Object): String</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="358" x="5640.16" y="204.7964">-callGeminiApi(systemPrompt: String, message: String): String</text></g><!--MD5=[268b75b5aa083a94fc0a43197b122741]
+link Booking to AvailabilitySlot--><g id="link_Booking_AvailabilitySlot"><path codeLine="64" d="M547.97,541.6038 C537.45,553.1238 525.82,563.6637 513.16,572.0938 C499.88,580.9337 492.51,573.1238 478.16,580.0938 C448.74,594.3738 419.94,615.6138 395.87,636.1038 " fill="none" id="Booking-to-AvailabilitySlot" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="392.04,639.3838,401.4765,636.5637,395.8363,636.1298,396.2701,630.4896,392.04,639.3838" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="95" x="479.16" y="593.1606">references slot</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="519.8008" y="561.586">0..*</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="390.7285" y="628.4018">1</text></g><!--MD5=[9f07a8482412f45893e5bf3b83a1cf09]
+link Booking to PaymentMethod--><g id="link_Booking_PaymentMethod"><path codeLine="65" d="M589.65,541.8338 C587.4,554.6837 585.48,567.6238 584.16,580.0938 C583.36,587.6038 584.04,589.5438 584.16,597.0938 C584.31,607.0938 584.54,617.6538 584.81,628.0138 " fill="none" id="Booking-to-PaymentMethod" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="584.95,633.0838,588.6913,623.9732,584.8072,628.0858,580.6946,624.2017,584.95,633.0838" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="56" x="585.16" y="593.1606">paid with</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="564.1509" y="561.8307">0..*</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="24" x="559.3958" y="622.2489">0..1</text></g><!--MD5=[d5f0a488cd323a9751075332cf7a63dc]
+reverse link PaymentStrategy to CreditCardPayment--><g id="link_PaymentStrategy_CreditCardPayment"><path codeLine="103" d="M1548.51,750.5438 C1629.3,779.9538 1728.88,816.2038 1802.59,843.0338 " fill="none" id="PaymentStrategy-backto-CreditCardPayment" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1545.87,757.0338,1529.47,743.6138,1550.66,743.8838,1545.87,757.0338" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[84e8b0941e0ff5163262785581f2fd7a]
+reverse link PaymentStrategy to DebitCardPayment--><g id="link_PaymentStrategy_DebitCardPayment"><path codeLine="104" d="M1266.08,750.5438 C1185.46,779.9538 1086.08,816.2038 1012.52,843.0338 " fill="none" id="PaymentStrategy-backto-DebitCardPayment" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1263.9,743.8938,1285.09,743.6138,1268.7,757.0438,1263.9,743.8938" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[ede3516dc5828466012d4283c046a646]
+reverse link PaymentStrategy to BankTransferPayment--><g id="link_PaymentStrategy_BankTransferPayment"><path codeLine="105" d="M1352.98,758.4838 C1327.68,786.2238 1298.31,818.4338 1276.01,842.8838 " fill="none" id="PaymentStrategy-backto-BankTransferPayment" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1347.9,753.6738,1366.55,743.6138,1358.24,763.1138,1347.9,753.6738" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[84a1d028417a5a7d35091c22975be07f]
+reverse link PaymentStrategy to PayPalPayment--><g id="link_PaymentStrategy_PayPalPayment"><path codeLine="106" d="M1461.66,758.4838 C1487.11,786.2238 1516.66,818.4338 1539.09,842.8838 " fill="none" id="PaymentStrategy-backto-PayPalPayment" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="1456.37,763.0838,1448.01,743.6138,1466.69,753.6238,1456.37,763.0838" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[ed587d7d60260e961e84a1fc41433319]
+link PaymentStrategyFactory to PaymentStrategy--><g id="link_PaymentStrategyFactory_PaymentStrategy"><path codeLine="107" d="M1841.67,458.6838 C1755.21,506.1238 1592.79,595.2438 1492.88,650.0638 " fill="none" id="PaymentStrategyFactory-to-PaymentStrategy" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="1488.46,652.4838,1498.2733,651.6477,1492.8402,650.0725,1494.4153,644.6394,1488.46,652.4838" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="48" x="1610.16" y="593.1606">creates</text></g><!--MD5=[d1227f584568509972214a2a4698f9a0]
+reverse link BookingState to RequestedState--><g id="link_BookingState_RequestedState"><path codeLine="168" d="M2755.04,783.6038 C2739.47,799.4338 2723.64,815.5238 2709.45,829.9538 " fill="none" id="BookingState-backto-RequestedState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2750.19,778.5538,2769.21,769.2038,2760.17,788.3638,2750.19,778.5538" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[21c1a7df3cdeb3e1ce9cf40997ae2c22]
+reverse link BookingState to ConfirmedState--><g id="link_BookingState_ConfirmedState"><path codeLine="169" d="M2838.16,789.4038 C2838.16,805.7938 2838.16,822.2138 2838.16,836.5438 " fill="none" id="BookingState-backto-ConfirmedState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2831.16,789.2038,2838.16,769.2038,2845.16,789.2038,2831.16,789.2038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[b7810f8fd8509ec57f11cb46f658c358]
+reverse link BookingState to PendingPaymentState--><g id="link_BookingState_PendingPaymentState"><path codeLine="170" d="M2925,783.1637 C2944.03,801.5938 2963.46,820.3938 2980.14,836.5438 " fill="none" id="BookingState-backto-PendingPaymentState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2920.07,788.1438,2910.57,769.2038,2929.81,778.0838,2920.07,788.1438" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[7b8a60e8b2229b534d05d2355d9ece2b]
+reverse link BookingState to PaidState--><g id="link_BookingState_PaidState"><path codeLine="171" d="M2931.64,739.3038 C2987.6,764.0838 3059.75,797.3138 3122.16,830.0938 C3127.84,833.0838 3133.68,836.2738 3139.51,839.5438 " fill="none" id="BookingState-backto-PaidState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2928.8,745.7038,2913.32,731.2338,2934.45,732.8838,2928.8,745.7038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[339e25c5c24890d937d087b21dbd8ff3]
+reverse link BookingState to CompletedState--><g id="link_BookingState_CompletedState"><path codeLine="172" d="M2932.88,722.6938 C3025.85,746.6938 3171.21,786.4938 3294.16,830.0938 C3310.05,835.7338 3326.86,842.4038 3342.7,849.0338 " fill="none" id="BookingState-backto-CompletedState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2930.92,729.4137,2913.28,717.6637,2934.4,715.8538,2930.92,729.4137" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[04f83dd386e167f8aa18bb77d9fd94a2]
+reverse link BookingState to RejectedState--><g id="link_BookingState_RejectedState"><path codeLine="173" d="M2743.29,719.3438 C2641.05,742.1938 2474.17,782.4338 2334.16,830.0938 C2317.98,835.6038 2300.9,842.2938 2284.87,848.9938 " fill="none" id="BookingState-backto-RejectedState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2741.81,712.5038,2762.85,715.0138,2744.83,726.1738,2741.81,712.5038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[1aeb065cdb06885499275604e6cdfcd9]
+reverse link BookingState to CancelledState--><g id="link_BookingState_CancelledState"><path codeLine="174" d="M2744.64,743.3038 C2675.56,775.9538 2583.11,819.6637 2521.02,849.0138 " fill="none" id="BookingState-backto-CancelledState" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="2741.94,736.8338,2763.01,734.6138,2747.92,749.4938,2741.94,736.8338" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[e2ca8f45cabca27484e1fafe97f7d309]
+link BookingStateMachine to BookingState--><g id="link_BookingStateMachine_BookingState"><path codeLine="175" d="M3040.2,471.2638 C3003.3,512.5038 2947.8,574.5438 2904.3,623.1637 " fill="none" id="BookingStateMachine-to-BookingState" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="2900.92,626.9337,2909.9062,622.9028,2904.2577,623.2109,2903.9496,617.5624,2900.92,626.9337" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="130" x="2938.16" y="593.1606">creates &amp; delegates</text></g><!--MD5=[fcc66359e1855e01fa20fb48b97f54b0]
+reverse link Subject to NotificationManager--><g id="link_Subject_NotificationManager"><path codeLine="212" d="M6372.7,222.0338 C6339.64,271.4338 6295.82,336.9338 6267.07,379.8837 " fill="none" id="Subject-backto-NotificationManager" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="6366.96,218.0237,6383.9,205.2938,6378.59,225.8038,6366.96,218.0237" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[5873a08c71297d1fa99c6ea40ebdab0a]
+reverse link Observer to EmailNotifier--><g id="link_Observer_EmailNotifier"><path codeLine="213" d="M6551.11,472.7138 C6518.6,502.7638 6473.94,541.8538 6431.16,572.0938 C6381.11,607.4638 6320.28,641.4038 6275.28,664.9638 " fill="none" id="Observer-backto-EmailNotifier" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="6546.64,467.3138,6566.04,458.7638,6556.2,477.5338,6546.64,467.3138" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[164692a8da5903a3c03084d2101659b5]
+reverse link Observer to SmsNotifier--><g id="link_Observer_SmsNotifier"><path codeLine="214" d="M6589.17,478.5338 C6578.58,533.6438 6562.17,619.0038 6553.32,665.0438 " fill="none" id="Observer-backto-SmsNotifier" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="6582.34,477.0038,6592.99,458.6838,6596.09,479.6438,6582.34,477.0038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[56d0306c7d2434fa6d9fb7e93653a45c]
+reverse link Observer to PushNotifier--><g id="link_Observer_PushNotifier"><path codeLine="215" d="M6647.67,472.8038 C6705.17,527.5738 6799.46,617.3838 6849.51,665.0438 " fill="none" id="Observer-backto-PushNotifier" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="6642.51,477.5438,6632.85,458.6838,6652.16,467.4138,6642.51,477.5438" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[7518d0f2b34a53396ed9c2f001163bb5]
+reverse link Subject to Observer--><g id="link_Subject_Observer"><path codeLine="216" d="M6459.77,216.2838 C6496.49,271.1638 6548.55,348.9538 6577.53,392.2737 " fill="none" id="Subject-backto-Observer" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="6452.41,205.2938,6452.4188,212.5048,6459.0786,215.2702,6459.0698,208.0591,6452.41,205.2938" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="63" x="6487.16" y="254.6606">observers</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="6448.2858" y="225.0187">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="6548.2146" y="381.6122">0..*</text></g><!--MD5=[a605f9a646bac91c0f1ec4bed5c60b13]
+reverse link User to Client--><g id="link_User_Client"><path codeLine="251" d="M3650.65,496.5138 C3662.96,528.8538 3680.22,566.7338 3702.16,597.0938 C3712.19,610.9838 3741.47,636.9938 3767.58,659.0038 " fill="none" id="User-backto-Client" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="3644.07,498.9038,3643.8,477.7138,3657.23,494.1138,3644.07,498.9038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[20fcc133c2d0faa4f47d45f201301a95]
+reverse link User to ConsultantUser--><g id="link_User_ConsultantUser"><path codeLine="252" d="M3631.58,497.7938 C3633.93,546.7838 3636.99,610.3638 3639.01,652.3838 " fill="none" id="User-backto-ConsultantUser" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="3624.59,498.1038,3630.62,477.7938,3638.57,497.4338,3624.59,498.1038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[933987b91d2b08b1b4941f3221fa6cec]
+reverse link User to Admin--><g id="link_User_Admin"><path codeLine="253" d="M3647.21,496.7038 C3658.51,524.7938 3675.92,554.5838 3702.16,572.0938 C3721.44,584.9638 3783.81,573.9538 3806.16,580.0938 C3851.58,592.5738 3860.58,603.1637 3901.16,627.0938 C3917.61,636.7938 3934.9,648.2638 3950.43,659.0838 " fill="none" id="User-backto-Admin" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="none" points="3640.56,498.9038,3640.33,477.7138,3653.72,494.1338,3640.56,498.9038" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[a2793b8344fdc569077d517313ce8dfe]
+link UserFactory to Client--><g id="link_UserFactory_Client"><path codeLine="254" d="M3970.16,458.6838 C3938.27,507.4138 3877.6,600.1338 3842.05,654.4738 " fill="none" id="UserFactory-to-Client" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="3839.11,658.9638,3847.3885,653.6284,3841.8505,654.7817,3840.6972,649.2436,3839.11,658.9638" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="48" x="3887.16" y="593.1606">creates</text></g><!--MD5=[ea9571fbdf1a3694a4409443a8353c79]
+link UserFactory to ConsultantUser--><g id="link_UserFactory_ConsultantUser"><path codeLine="255" d="M3948.07,458.8938 C3895.76,498.2438 3805,566.9038 3728.16,627.0938 C3719.08,634.2038 3709.52,641.7938 3700.19,649.2538 " fill="none" id="UserFactory-to-ConsultantUser" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="3696.21,652.4337,3705.7377,649.9392,3700.1157,649.312,3700.7429,643.69,3696.21,652.4337" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="48" x="3786.16" y="593.1606">creates</text></g><!--MD5=[6b6da51bc176b4c3a18643add3750353]
+link UserFactory to Admin--><g id="link_UserFactory_Admin"><path codeLine="256" d="M3992.46,458.6838 C3994.44,507.2238 3998.18,599.3938 4000.4,653.8138 " fill="none" id="UserFactory-to-Admin" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="4000.61,658.9638,4004.2471,649.8111,4000.4102,653.9677,3996.2535,650.1308,4000.61,658.9638" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="48" x="3998.16" y="593.1606">creates</text></g><!--MD5=[86e216f97bd4d704ce1bbe3b04534cc1]
+link BookingService to SystemPolicyManager--><g id="link_BookingService_SystemPolicyManager"><path codeLine="310" d="M5242.15,205.1237 C5220.89,215.7537 5199.79,227.9438 5181.16,241.5938 C5158.45,258.2338 5136.59,278.5037 5116.66,299.4037 " fill="none" id="BookingService-to-SystemPolicyManager" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="5113.22,303.0438,5122.309,299.2503,5116.6544,299.4099,5116.4948,293.7553,5113.22,303.0438" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="87" x="5182.16" y="254.6606">reads policies</text></g><!--MD5=[777dab3d2ac56234f588c2e8fbbc8f05]
+link ConsultantService to SystemPolicyManager--><g id="link_ConsultantService_SystemPolicyManager"><path codeLine="311" d="M4877.9,205.2938 C4894.87,231.8238 4916.41,265.5037 4937.49,298.4638 " fill="none" id="ConsultantService-to-SystemPolicyManager" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="4940.32,302.8937,4938.8564,293.1543,4937.6328,298.6772,4932.1099,297.4537,4940.32,302.8937" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="87" x="4911.16" y="254.6606">reads policies</text></g><!--MD5=[def58b387bd0f3b6a38d5e4823ac0113]
+link CustomerAssistant to SystemPolicyManager--><g id="link_CustomerAssistant_SystemPolicyManager"><path codeLine="312" d="M5633.89,208.0037 C5627.93,209.2838 5622,210.4838 5616.16,211.5938 C5483.64,236.7338 5441.92,198.3538 5314.16,241.5938 C5282.99,252.1437 5224.77,286.8338 5168.15,323.2238 " fill="none" id="CustomerAssistant-to-SystemPolicyManager" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="5163.73,326.0738,5173.4636,324.5716,5167.9359,323.37,5169.1376,317.8422,5163.73,326.0738" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="216" x="5315.16" y="254.6606">reads cancellation &amp; refund policy</text></g><!--MD5=[e97071631cf233e8b1b60528a1d40ecf]
+reverse link BookingService to Booking--><g id="link_BookingService_Booking"><path codeLine="314" d="M5165.63,207.3438 C5155.7,208.9638 5145.84,210.4037 5136.16,211.5938 C4799.24,253.0738 2420.57,235.6137 2081.16,241.5938 C1783.77,246.8338 1709.53,253.0338 1412.16,258.5938 C1393.58,258.9438 759.85,258.4338 743.16,266.5938 C722.35,276.7637 703.9,292.1938 687.97,309.4938 " fill="none" id="BookingService-backto-Booking" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="5178.71,205.1038,5172.1197,202.1767,5166.883,207.1342,5173.4733,210.0613,5178.71,205.1038" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="60" x="2082.16" y="254.6606">manages</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="5143.6402" y="225.1767">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="668.7695" y="298.6455">0..*</text></g><!--MD5=[b45073c318679d6a156bad22c75ef23f]
+reverse link ConsultantService to AvailabilitySlot--><g id="link_ConsultantService_AvailabilitySlot"><path codeLine="315" d="M4592.54,206.9738 C4579.59,208.7537 4566.74,210.3138 4554.16,211.5938 C4108.88,256.8438 973.48,226.8438 526.16,241.5938 C431.16,244.7238 164.37,197.4438 99.16,266.5938 C6,365.3738 29.34,455.6438 99.16,572.0938 C133.38,629.1737 203.52,661.6438 258.13,679.0938 " fill="none" id="ConsultantService-backto-AvailabilitySlot" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="4605.51,205.1237,4599.007,202.0074,4593.6293,206.8116,4600.1323,209.9279,4605.51,205.1237" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="60" x="100.16" y="430.1606">manages</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="4573.8445" y="225.1994">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="227.153" y="673.7332">0..*</text></g><!--MD5=[82a8dce5cad6cf34da588dc259627198]
+reverse link ConsultantService to ConsultantRegistration--><g id="link_ConsultantService_ConsultantRegistration"><path codeLine="316" d="M4592.24,206.9838 C4579.39,208.7537 4566.64,210.3138 4554.16,211.5938 C4199.56,247.9638 1702.55,234.5738 1346.16,241.5938 C1161.22,245.2338 674.63,174.5938 514.16,266.5938 C478.49,287.0438 453.85,326.0838 438.07,360.2438 " fill="none" id="ConsultantService-backto-ConsultantRegistration" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="4605.11,205.1437,4598.6032,202.0355,4593.2314,206.8463,4599.7382,209.9546,4605.11,205.1437" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="60" x="1347.16" y="254.6606">manages</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="4564.3158" y="225.2221">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="416.318" y="349.3717">0..*</text></g><!--MD5=[8ec7bbe8b17e2f6e1c8fa75cd5b24669]
+reverse link ServiceCatalog to Service--><g id="link_ServiceCatalog_Service"><path codeLine="317" d="M4306.39,155.7138 C3845.8,162.0938 2166.2,187.9037 783.16,241.5938 C575.9,249.6437 490.32,152.4238 317.16,266.5938 C284.85,287.8937 265.43,326.7238 254.04,360.5538 " fill="none" id="ServiceCatalog-backto-Service" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="4319.66,155.5237,4313.6035,151.6099,4307.6612,155.6952,4313.7177,159.609,4319.66,155.5237" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="54" x="784.16" y="254.6606">contains</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="4303.7498" y="152.2322">1</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="23" x="231.4097" y="349.7156">0..*</text></g><!--MD5=[035ce8b487a4538577eb72e21ee5b59a]
+link BookingService to BookingStateMachine--><g id="link_BookingService_BookingStateMachine"><path codeLine="323" d="M5176.7,205.1137 C5163.03,207.6038 5149.43,209.8138 5136.16,211.5938 C4787.96,258.3638 3901.82,203.7737 3556.16,266.5938 C3427.26,290.0137 3285.45,340.4838 3190.43,378.1138 " fill="none" id="BookingService-to-BookingStateMachine" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="3185.66,380.0137,3195.5008,380.4113,3190.3073,378.1691,3192.5494,372.9756,3185.66,380.0137" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="138" x="3789.16" y="254.6606">uses state transitions</text></g><!--MD5=[b8ed867eed5fb003f8bf4b5af6feede1]
+link BookingService to NotificationManager--><g id="link_BookingService_NotificationManager"><path codeLine="324" d="M5584.56,205.1537 C5595.57,207.4338 5606.48,209.5938 5617.16,211.5938 C5794.85,244.8338 5852.45,199.1237 6020.16,266.5938 C6083.4,292.0338 6145.22,339.9938 6186.59,376.4238 " fill="none" id="BookingService-to-NotificationManager" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="6190.53,379.9138,6186.4438,370.9526,6186.7867,376.599,6181.1402,376.9419,6190.53,379.9138" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="172" x="5991.16" y="254.6606">broadcasts booking events</text></g><!--MD5=[b24c66c0817869aaf6d68996c88e1867]
+link BookingService to PaymentStrategyFactory--><g id="link_BookingService_PaymentStrategyFactory"><path codeLine="325" d="M5177.71,205.1537 C5163.71,207.6738 5149.76,209.8637 5136.16,211.5938 C4968.59,232.9037 2254.92,208.9138 2096.16,266.5938 C2028.38,291.2138 1966.55,349.7238 1931.16,388.2238 " fill="none" id="BookingService-to-PaymentStrategyFactory" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="1927.4,392.3438,1936.4184,388.3854,1930.7676,388.6479,1930.5051,382.9972,1927.4,392.3438" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="163" x="2401.16" y="254.6606">selects payment strategy</text></g><!--MD5=[b12fcb7342709e6ac3c8cf49511110a1]
+link BookingService to UserFactory--><g id="link_BookingService_UserFactory"><path codeLine="326" d="M5173.68,205.1537 C5161.02,207.5538 5148.44,209.7338 5136.16,211.5938 C4769.32,267.2338 4661,168.5738 4303.16,266.5938 C4205.8,293.2637 4103.3,351.9338 4043.4,389.7938 " fill="none" id="BookingService-to-UserFactory" style="stroke:#181818;stroke-width:1.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#181818" points="4039.17,392.4838,4048.9095,391.0201,4043.3865,389.7966,4044.6101,384.2736,4039.17,392.4838" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="146" x="4404.16" y="254.6606">creates booking actors</text></g><!--MD5=[bbda0a0493ed8698e8d1b828be8a1d2c]
+link Booking to PaymentStrategy--><!--MD5=[2155b4a31f2d4f517fa4b3c91ec04564]
+link Booking to BookingState--><!--MD5=[887a40e80fd1f109469a278ae589bc65]
+link Booking to Observer--><!--MD5=[964da8a7d686ae15e985e18eef8d1603]
+link PaymentStrategyFactory to BookingStateMachine--><!--MD5=[2d47b210f47a008576f172f96d7b64bb]
+link BookingStateMachine to NotificationManager--><!--MD5=[4efcb4e2d525ba5078d9874c5dc79e1e]
+link UserFactory to SystemPolicyManager--><!--MD5=[0f829bb28f76a263f190138efd97a36d]
+link NotificationManager to UserFactory--><!--MD5=[9818a54f3982b8d23bb288a2dba7ee1b]
+@startuml
+title Synergy — Unified Backend Class Diagram\n(Domain Entities · Strategy · State · Observer · Factory · Singleton)
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+top to bottom direction
+
+' ─────────────────────────────────────────────────────────────────────────────
+' DOMAIN ENTITIES  (core data objects persisted to the database)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Domain Entities" #E8E8E8 {
+
+  class Booking <<Entity>> {
+    - id: int
+    - clientId: String
+    - clientName: String
+    - consultantName: String
+    - slotDate: String
+    - slotTime: String
+    - status: String
+    - paymentStatus: String
+    - transactionId: String
+    - refundTransactionId: String
+    - refundProcessedAt: String
+    - price: double
+    - notes: String
+    - createdAt: String
+  }
+
+  class Service <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - duration: int
+    - basePrice: double
+    - description: String
+  }
+
+  class AvailabilitySlot <<Entity>> {
+    - id: int
+    - consultantName: String
+    - slotDate: String
+    - slotTime: String
+    - isAvailable: boolean
+  }
+
+  class PaymentMethod <<Entity>> {
+    - id: int
+    - userId: String
+    - methodType: String
+    - label: String
+    - details: Object
+    - createdAt: String
+  }
+
+  class ConsultantRegistration <<Entity>> {
+    - id: int
+    - name: String
+    - email: String
+    - expertise: String
+    - status: String
+    - createdAt: String
+  }
+
+  Booking "0..*" - -> "1" AvailabilitySlot : references slot
+  Booking "0..*" - -> "0..1" PaymentMethod   : paid with
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' STRATEGY PATTERN — Payment Processing  (PaymentStrategies.js)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Strategy Pattern (Payment Processing)" #FFEFD5 {
+
+  abstract class PaymentStrategy <<Abstract Strategy>> {
+    + {abstract} process(amount: double, details: Object): Object
+    + validate(details: Object): boolean
+    # buildTransactionId(prefix: String): String
+  }
+
+  class CreditCardPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class DebitCardPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class BankTransferPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class PayPalPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class PaymentStrategyFactory <<Strategy Selector\nFactory Method Pattern>> {
+    + {static} create(methodType: String): PaymentStrategy
+  }
+
+  PaymentStrategy <|- - CreditCardPayment
+  PaymentStrategy <|- - DebitCardPayment
+  PaymentStrategy <|- - BankTransferPayment
+  PaymentStrategy <|- - PayPalPayment
+  PaymentStrategyFactory ..> PaymentStrategy : «creates»
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' STATE PATTERN — Booking Lifecycle  (BookingState.js + state files)
+' ─────────────────────────────────────────────────────────────────────────────
+package "State Pattern (Booking Lifecycle)" #E0F0FF {
+
+  abstract class BookingState <<Abstract State>> {
+    + {abstract} getName(): String
+    + confirm(): String
+    + reject(): String
+    + cancel(): String
+    + awaitPayment(): String
+    + pay(): String
+    + complete(): String
+  }
+
+  class RequestedState <<Concrete State>> {
+    + getName(): String
+    + confirm(): String
+    + reject(): String
+    + cancel(): String
+  }
+
+  class ConfirmedState <<Concrete State>> {
+    + getName(): String
+    + awaitPayment(): String
+    + cancel(): String
+  }
+
+  class PendingPaymentState <<Concrete State>> {
+    + getName(): String
+    + pay(): String
+    + cancel(): String
+  }
+
+  class PaidState <<Concrete State>> {
+    + getName(): String
+    + complete(): String
+    + cancel(): String
+  }
+
+  class CompletedState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class RejectedState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class CancelledState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class BookingStateMachine <<Context / State Machine>> {
+    + {static} getStateObject(statusString: String): BookingState
+    + {static} transition(currentStatus: String, nextStatus: String): String
+    + {static} canTransition(currentStatus: String, nextStatus: String): boolean
+  }
+
+  BookingState <|- - RequestedState
+  BookingState <|- - ConfirmedState
+  BookingState <|- - PendingPaymentState
+  BookingState <|- - PaidState
+  BookingState <|- - CompletedState
+  BookingState <|- - RejectedState
+  BookingState <|- - CancelledState
+  BookingStateMachine ..> BookingState : «creates & delegates»
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' OBSERVER PATTERN — Notifications  (NotificationManager.js)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Observer Pattern (Notifications)" #F0FFE0 {
+
+  abstract class Observer <<Abstract Observer>> {
+    + {abstract} update(eventName: String, payload: Object): void
+  }
+
+  class Subject <<Subject / Publisher>> {
+    - observers: List<Observer>
+    + attach(observer: Observer): void
+    + detach(observer: Observer): void
+    # notify(eventName: String, payload: Object): void
+  }
+
+  class NotificationManager <<Concrete Subject\nObserver Pattern>> {
+    - history: List<Object>
+    + sendNotification(eventName: String, payload: Object): void
+    + getHistory(): List<Object>
+  }
+
+  class EmailNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  class SmsNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  class PushNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  Subject <|- - NotificationManager
+  Observer <|- - EmailNotifier
+  Observer <|- - SmsNotifier
+  Observer <|- - PushNotifier
+  Subject "1" o- - "0..*" Observer : observers
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' FACTORY PATTERN — User Creation  (UserFactory.js)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Factory Method Pattern (User Creation)" #FFF0F0 {
+
+  class User <<Base Entity>> {
+    - id: String
+    - name: String
+    - email: String
+    - createdAt: String
+  }
+
+  class Client <<Concrete Entity>> {
+    - role: String
+    - bookings: List
+  }
+
+  class ConsultantUser <<Concrete Entity>> {
+    - role: String
+    - expertise: String
+    - status: String
+  }
+
+  class Admin <<Concrete Entity>> {
+    - role: String
+    - permissions: List<String>
+  }
+
+  class UserFactory <<Concrete Creator\nFactory Method Pattern>> {
+    + createUser(type: String, id: String, name: String, email: String, additionalInfo: Object): User
+  }
+
+  User <|- - Client
+  User <|- - ConsultantUser
+  User <|- - Admin
+  UserFactory ..> Client        : «creates»
+  UserFactory ..> ConsultantUser : «creates»
+  UserFactory ..> Admin         : «creates»
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' SINGLETON PATTERN — System Policies & Service Layer
+' ─────────────────────────────────────────────────────────────────────────────
+package "Singleton Pattern (System Policies) & Service Layer" #F5F0FF {
+
+  class SystemPolicyManager <<Singleton Class\nSingleton Pattern>> {
+    - {static} instance: SystemPolicyManager
+    - cancellationWindowHours: int
+    - pricingMultiplier: double
+    - notificationsEnabled: boolean
+    - refundPolicy: String
+    - SystemPolicyManager()
+    + {static} getInstance(): SystemPolicyManager
+    + getCancellationWindowHours(): int
+    + setCancellationWindowHours(hours: int): void
+    + getPricingMultiplier(): double
+    + setPricingMultiplier(multiplier: double): void
+    + isNotificationsEnabled(): boolean
+    + setNotificationsEnabled(enabled: boolean): void
+    + getRefundPolicy(): String
+    + setRefundPolicy(policy: String): void
+  }
+
+  class BookingService <<Service Class>> {
+    + createBooking(clientId: String, consultantId: String, slotId: String): Booking
+    + cancelBooking(bookingId: String): void
+    + getBookingHistory(clientId: String): List<Booking>
+    + transitionStatus(bookingId: String, nextStatus: String): Booking
+  }
+
+  class ConsultantService <<Service Class>> {
+    + registerConsultant(name: String, email: String, expertise: String): ConsultantRegistration
+    + approveConsultant(registrationId: String): void
+    + rejectConsultant(registrationId: String): void
+    + updateAvailability(consultantName: String, slotDate: String, slotTime: String): AvailabilitySlot
+  }
+
+  class ServiceCatalog <<Service Class>> {
+    + addService(service: Service): void
+    + listServices(): List<Service>
+    + findById(serviceId: String): Service
+  }
+
+  class CustomerAssistant <<Service Class\nAI Chatbot>> {
+    - geminiApiUrl: String
+    - maxOutputTokens: int
+    + handleChat(message: String): String
+    - buildSystemPrompt(consultants: List, policies: Object): String
+    - callGeminiApi(systemPrompt: String, message: String): String
+  }
+
+  BookingService    - -> SystemPolicyManager : reads policies
+  ConsultantService - -> SystemPolicyManager : reads policies
+  CustomerAssistant - -> SystemPolicyManager : reads cancellation & refund policy
+
+  BookingService    "1" *- - "0..*" Booking                 : manages
+  ConsultantService "1" *- - "0..*" AvailabilitySlot        : manages
+  ConsultantService "1" *- - "0..*" ConsultantRegistration  : manages
+  ServiceCatalog    "1" *- - "0..*" Service                 : contains
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' Cross-pattern relationships (Service Layer wiring)
+' ─────────────────────────────────────────────────────────────────────────────
+BookingService ..> BookingStateMachine     : uses state transitions
+BookingService ..> NotificationManager    : broadcasts booking events
+BookingService ..> PaymentStrategyFactory : selects payment strategy
+BookingService ..> UserFactory            : creates booking actors
+
+' ─────────────────────────────────────────────────────────────────────────────
+' Layout hints — force packages into a readable vertical arrangement
+'   Row 1: Domain Entities (full width)
+'   Row 2: Strategy | State | Observer
+'   Row 3: Factory  | Singleton & Service Layer
+' ─────────────────────────────────────────────────────────────────────────────
+Booking                -[hidden]down-> PaymentStrategy
+Booking                -[hidden]down-> BookingState
+Booking                -[hidden]down-> Observer
+PaymentStrategyFactory -[hidden]right-> BookingStateMachine
+BookingStateMachine    -[hidden]right-> NotificationManager
+UserFactory            -[hidden]right-> SystemPolicyManager
+NotificationManager    -[hidden]down->  UserFactory
+@enduml
+
+@startuml
+title Synergy — Unified Backend Class Diagram\n(Domain Entities · Strategy · State · Observer · Factory · Singleton)
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+top to bottom direction
+
+package "Domain Entities" #E8E8E8 {
+
+  class Booking <<Entity>> {
+    - id: int
+    - clientId: String
+    - clientName: String
+    - consultantName: String
+    - slotDate: String
+    - slotTime: String
+    - status: String
+    - paymentStatus: String
+    - transactionId: String
+    - refundTransactionId: String
+    - refundProcessedAt: String
+    - price: double
+    - notes: String
+    - createdAt: String
+  }
+
+  class Service <<Entity>> {
+    - id: int
+    - name: String
+    - type: String
+    - duration: int
+    - basePrice: double
+    - description: String
+  }
+
+  class AvailabilitySlot <<Entity>> {
+    - id: int
+    - consultantName: String
+    - slotDate: String
+    - slotTime: String
+    - isAvailable: boolean
+  }
+
+  class PaymentMethod <<Entity>> {
+    - id: int
+    - userId: String
+    - methodType: String
+    - label: String
+    - details: Object
+    - createdAt: String
+  }
+
+  class ConsultantRegistration <<Entity>> {
+    - id: int
+    - name: String
+    - email: String
+    - expertise: String
+    - status: String
+    - createdAt: String
+  }
+
+  Booking "0..*" - -> "1" AvailabilitySlot : references slot
+  Booking "0..*" - -> "0..1" PaymentMethod   : paid with
+}
+
+package "Strategy Pattern (Payment Processing)" #FFEFD5 {
+
+  abstract class PaymentStrategy <<Abstract Strategy>> {
+    + {abstract} process(amount: double, details: Object): Object
+    + validate(details: Object): boolean
+    # buildTransactionId(prefix: String): String
+  }
+
+  class CreditCardPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class DebitCardPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class BankTransferPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class PayPalPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class PaymentStrategyFactory <<Strategy Selector\nFactory Method Pattern>> {
+    + {static} create(methodType: String): PaymentStrategy
+  }
+
+  PaymentStrategy <|- - CreditCardPayment
+  PaymentStrategy <|- - DebitCardPayment
+  PaymentStrategy <|- - BankTransferPayment
+  PaymentStrategy <|- - PayPalPayment
+  PaymentStrategyFactory ..> PaymentStrategy : «creates»
+}
+
+package "State Pattern (Booking Lifecycle)" #E0F0FF {
+
+  abstract class BookingState <<Abstract State>> {
+    + {abstract} getName(): String
+    + confirm(): String
+    + reject(): String
+    + cancel(): String
+    + awaitPayment(): String
+    + pay(): String
+    + complete(): String
+  }
+
+  class RequestedState <<Concrete State>> {
+    + getName(): String
+    + confirm(): String
+    + reject(): String
+    + cancel(): String
+  }
+
+  class ConfirmedState <<Concrete State>> {
+    + getName(): String
+    + awaitPayment(): String
+    + cancel(): String
+  }
+
+  class PendingPaymentState <<Concrete State>> {
+    + getName(): String
+    + pay(): String
+    + cancel(): String
+  }
+
+  class PaidState <<Concrete State>> {
+    + getName(): String
+    + complete(): String
+    + cancel(): String
+  }
+
+  class CompletedState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class RejectedState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class CancelledState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class BookingStateMachine <<Context / State Machine>> {
+    + {static} getStateObject(statusString: String): BookingState
+    + {static} transition(currentStatus: String, nextStatus: String): String
+    + {static} canTransition(currentStatus: String, nextStatus: String): boolean
+  }
+
+  BookingState <|- - RequestedState
+  BookingState <|- - ConfirmedState
+  BookingState <|- - PendingPaymentState
+  BookingState <|- - PaidState
+  BookingState <|- - CompletedState
+  BookingState <|- - RejectedState
+  BookingState <|- - CancelledState
+  BookingStateMachine ..> BookingState : «creates & delegates»
+}
+
+package "Observer Pattern (Notifications)" #F0FFE0 {
+
+  abstract class Observer <<Abstract Observer>> {
+    + {abstract} update(eventName: String, payload: Object): void
+  }
+
+  class Subject <<Subject / Publisher>> {
+    - observers: List<Observer>
+    + attach(observer: Observer): void
+    + detach(observer: Observer): void
+    # notify(eventName: String, payload: Object): void
+  }
+
+  class NotificationManager <<Concrete Subject\nObserver Pattern>> {
+    - history: List<Object>
+    + sendNotification(eventName: String, payload: Object): void
+    + getHistory(): List<Object>
+  }
+
+  class EmailNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  class SmsNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  class PushNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  Subject <|- - NotificationManager
+  Observer <|- - EmailNotifier
+  Observer <|- - SmsNotifier
+  Observer <|- - PushNotifier
+  Subject "1" o- - "0..*" Observer : observers
+}
+
+package "Factory Method Pattern (User Creation)" #FFF0F0 {
+
+  class User <<Base Entity>> {
+    - id: String
+    - name: String
+    - email: String
+    - createdAt: String
+  }
+
+  class Client <<Concrete Entity>> {
+    - role: String
+    - bookings: List
+  }
+
+  class ConsultantUser <<Concrete Entity>> {
+    - role: String
+    - expertise: String
+    - status: String
+  }
+
+  class Admin <<Concrete Entity>> {
+    - role: String
+    - permissions: List<String>
+  }
+
+  class UserFactory <<Concrete Creator\nFactory Method Pattern>> {
+    + createUser(type: String, id: String, name: String, email: String, additionalInfo: Object): User
+  }
+
+  User <|- - Client
+  User <|- - ConsultantUser
+  User <|- - Admin
+  UserFactory ..> Client        : «creates»
+  UserFactory ..> ConsultantUser : «creates»
+  UserFactory ..> Admin         : «creates»
+}
+
+package "Singleton Pattern (System Policies) & Service Layer" #F5F0FF {
+
+  class SystemPolicyManager <<Singleton Class\nSingleton Pattern>> {
+    - {static} instance: SystemPolicyManager
+    - cancellationWindowHours: int
+    - pricingMultiplier: double
+    - notificationsEnabled: boolean
+    - refundPolicy: String
+    - SystemPolicyManager()
+    + {static} getInstance(): SystemPolicyManager
+    + getCancellationWindowHours(): int
+    + setCancellationWindowHours(hours: int): void
+    + getPricingMultiplier(): double
+    + setPricingMultiplier(multiplier: double): void
+    + isNotificationsEnabled(): boolean
+    + setNotificationsEnabled(enabled: boolean): void
+    + getRefundPolicy(): String
+    + setRefundPolicy(policy: String): void
+  }
+
+  class BookingService <<Service Class>> {
+    + createBooking(clientId: String, consultantId: String, slotId: String): Booking
+    + cancelBooking(bookingId: String): void
+    + getBookingHistory(clientId: String): List<Booking>
+    + transitionStatus(bookingId: String, nextStatus: String): Booking
+  }
+
+  class ConsultantService <<Service Class>> {
+    + registerConsultant(name: String, email: String, expertise: String): ConsultantRegistration
+    + approveConsultant(registrationId: String): void
+    + rejectConsultant(registrationId: String): void
+    + updateAvailability(consultantName: String, slotDate: String, slotTime: String): AvailabilitySlot
+  }
+
+  class ServiceCatalog <<Service Class>> {
+    + addService(service: Service): void
+    + listServices(): List<Service>
+    + findById(serviceId: String): Service
+  }
+
+  class CustomerAssistant <<Service Class\nAI Chatbot>> {
+    - geminiApiUrl: String
+    - maxOutputTokens: int
+    + handleChat(message: String): String
+    - buildSystemPrompt(consultants: List, policies: Object): String
+    - callGeminiApi(systemPrompt: String, message: String): String
+  }
+
+  BookingService    - -> SystemPolicyManager : reads policies
+  ConsultantService - -> SystemPolicyManager : reads policies
+  CustomerAssistant - -> SystemPolicyManager : reads cancellation & refund policy
+
+  BookingService    "1" *- - "0..*" Booking                 : manages
+  ConsultantService "1" *- - "0..*" AvailabilitySlot        : manages
+  ConsultantService "1" *- - "0..*" ConsultantRegistration  : manages
+  ServiceCatalog    "1" *- - "0..*" Service                 : contains
+}
+
+BookingService ..> BookingStateMachine     : uses state transitions
+BookingService ..> NotificationManager    : broadcasts booking events
+BookingService ..> PaymentStrategyFactory : selects payment strategy
+BookingService ..> UserFactory            : creates booking actors
+
+Booking                -[hidden]down-> PaymentStrategy
+Booking                -[hidden]down-> BookingState
+Booking                -[hidden]down-> Observer
+PaymentStrategyFactory -[hidden]right-> BookingStateMachine
+BookingStateMachine    -[hidden]right-> NotificationManager
+UserFactory            -[hidden]right-> SystemPolicyManager
+NotificationManager    -[hidden]down->  UserFactory
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 17:01:30 UTC 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: null
+--></g></svg>
