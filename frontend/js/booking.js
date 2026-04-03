@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const t = String(bookingTime || "").trim();
     if (!d && !t) return "-";
     return t ? `${d} ${t}` : d;
+
   }
 
   // Table row builders
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data-action="cancel" data-booking-id="${booking.id}">
           Cancel
         </button>`);
+        
     }
 
     if (booking.status === "Pending Payment") {

@@ -474,12 +474,15 @@ function validatePaymentMethodPayload(input) {
     };
   }
 
-  return { error: "Unsupported payment type." };
+  return { error: "Unsupported payment type." 
+
+  };
 }
 
 function buildUserId(role) {
   const randomPart = Math.random().toString(36).slice(2, 7);
   return `${role}-${Date.now()}-${randomPart}`;
+  
 }
 
 function toInternalEmail(displayName, role) {

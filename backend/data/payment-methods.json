@@ -9,10 +9,13 @@
       "last4": "7654",
       "expiry": "12/28",
       "cvv": "878"
+
     },
+
     "createdAt": "2026-03-06T20:11:26.802Z",
     "updatedAt": null
   },
+
   {
     "id": "pm_1772827913388",
     "type": "Bank Transfer",
@@ -22,8 +25,11 @@
       "accountNumber": "098765",
       "routingNumber": "123456789",
       "last4": "8765"
+
     },
+
     "createdAt": "2026-03-06T20:11:53.388Z",
     "updatedAt": null
+    
   }
 ]

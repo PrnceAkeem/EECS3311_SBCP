@@ -95,11 +95,15 @@
       if (metadata.paymentMethodId) {
         payload.paymentMethodId = metadata.paymentMethodId;
       }
+      
       if (metadata.paymentMethodType) {
         payload.paymentMethodType = metadata.paymentMethodType;
+
       }
+
       if (metadata.paymentMethodLabel) {
         payload.paymentMethodLabel = metadata.paymentMethodLabel;
+
       }
     }
 

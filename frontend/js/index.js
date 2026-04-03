@@ -19,6 +19,7 @@ function handleLogin() {
   if (destination) {
     window.location.href = destination;
     return;
+    
   }
 
   alert(

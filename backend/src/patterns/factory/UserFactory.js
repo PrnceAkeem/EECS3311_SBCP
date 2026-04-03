@@ -29,6 +29,7 @@ class Consultant extends User {
   }
 }
 
+//admin class
 class Admin extends User {
   constructor(id, name, email) {
     super(id, name, email);
@@ -37,6 +38,7 @@ class Admin extends User {
   }
 }
 
+//UserFactory class
 class UserFactory {
   createUser(type, id, name, email, additionalInfo = {}) {
     const normalizedType = String(type || "").toLowerCase();
