@@ -1,0 +1,341 @@
+@startuml Synergy_Backend_Unified
+title Synergy — Unified Backend Class Diagram\n(Domain Entities · Strategy · State · Observer · Factory · Singleton)
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+top to bottom direction
+
+' ─────────────────────────────────────────────────────────────────────────────
+' DOMAIN ENTITIES  (core data objects — Booking & AvailabilitySlot in PostgreSQL;
+'                   PaymentMethod & ConsultantRegistration in JSON flat files)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Domain Entities" #E8E8E8 {
+
+  class Booking <<Entity>> {
+    - id: int
+    - bookingRef: String
+    - customerId: String
+    - service: String
+    - price: String
+    - clientName: String
+    - clientEmail: String
+    - consultantName: String
+    - bookingDate: String
+    - bookingTime: String
+    - status: String
+    - paymentStatus: String
+    - paymentTransactionId: String
+    - paymentProcessedAt: String
+    - refundTransactionId: String
+    - refundProcessedAt: String
+    - updatedBy: String
+    - createdAt: String
+    - updatedAt: String
+  }
+
+  class AvailabilitySlot <<Entity>> {
+    - id: int
+    - consultantName: String
+    - slotDate: String
+    - slotTime: String
+    - isAvailable: boolean
+    - createdAt: String
+    - updatedAt: String
+  }
+
+  class PaymentMethod <<Entity (JSON)>> {
+    - id: String
+    - type: String
+    - label: String
+    - details: Object
+    - createdAt: String
+    - updatedAt: String
+  }
+
+  class ConsultantRegistration <<Entity (JSON)>> {
+    - id: String
+    - name: String
+    - email: String
+    - expertise: String
+    - status: String
+    - createdAt: String
+  }
+
+  Booking "0..*" --> "1"    AvailabilitySlot : references slot
+  Booking "0..*" --> "0..1" PaymentMethod    : paid with
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' STRATEGY PATTERN — Payment Processing  (PaymentStrategies.js)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Strategy Pattern (Payment Processing)" #FFEFD5 {
+
+  abstract class PaymentStrategy <<Abstract Strategy>> {
+    + {abstract} process(amount: double, details: Object): Object
+    + validate(details: Object): boolean
+    # buildTransactionId(prefix: String): String
+  }
+
+  class CreditCardPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class DebitCardPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class BankTransferPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class PayPalPayment <<Concrete Strategy>> {
+    + validate(details: Object): boolean
+    + process(amount: double, details: Object): Object
+  }
+
+  class PaymentStrategyFactory <<Strategy Selector\nFactory Method Pattern>> {
+    + {static} create(methodType: String): PaymentStrategy
+  }
+
+  PaymentStrategy <|-- CreditCardPayment
+  PaymentStrategy <|-- DebitCardPayment
+  PaymentStrategy <|-- BankTransferPayment
+  PaymentStrategy <|-- PayPalPayment
+  PaymentStrategyFactory ..> PaymentStrategy : «creates»
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' STATE PATTERN — Booking Lifecycle  (BookingState.js + concrete state files)
+' ─────────────────────────────────────────────────────────────────────────────
+package "State Pattern (Booking Lifecycle)" #E0F0FF {
+
+  abstract class BookingState <<Abstract State>> {
+    + {abstract} getName(): String
+    + confirm(): String
+    + reject(): String
+    + cancel(): String
+    + awaitPayment(): String
+    + pay(): String
+    + complete(): String
+  }
+
+  class RequestedState <<Concrete State>> {
+    + getName(): String
+    + confirm(): String
+    + reject(): String
+    + cancel(): String
+  }
+
+  class ConfirmedState <<Concrete State>> {
+    + getName(): String
+    + awaitPayment(): String
+    + cancel(): String
+  }
+
+  class PendingPaymentState <<Concrete State>> {
+    + getName(): String
+    + pay(): String
+    + cancel(): String
+  }
+
+  class PaidState <<Concrete State>> {
+    + getName(): String
+    + complete(): String
+    + cancel(): String
+  }
+
+  class CompletedState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class RejectedState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class CancelledState <<Concrete State (Terminal)>> {
+    + getName(): String
+  }
+
+  class BookingStateMachine <<Context / State Machine>> {
+    + {static} getStateObject(statusString: String): BookingState
+    + {static} transition(currentStatus: String, nextStatus: String): String
+    + {static} canTransition(currentStatus: String, nextStatus: String): boolean
+  }
+
+  BookingState <|-- RequestedState
+  BookingState <|-- ConfirmedState
+  BookingState <|-- PendingPaymentState
+  BookingState <|-- PaidState
+  BookingState <|-- CompletedState
+  BookingState <|-- RejectedState
+  BookingState <|-- CancelledState
+  BookingStateMachine ..> BookingState : «creates & delegates»
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' OBSERVER PATTERN — Notifications  (NotificationManager.js)
+' ─────────────────────────────────────────────────────────────────────────────
+package "Observer Pattern (Notifications)" #F0FFE0 {
+
+  abstract class Observer <<Abstract Observer>> {
+    + {abstract} update(eventName: String, payload: Object): void
+  }
+
+  class Subject <<Subject / Publisher>> {
+    - observers: List<Observer>
+    + attach(observer: Observer): void
+    + detach(observer: Observer): void
+    # notify(eventName: String, payload: Object): void
+  }
+
+  class NotificationManager <<Concrete Subject\nObserver Pattern>> {
+    - history: List<Object>
+    + sendNotification(eventName: String, payload: Object): void
+    + getHistory(): List<Object>
+  }
+
+  class EmailNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  class SmsNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  class PushNotifier <<Concrete Observer>> {
+    + update(eventName: String, payload: Object): void
+  }
+
+  Subject <|-- NotificationManager
+  Observer <|-- EmailNotifier
+  Observer <|-- SmsNotifier
+  Observer <|-- PushNotifier
+  Subject "1" o-- "0..*" Observer : observers
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' FACTORY PATTERN — User Creation  (UserFactory.js)
+' Note: "ConsultantUser" here is the Consultant class in UserFactory.js;
+'       renamed in this diagram only to avoid collision with ConsultantRegistration.
+' ─────────────────────────────────────────────────────────────────────────────
+package "Factory Method Pattern (User Creation)" #FFF0F0 {
+
+  class User <<Base Class>> {
+    - id: String
+    - name: String
+    - email: String
+    - createdAt: String
+  }
+
+  class Client <<Concrete Product>> {
+    - role: String
+    - bookings: List
+  }
+
+  class ConsultantUser <<Concrete Product\n(Consultant in code)>> {
+    - role: String
+    - expertise: String
+    - status: String
+  }
+
+  class Admin <<Concrete Product>> {
+    - role: String
+    - permissions: List<String>
+  }
+
+  class UserFactory <<Concrete Creator\nFactory Method Pattern>> {
+    + createUser(type: String, id: String, name: String, email: String, additionalInfo: Object): User
+  }
+
+  User <|-- Client
+  User <|-- ConsultantUser
+  User <|-- Admin
+  UserFactory ..> Client         : «creates»
+  UserFactory ..> ConsultantUser : «creates»
+  UserFactory ..> Admin          : «creates»
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' SINGLETON PATTERN — System Policies & Service Layer
+' Note: SystemPolicyManager represents the readSystemPolicies() / writeSystemPolicies()
+'       policy functions in server.js (originally designed as a Singleton class).
+'       BookingService / ConsultantService / CustomerAssistant represent the
+'       logical groupings of route handlers in server.js.
+' ─────────────────────────────────────────────────────────────────────────────
+package "Singleton Pattern (System Policies) & Service Layer" #F5F0FF {
+
+  class SystemPolicyManager <<Singleton Class\nSingleton Pattern>> {
+    - {static} instance: SystemPolicyManager
+    - cancellationWindowHours: int
+    - pricingMultiplier: double
+    - notificationsEnabled: boolean
+    - refundPolicy: String
+    - SystemPolicyManager()
+    + {static} getInstance(): SystemPolicyManager
+    + getCancellationWindowHours(): int
+    + setCancellationWindowHours(hours: int): void
+    + getPricingMultiplier(): double
+    + setPricingMultiplier(multiplier: double): void
+    + isNotificationsEnabled(): boolean
+    + setNotificationsEnabled(enabled: boolean): void
+    + getRefundPolicy(): String
+    + setRefundPolicy(policy: String): void
+  }
+
+  class BookingService <<Service Class>> {
+    + createBooking(clientName: String, consultantName: String, slotId: int): Booking
+    + cancelBooking(bookingId: int): void
+    + getBookingHistory(clientName: String): List<Booking>
+    + transitionStatus(bookingId: int, nextStatus: String): Booking
+  }
+
+  class ConsultantService <<Service Class>> {
+    + registerConsultant(name: String, email: String, expertise: String): ConsultantRegistration
+    + approveConsultant(registrationId: String): void
+    + rejectConsultant(registrationId: String): void
+    + updateAvailability(consultantName: String, slotDate: String, slotTime: String): AvailabilitySlot
+  }
+
+  class CustomerAssistant <<Service Class\nAI Chatbot>> {
+    - geminiApiUrl: String
+    - maxOutputTokens: int
+    + handleChat(message: String): String
+    - buildSystemPrompt(consultants: List, policies: Object): String
+    - callGeminiApi(systemPrompt: String, message: String): String
+  }
+
+  BookingService    --> SystemPolicyManager : reads policies
+  ConsultantService --> SystemPolicyManager : reads policies
+  CustomerAssistant --> SystemPolicyManager : reads cancellation & refund policy
+
+  BookingService    "1" *-- "0..*" Booking                : manages
+  ConsultantService "1" *-- "0..*" AvailabilitySlot       : manages
+  ConsultantService "1" *-- "0..*" ConsultantRegistration : manages
+}
+
+' ─────────────────────────────────────────────────────────────────────────────
+' Cross-pattern relationships (Service Layer wiring)
+' ─────────────────────────────────────────────────────────────────────────────
+BookingService ..> BookingStateMachine     : uses state transitions
+BookingService ..> NotificationManager    : broadcasts booking events
+BookingService ..> PaymentStrategyFactory : selects payment strategy
+BookingService ..> UserFactory            : creates booking actors
+
+' ─────────────────────────────────────────────────────────────────────────────
+' Layout hints — force packages into a readable vertical arrangement
+'   Row 1: Domain Entities (full width)
+'   Row 2: Strategy | State | Observer
+'   Row 3: Factory  | Singleton & Service Layer
+' ─────────────────────────────────────────────────────────────────────────────
+Booking                -[hidden]down-> PaymentStrategy
+Booking                -[hidden]down-> BookingState
+Booking                -[hidden]down-> Observer
+PaymentStrategyFactory -[hidden]right-> BookingStateMachine
+BookingStateMachine    -[hidden]right-> NotificationManager
+UserFactory            -[hidden]right-> SystemPolicyManager
+NotificationManager    -[hidden]down->  UserFactory
+
+@enduml

@@ -67,7 +67,30 @@ PostgreSQL (bookings) + backend/data/payment-methods.json
 ### Payment Methods
 - `GET /api/payment-methods` - list saved methods
 - `POST /api/payment-methods` - add a method (`{ type, label }`)
+- `PATCH /api/payment-methods/:id` - update a saved method
 - `DELETE /api/payment-methods/:id` - remove a method
+
+### Consultants
+- `GET /api/consultants` - list all consultants
+- `POST /api/consultants` - add a consultant (admin only)
+
+### Consultant Registrations
+- `GET /api/consultants/registrations` - list all registration requests
+- `POST /api/consultants/registrations` - submit a consultant registration request
+- `PATCH /api/consultants/registrations/:id` - approve or reject a registration (admin only)
+
+### Availability
+- `GET /api/availability` - query consultant availability slots
+- `POST /api/availability` - add an availability slot (consultant)
+- `DELETE /api/availability/:id` - remove an availability slot (consultant)
+
+### System Policies
+- `GET /api/policies` - read current system policies
+- `PUT /api/policies` - update system policies (admin only)
+
+### Other
+- `POST /api/chat` - AI chatbot endpoint (proxied to Google Gemini)
+- `GET /health` - health check
 
 ## Booking Status Model
 Allowed transitions enforced by backend State Pattern:
@@ -132,9 +155,41 @@ All four patterns are implemented in `backend/src/patterns/` and wired in `backe
 | Observer | `backend/src/patterns/observer/NotificationManager.js` | After every successful status change — `broadcastBookingEvent()` calls `notificationManager.sendNotification()` which forwards to Email, SMS, and Push notifiers |
 | Factory | `backend/src/patterns/factory/UserFactory.js` | On `POST /api/bookings` — `UserFactory.createUser()` builds typed Client and Consultant objects for the booking actors |
 
+## Role-Based Workflows
+
+### Client
+- Browse available consultants and time slots
+- Request bookings; pay once confirmed (`Pending Payment → Paid`)
+- Cancel any booking; paid bookings trigger an automatic refund (`RF-XXXXXX` transaction ID)
+- View full payment and refund history
+
+### Consultant
+- Accept or reject incoming booking requests
+- Manage personal availability slots (required before clients can book)
+- Submit a registration request to join the platform (admin must approve)
+
+### Admin
+- Approve or reject consultant registration requests
+- Add consultants to the platform directory
+- Manage system policies: cancellation window, pricing multiplier, refund policy toggle, notifications flag
+- View all bookings across all users
+
+## Payment & Refund Transaction IDs
+
+| Event | ID Format |
+|-------|-----------|
+| Credit Card payment | `CC-XXXXX` |
+| Debit Card payment | `DC-XXXXX` |
+| PayPal payment | `PP-XXXXX` |
+| Bank Transfer payment | `BT-XXXXX` |
+| Refund (any method) | `RF-XXXXX` |
+
 ## Phase 2 Additions
 
 - Completed frontend for all client, consultant, and admin workflows
+- Consultant registration workflow: self-register, then admin approves or rejects
+- Availability slot management: consultants set their schedule; clients pick from available slots
+- System policy management: admin controls cancellation window, pricing, and refund settings
 - Client refund flow: "Cancel & Refund" button on paid bookings — backend auto-generates a refund transaction ID
 - Three-container Docker deployment (db + backend + frontend/nginx)
 - AI Customer Assistant chatbot (Google Gemini) embedded in the client interface

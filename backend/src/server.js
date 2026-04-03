@@ -19,7 +19,7 @@ const PORT = Number(process.env.PORT || 3000);
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://synergy_user:synergy_pass@localhost:5432/synergy";
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 
 const DATA_DIR = path.join(__dirname, "..", "data");
 const PAYMENT_METHODS_FILE = path.join(DATA_DIR, "payment-methods.json");
@@ -1610,7 +1610,7 @@ app.post("/api/chat", async (request, response) => {
     return response.status(400).json({ error: "message is required" });
   }
 
-  if (!GEMINI_API_KEY) {
+  if (!OPENROUTER_API_KEY) {
     return response
       .status(503)
       .json({ error: "AI assistant is not configured (missing API key)" });
@@ -1661,31 +1661,34 @@ IMPORTANT RULES FOR YOUR RESPONSES:
 - Keep answers concise and helpful.`;
 
   try {
-    const geminiUrl =
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${GEMINI_API_KEY}`;
-
-    const geminiResponse = await fetch(geminiUrl, {
+    const orResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: message.trim() }] }],
-        generationConfig: { maxOutputTokens: 512 }
+        model: "qwen/qwen3.6-plus:free",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: message.trim() }
+        ],
+        max_tokens: 512
       })
     });
 
-    if (!geminiResponse.ok) {
-      const errBody = await geminiResponse.text();
+    if (!orResponse.ok) {
+      const errBody = await orResponse.text();
       // eslint-disable-next-line no-console
-      console.error("Gemini API error:", geminiResponse.status, errBody);
+      console.error("OpenRouter API error:", orResponse.status, errBody);
       return response
         .status(502)
         .json({ error: "AI assistant encountered an error. Please try again." });
     }
 
-    const data = await geminiResponse.json();
+    const data = await orResponse.json();
     const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data.choices?.[0]?.message?.content ||
       "I'm sorry, I could not generate a response. Please try again.";
 
     return response.json({ reply });

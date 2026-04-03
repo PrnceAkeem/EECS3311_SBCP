@@ -4,9 +4,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const availabilityConsultantName = document.getElementById("availabilityConsultantName");
   const availabilityDate = document.getElementById("availabilityDate");
-  const availabilityTime = document.getElementById("availabilityTime");
-  const addAvailabilityBtn = document.getElementById("addAvailabilityBtn");
+  const availabilitySlotPicker = document.getElementById("availabilitySlotPicker");
+  const availabilitySlotBtns = document.querySelectorAll(".avail-slot-btn");
+  const saveAvailabilityBtn = document.getElementById("saveAvailabilityBtn");
+  const slotPickerHint = document.getElementById("slotPickerHint");
   const availabilityTableBody = document.getElementById("availabilityTableBody");
+
+  // dbSlots: current slots in DB for the selected consultant+date
+  // key = bookingTime string, value = { id, isAvailable }
+  let dbSlots = {};
+  // selectedTimes: Set of time strings the consultant has toggled on in the grid
+  let selectedTimes = new Set();
 
   const STATUS_OPTIONS = [
     "Requested",
@@ -174,109 +182,162 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function loadAvailability() {
-    if (!availabilityTableBody) return;
+  function renderSlotGrid() {
+    availabilitySlotBtns.forEach((btn) => {
+      const time = btn.dataset.time;
+      const inDb = dbSlots[time];
+      const booked = inDb && !inDb.isAvailable;
 
+      btn.disabled = booked;
+      btn.classList.remove("slot-selected", "slot-booked");
+
+      if (booked) {
+        btn.classList.add("slot-booked");
+      } else if (selectedTimes.has(time)) {
+        btn.classList.add("slot-selected");
+      }
+    });
+  }
+
+  async function loadAvailability() {
     const consultantName = availabilityConsultantName.value.trim();
+    const bookingDate = availabilityDate.value;
+
+    // Reset grid state
+    dbSlots = {};
+    selectedTimes = new Set();
+
     if (!consultantName) {
-      availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Select a consultant to view availability.</td></tr>';
+      availabilitySlotPicker.hidden = true;
+      if (availabilityTableBody) {
+        availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Select a consultant to view availability.</td></tr>';
+      }
       return;
     }
 
-    availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Loading availability...</td></tr>';
+    // Show the grid only when both consultant and date are chosen
+    availabilitySlotPicker.hidden = !bookingDate;
+
+    if (availabilityTableBody) {
+      availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">Loading availability...</td></tr>';
+    }
 
     try {
       const params = new URLSearchParams({ consultantName });
       const response = await fetch(`/api/availability?${params.toString()}`);
-      if (!response.ok) {
-        throw new Error("Failed to load availability.");
+      if (!response.ok) throw new Error("Failed to load availability.");
+
+      const allSlots = await response.json();
+
+      if (availabilityTableBody) {
+        if (!allSlots.length) {
+          availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No availability slots yet.</td></tr>';
+        } else {
+          availabilityTableBody.innerHTML = allSlots.map((slot) => `
+            <tr>
+              <td>${escapeHtml(slot.id)}</td>
+              <td>${escapeHtml(slot.consultantName)}</td>
+              <td>${escapeHtml(slot.bookingDate)}</td>
+              <td>${escapeHtml(slot.bookingTime)}</td>
+              <td>${slot.isAvailable ? "Available" : "Booked"}</td>
+              <td>
+                <button type="button" class="table-action-btn cancel" data-role="remove-slot" data-slot-id="${escapeHtml(slot.id)}" ${slot.isAvailable ? "" : "disabled"}>Remove</button>
+              </td>
+            </tr>
+          `).join("");
+        }
       }
 
-      const slots = await response.json();
-      if (!slots.length) {
-        availabilityTableBody.innerHTML = '<tr><td colspan="6" class="empty-row">No availability slots yet.</td></tr>';
-        return;
-      }
+      // Pre-populate grid for the selected date
+      if (bookingDate) {
+        allSlots
+          .filter((slot) => slot.bookingDate === bookingDate)
+          .forEach((slot) => {
+            dbSlots[slot.bookingTime] = { id: slot.id, isAvailable: slot.isAvailable };
+            if (slot.isAvailable) {
+              selectedTimes.add(slot.bookingTime);
+            }
+          });
 
-      availabilityTableBody.innerHTML = slots.map((slot) => {
-        const availabilityText = slot.isAvailable ? "Available" : "Booked";
-        return `
-          <tr>
-            <td>${escapeHtml(slot.id)}</td>
-            <td>${escapeHtml(slot.consultantName)}</td>
-            <td>${escapeHtml(slot.bookingDate)}</td>
-            <td>${escapeHtml(slot.bookingTime)}</td>
-            <td>${escapeHtml(availabilityText)}</td>
-            <td>
-              <button type="button" class="table-action-btn cancel" data-role="remove-slot" data-slot-id="${escapeHtml(slot.id)}" ${slot.isAvailable ? "" : "disabled"}>Remove</button>
-            </td>
-          </tr>
-        `;
-      }).join("");
+        renderSlotGrid();
+        const selectedCount = selectedTimes.size;
+        slotPickerHint.textContent = selectedCount
+          ? `${selectedCount} slot(s) currently available. Toggle to change, then save.`
+          : "No slots set for this date. Click times to make them available.";
+      }
     } catch (error) {
-      availabilityTableBody.innerHTML = `<tr><td colspan="6" class="empty-row">${escapeHtml(error.message || "Failed to load availability.")}</td></tr>`;
+      if (availabilityTableBody) {
+        availabilityTableBody.innerHTML = `<tr><td colspan="6" class="empty-row">${escapeHtml(error.message || "Failed to load availability.")}</td></tr>`;
+      }
     }
   }
 
-  async function addAvailability() {
+  async function saveAvailability() {
     const consultantName = availabilityConsultantName.value.trim();
     const bookingDate = availabilityDate.value;
-    const bookingTime = normalizeTime(availabilityTime.value);
 
-    if (!consultantName || !bookingDate || !bookingTime) {
-      showToast("Consultant name, date, and time are required.");
+    if (!consultantName || !bookingDate) {
+      showToast("Select a consultant and date first.");
       return;
     }
 
-    addAvailabilityBtn.disabled = true;
+    saveAvailabilityBtn.disabled = true;
+
     try {
-      const response = await fetch("/api/availability", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ consultantName, bookingDate, bookingTime })
+      const toAdd = [];
+      const toRemove = [];
+
+      availabilitySlotBtns.forEach((btn) => {
+        const time = btn.dataset.time;
+        const inDb = dbSlots[time];
+        const isSelected = selectedTimes.has(time);
+
+        if (isSelected && !inDb) {
+          toAdd.push(time);
+        } else if (!isSelected && inDb && inDb.isAvailable) {
+          toRemove.push(inDb.id);
+        }
       });
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.error || "Failed to add availability slot.");
-      }
+      await Promise.all([
+        ...toAdd.map((bookingTime) =>
+          fetch("/api/availability", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ consultantName, bookingDate, bookingTime })
+          })
+        ),
+        ...toRemove.map((id) =>
+          fetch(`/api/availability/${encodeURIComponent(id)}`, { method: "DELETE" })
+        )
+      ]);
 
-      availabilityTime.value = "";
-      showToast("Availability slot saved.");
+      showToast("Availability saved.");
       await loadAvailability();
     } catch (error) {
-      showToast(error.message || "Could not add slot.");
+      showToast(error.message || "Could not save availability.");
     } finally {
-      addAvailabilityBtn.disabled = false;
+      saveAvailabilityBtn.disabled = false;
     }
   }
 
-  async function removeAvailability(slotId, buttonEl) {
-    buttonEl.disabled = true;
-    try {
-      const response = await fetch(`/api/availability/${encodeURIComponent(slotId)}`, {
-        method: "DELETE"
-      });
-
-      if (!response.ok && response.status !== 204) {
-        const payload = await response.json().catch(() => ({}));
-        throw new Error(payload.error || "Failed to remove availability slot.");
+  // Toggle slot on click
+  availabilitySlotBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const time = btn.dataset.time;
+      if (selectedTimes.has(time)) {
+        selectedTimes.delete(time);
+      } else {
+        selectedTimes.add(time);
       }
-
-      showToast("Availability slot removed.");
-      await loadAvailability();
-    } catch (error) {
-      showToast(error.message || "Could not remove slot.");
-      buttonEl.disabled = false;
-    }
-  }
-
-  addAvailabilityBtn.addEventListener("click", addAvailability);
-  availabilityConsultantName.addEventListener("change", () => {
-    loadAvailability();
+      renderSlotGrid();
+    });
   });
+
+  saveAvailabilityBtn.addEventListener("click", saveAvailability);
+
+  availabilityConsultantName.addEventListener("change", loadAvailability);
+  availabilityDate.addEventListener("change", loadAvailability);
 
   availabilityTableBody.addEventListener("click", async (event) => {
     const removeButton = event.target.closest('button[data-role="remove-slot"]');
@@ -285,7 +346,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const slotId = Number(removeButton.dataset.slotId);
     if (!Number.isInteger(slotId)) return;
 
-    await removeAvailability(slotId, removeButton);
+    removeButton.disabled = true;
+    try {
+      const response = await fetch(`/api/availability/${encodeURIComponent(slotId)}`, { method: "DELETE" });
+      if (!response.ok && response.status !== 204) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "Failed to remove slot.");
+      }
+      showToast("Slot removed.");
+      await loadAvailability();
+    } catch (error) {
+      showToast(error.message || "Could not remove slot.");
+      removeButton.disabled = false;
+    }
   });
 
   tableBody.addEventListener("click", async (event) => {

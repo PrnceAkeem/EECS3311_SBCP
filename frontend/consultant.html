@@ -41,22 +41,22 @@
           Date
           <input id="availabilityDate" class="input-field" type="date" />
         </label>
-        <label class="form-label">
-          Time Slot
-          <select id="availabilityTime" class="input-field">
-            <option value="" selected disabled>Select time slot</option>
-            <option value="09:00 AM">09:00 AM</option>
-            <option value="10:00 AM">10:00 AM</option>
-            <option value="11:00 AM">11:00 AM</option>
-            <option value="12:00 PM">12:00 PM</option>
-            <option value="01:00 PM">01:00 PM</option>
-            <option value="02:00 PM">02:00 PM</option>
-            <option value="03:00 PM">03:00 PM</option>
-            <option value="04:00 PM">04:00 PM</option>
-            <option value="05:00 PM">05:00 PM</option>
-          </select>
-        </label>
-        <button type="button" id="addAvailabilityBtn" class="action-btn">Add Slot</button>
+      </div>
+
+      <div id="availabilitySlotPicker" class="availability-slot-picker" hidden>
+        <p class="slot-picker-hint" id="slotPickerHint">Select the time slots you want to make available.</p>
+        <div class="time-slot-grid">
+          <button type="button" class="avail-slot-btn" data-time="09:00 AM">09:00 AM</button>
+          <button type="button" class="avail-slot-btn" data-time="10:00 AM">10:00 AM</button>
+          <button type="button" class="avail-slot-btn" data-time="11:00 AM">11:00 AM</button>
+          <button type="button" class="avail-slot-btn" data-time="12:00 PM">12:00 PM</button>
+          <button type="button" class="avail-slot-btn" data-time="01:00 PM">01:00 PM</button>
+          <button type="button" class="avail-slot-btn" data-time="02:00 PM">02:00 PM</button>
+          <button type="button" class="avail-slot-btn" data-time="03:00 PM">03:00 PM</button>
+          <button type="button" class="avail-slot-btn" data-time="04:00 PM">04:00 PM</button>
+          <button type="button" class="avail-slot-btn" data-time="05:00 PM">05:00 PM</button>
+        </div>
+        <button type="button" id="saveAvailabilityBtn" class="action-btn">Save Availability</button>
       </div>
 
       <div class="table-wrap compact-wrap">
