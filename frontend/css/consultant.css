@@ -67,6 +67,39 @@
   color: var(--muted);
 }
 
+.table-action-btn {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(149, 162, 184, 0.16);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 0.34rem 0.64rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.table-action-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.table-action-btn.cancel {
+  background: rgba(240, 113, 113, 0.16);
+  border-color: rgba(240, 113, 113, 0.3);
+  color: #ffb8b8;
+}
+
+.table-action-btn.cancel:hover {
+  background: rgba(240, 113, 113, 0.24);
+}
+
+.table-action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .toast {
   position: fixed;
   bottom: 1.5rem;

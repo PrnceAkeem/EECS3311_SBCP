@@ -94,6 +94,10 @@
   font-size: 1.15rem;
 }
 
+.section-card .page-subtitle {
+  margin-bottom: 0.9rem;
+}
+
 .inline-form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

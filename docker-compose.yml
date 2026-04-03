@@ -8,6 +8,8 @@ services:
       POSTGRES_DB: synergy
       POSTGRES_USER: synergy_user
       POSTGRES_PASSWORD: synergy_pass
+    ports:
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
@@ -26,7 +28,7 @@ services:
     environment:
       PORT: 3000
       DATABASE_URL: postgres://synergy_user:synergy_pass@db:5432/synergy
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
     volumes:
       # Persist JSON data files (payment methods, consultants, etc.) across restarts.
       - ./backend/data:/app/backend/data

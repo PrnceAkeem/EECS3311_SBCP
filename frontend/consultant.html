@@ -29,6 +29,29 @@
     </div>
 
     <section class="table-card section-card">
+      <h2>Consultant Registration Request</h2>
+      <p class="page-subtitle">New consultants can submit a registration request for admin approval.</p>
+      <div class="inline-form-grid">
+        <label class="form-label">
+          Consultant Name
+          <input id="registrationNameInput" class="input-field" type="text" maxlength="80" placeholder="Jane Doe" />
+        </label>
+        <label class="form-label">
+          Email
+          <input id="registrationEmailInput" class="input-field" type="email" maxlength="120"
+            placeholder="jane@example.com" />
+        </label>
+        <label class="form-label">
+          Expertise
+          <select id="registrationExpertiseInput" class="input-field">
+            <option value="" selected disabled>Select expertise</option>
+          </select>
+        </label>
+        <button type="button" id="submitRegistrationBtn" class="action-btn">Submit Registration</button>
+      </div>
+    </section>
+
+    <section class="table-card section-card">
       <h2>Manage Availability</h2>
       <div class="inline-form-grid">
         <label class="form-label">

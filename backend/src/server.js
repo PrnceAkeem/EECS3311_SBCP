@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const { Pool } = require("pg");
-// Google Gemini is called via the REST API — no extra package needed.
+// OpenRouter is called via the REST API — no extra package needed.
 
 const BookingStateMachine = require("./patterns/state/BookingStateMachine");
 const { PaymentStrategyFactory } = require("./patterns/strategy/PaymentStrategies");
@@ -19,7 +19,7 @@ const PORT = Number(process.env.PORT || 3000);
 const DATABASE_URL =
   process.env.DATABASE_URL ||
   "postgres://synergy_user:synergy_pass@localhost:5432/synergy";
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "";
 
 const DATA_DIR = path.join(__dirname, "..", "data");
 const PAYMENT_METHODS_FILE = path.join(DATA_DIR, "payment-methods.json");
@@ -34,26 +34,42 @@ const DEFAULT_POLICIES = {
   refundPolicy: "Paid bookings cancelled before the session are refunded automatically."
 };
 
+const DEFAULT_EXPERTISE_OPTIONS = [
+  "Software Architecture Review",
+  "Cloud Migration Consulting",
+  "Career Path Consulting",
+  "Technical Interview Prep",
+  "Startup Strategy Session",
+  "Code Review & Mentorship"
+];
+
+const LEGACY_EXPERTISE_ALIASES = new Map([
+  ["software architecture", "Software Architecture Review"],
+  ["technical interviews", "Technical Interview Prep"],
+  ["career coaching", "Career Path Consulting"],
+  ["cloud migration", "Cloud Migration Consulting"]
+]);
+
 const DEFAULT_CONSULTANTS = [
   {
     id: "con_1",
     name: "John Smith",
     email: "john.smith@consultant.synergy.local",
-    expertise: "Software Architecture",
+    expertise: "Software Architecture Review",
     createdAt: "2026-01-01T00:00:00.000Z"
   },
   {
     id: "con_2",
     name: "Angela Fox",
     email: "angela.fox@consultant.synergy.local",
-    expertise: "Technical Interviews",
+    expertise: "Technical Interview Prep",
     createdAt: "2026-01-01T00:00:00.000Z"
   },
   {
     id: "con_3",
     name: "Brian Flys",
     email: "brian.flys@consultant.synergy.local",
-    expertise: "Career Coaching",
+    expertise: "Career Path Consulting",
     createdAt: "2026-01-01T00:00:00.000Z"
   }
 ];
@@ -135,6 +151,115 @@ function writePaymentMethods(methods) {
   writeJsonFile(PAYMENT_METHODS_FILE, methods);
 }
 
+function mapPaymentMethodRow(row) {
+  if (!row) {
+    return null;
+  }
+  return {
+    id: row.id,
+    type: row.type,
+    label: row.label,
+    details: row.details || {},
+    customerId: row.customer_id || null,
+    createdAt: row.created_at || null,
+    updatedAt: row.updated_at || null
+  };
+}
+
+async function listPaymentMethodsFromDb() {
+  const result = await pool.query(
+    `SELECT
+       id,
+       customer_id,
+       type,
+       label,
+       details,
+       created_at,
+       updated_at
+     FROM payment_methods
+     ORDER BY created_at DESC, id DESC`
+  );
+
+  return result.rows.map(mapPaymentMethodRow).filter(Boolean);
+}
+
+async function findPaymentMethodById(methodId) {
+  if (!methodId) {
+    return null;
+  }
+
+  const result = await pool.query(
+    `SELECT
+       id,
+       customer_id,
+       type,
+       label,
+       details,
+       created_at,
+       updated_at
+     FROM payment_methods
+     WHERE id = $1
+     LIMIT 1`,
+    [methodId]
+  );
+
+  return mapPaymentMethodRow(result.rows[0]);
+}
+
+async function migratePaymentMethodsJsonToDb() {
+  const methods = readPaymentMethods();
+  if (!methods.length) {
+    return;
+  }
+
+  for (const method of methods) {
+    const id = sanitizeText(method.id, 80) || `pm_${Date.now()}`;
+    const type = sanitizeText(method.type, 40);
+    const label = sanitizeText(method.label, 80);
+    const details = method.details && typeof method.details === "object"
+      ? method.details
+      : {};
+    const createdAt = normalizeIsoDateTime(method.createdAt);
+    const updatedAt = normalizeIsoDateTime(method.updatedAt);
+
+    if (!ALLOWED_METHOD_TYPES.includes(type) || !label) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    await pool.query(
+      `INSERT INTO payment_methods (
+         id,
+         customer_id,
+         type,
+         label,
+         details,
+         created_at,
+         updated_at
+       )
+       VALUES (
+         $1,
+         COALESCE($2, 'cu_demo'),
+         $3,
+         $4,
+         $5::jsonb,
+         COALESCE($6::timestamptz, NOW()),
+         $7::timestamptz
+       )
+       ON CONFLICT (id) DO NOTHING`,
+      [
+        id,
+        sanitizeText(method.customerId, 80) || "cu_demo",
+        type,
+        label,
+        JSON.stringify(details),
+        createdAt,
+        updatedAt
+      ]
+    );
+  }
+}
+
 function readConsultantRegistrations() {
   return readJsonFile(CONSULTANT_REGISTRATIONS_FILE, []);
 }
@@ -163,6 +288,278 @@ function writeSystemPolicies(policies) {
   writeJsonFile(SYSTEM_POLICIES_FILE, policies);
 }
 
+function normalizeIsoDateTime(value) {
+  if (!value) {
+    return null;
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed.toISOString();
+}
+
+function normalizeExpertiseValue(value) {
+  const normalized = sanitizeText(value, 120);
+  if (!normalized) {
+    return "";
+  }
+
+  const lower = normalized.toLowerCase();
+  const directMatch = DEFAULT_EXPERTISE_OPTIONS.find(
+    (option) => option.toLowerCase() === lower
+  );
+  if (directMatch) {
+    return directMatch;
+  }
+
+  return LEGACY_EXPERTISE_ALIASES.get(lower) || "";
+}
+
+async function listConsultantsFromDb() {
+  const result = await pool.query(
+    `SELECT
+       id,
+       name,
+       email,
+       expertise,
+       created_at
+     FROM consultants
+     ORDER BY name ASC`
+  );
+
+  return result.rows.map(toPublicConsultant).filter(Boolean);
+}
+
+async function listExpertiseOptionsFromDb() {
+  return DEFAULT_EXPERTISE_OPTIONS.map((name, index) => ({
+    id: index + 1,
+    name,
+    createdAt: null
+  }));
+}
+
+async function buildNextConsultantId() {
+  const result = await pool.query(
+    `SELECT COALESCE(MAX((regexp_match(id, '^con_([0-9]+)$'))[1]::int), 0) AS max_id
+     FROM consultants
+     WHERE id ~ '^con_[0-9]+$'`
+  );
+  const maxId = Number(result.rows?.[0]?.max_id || 0);
+  return `con_${maxId + 1}`;
+}
+
+async function migrateConsultantsJsonToDb() {
+  const consultants = readConsultants()
+    .map(toPublicConsultant)
+    .filter(Boolean);
+
+  if (!consultants.length) {
+    return;
+  }
+
+  const seenNames = new Set();
+  const seenEmails = new Set();
+
+  for (const consultant of consultants) {
+    const name = sanitizeText(consultant.name, 80);
+    const email = sanitizeText(consultant.email, 120).toLowerCase();
+    const expertise = normalizeExpertiseValue(consultant.expertise);
+    const createdAt = normalizeIsoDateTime(consultant.createdAt);
+
+    if (!name) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    const nameKey = name.toLowerCase();
+    const emailKey = email.toLowerCase();
+    if (seenNames.has(nameKey) || (emailKey && seenEmails.has(emailKey))) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    seenNames.add(nameKey);
+    if (emailKey) {
+      seenEmails.add(emailKey);
+    }
+
+    await pool.query(
+      `INSERT INTO consultants (id, name, email, expertise, created_at)
+       VALUES ($1, $2, $3, $4, COALESCE($5::timestamptz, NOW()))
+       ON CONFLICT (id) DO UPDATE
+       SET name = EXCLUDED.name,
+           email = EXCLUDED.email,
+           expertise = EXCLUDED.expertise`,
+      [
+        sanitizeText(consultant.id, 80) || await buildNextConsultantId(),
+        name,
+        email,
+        expertise,
+        createdAt
+      ]
+    );
+  }
+}
+
+async function upsertCustomer({
+  customerId,
+  name,
+  email
+}) {
+  const normalizedCustomerId = sanitizeText(customerId, 80);
+  const normalizedName = sanitizeText(name, 80);
+  const normalizedEmail = sanitizeText(email, 120).toLowerCase();
+
+  if (!normalizedCustomerId || !normalizedName || !normalizedEmail) {
+    return null;
+  }
+
+  const existingByEmailResult = await pool.query(
+    `SELECT id
+     FROM customers
+     WHERE LOWER(email) = $1
+     LIMIT 1`,
+    [normalizedEmail]
+  );
+
+  if (existingByEmailResult.rows.length) {
+    const existingId = existingByEmailResult.rows[0].id;
+    const result = await pool.query(
+      `UPDATE customers
+       SET
+         name = $2,
+         updated_at = NOW()
+       WHERE id = $1
+       RETURNING id, name, email, created_at, updated_at`,
+      [existingId, normalizedName]
+    );
+    return result.rows[0] || null;
+  }
+
+  const result = await pool.query(
+    `INSERT INTO customers (id, name, email, created_at, updated_at)
+     VALUES ($1, $2, $3, NOW(), NOW())
+     ON CONFLICT (id) DO UPDATE
+     SET
+       name = EXCLUDED.name,
+       email = EXCLUDED.email,
+       updated_at = NOW()
+     RETURNING id, name, email, created_at, updated_at`,
+    [normalizedCustomerId, normalizedName, normalizedEmail]
+  );
+
+  return result.rows[0] || null;
+}
+
+async function syncCustomersFromBookings() {
+  const bookingRows = await pool.query(
+    `SELECT
+       id,
+       customer_id,
+       client_name,
+       LOWER(client_email) AS client_email
+     FROM bookings
+     WHERE TRIM(COALESCE(client_name, '')) <> ''
+       AND TRIM(COALESCE(client_email, '')) <> ''
+     ORDER BY id ASC`
+  );
+
+  for (const row of bookingRows.rows) {
+    const fallbackCustomerId =
+      sanitizeText(row.customer_id, 80) || buildCanonicalCustomerId(row.id);
+
+    const customer = await upsertCustomer({
+      customerId: fallbackCustomerId,
+      name: row.client_name,
+      email: row.client_email
+    });
+
+    const canonicalCustomerId = customer?.id || fallbackCustomerId;
+    if (!canonicalCustomerId || canonicalCustomerId === row.customer_id) {
+      // eslint-disable-next-line no-continue
+      continue;
+    }
+
+    await pool.query(
+      `UPDATE bookings
+       SET customer_id = $1
+       WHERE id = $2`,
+      [canonicalCustomerId, row.id]
+    );
+  }
+}
+
+async function seedDefaultCustomer() {
+  await pool.query(
+    `INSERT INTO customers (id, name, email, created_at, updated_at)
+     VALUES ('cu_demo', 'Demo Client', 'client@synergy.local', NOW(), NOW())
+     ON CONFLICT (id) DO NOTHING`
+  );
+}
+
+async function syncPaymentsFromBookings() {
+  await pool.query(
+    `INSERT INTO payments (
+       booking_id,
+       customer_id,
+       payment_method_id,
+       kind,
+       status,
+       amount,
+       transaction_id,
+       metadata,
+       created_at,
+       processed_at
+     )
+     SELECT
+       id,
+       customer_id,
+       NULL,
+       'payment',
+       COALESCE(payment_status, 'Success'),
+       COALESCE(price, '0'),
+       payment_transaction_id,
+       '{}'::jsonb,
+       COALESCE(payment_processed_at, updated_at, created_at, NOW()),
+       COALESCE(payment_processed_at, updated_at, created_at, NOW())
+     FROM bookings
+     WHERE payment_transaction_id IS NOT NULL
+       AND TRIM(COALESCE(payment_transaction_id, '')) <> ''
+     ON CONFLICT (transaction_id) DO NOTHING`
+  );
+
+  await pool.query(
+    `INSERT INTO payments (
+       booking_id,
+       customer_id,
+       payment_method_id,
+       kind,
+       status,
+       amount,
+       transaction_id,
+       metadata,
+       created_at,
+       processed_at
+     )
+     SELECT
+       id,
+       customer_id,
+       NULL,
+       'refund',
+       'Refunded',
+       COALESCE(price, '0'),
+       refund_transaction_id,
+       '{}'::jsonb,
+       COALESCE(refund_processed_at, updated_at, created_at, NOW()),
+       COALESCE(refund_processed_at, updated_at, created_at, NOW())
+     FROM bookings
+     WHERE refund_transaction_id IS NOT NULL
+       AND TRIM(COALESCE(refund_transaction_id, '')) <> ''
+     ON CONFLICT (transaction_id) DO NOTHING`
+  );
+}
+
 function toPublicPaymentMethod(method) {
   if (!method) {
     return null;
@@ -186,16 +583,8 @@ function toPublicConsultant(consultant) {
     name: consultant.name,
     email: consultant.email || "",
     expertise: consultant.expertise || "general",
-    createdAt: consultant.createdAt || null
+    createdAt: consultant.createdAt || consultant.created_at || null
   };
-}
-
-function findPaymentMethodById(methodId) {
-  if (!methodId) {
-    return null;
-  }
-  const methods = readPaymentMethods();
-  return methods.find((method) => method.id === methodId) || null;
 }
 
 function sanitizeText(value, maxLen = 120) {
@@ -382,6 +771,76 @@ function normalizePoliciesPayload(rawPayload) {
   };
 }
 
+function buildFallbackChatReply(message, consultants, policies) {
+  const prompt = String(message || "").trim().toLowerCase();
+  const cancellationHours = Number(policies?.cancellationWindowHours || 24);
+  const refundPolicy = String(
+    policies?.refundPolicy || "Refunds follow the current cancellation policy."
+  );
+
+  const expertiseSet = new Set(DEFAULT_EXPERTISE_OPTIONS);
+  if (Array.isArray(consultants)) {
+    consultants.forEach((consultant) => {
+      const normalized = normalizeExpertiseValue(consultant?.expertise);
+      if (normalized) {
+        expertiseSet.add(normalized);
+      }
+    });
+  }
+  const expertiseList = Array.from(expertiseSet);
+
+  if (
+    /\b(hi|hello|hey|greetings|good morning|good afternoon|good evening)\b/.test(prompt)
+  ) {
+    return "Hello. I can help with bookings, payment methods, cancellation/refunds, and available services.";
+  }
+
+  if (/\b(book|booking|session|appointment|reserve)\b/.test(prompt)) {
+    return [
+      "Booking flow:",
+      "1) Pick a service and consultant.",
+      "2) Select an available date/time slot.",
+      "3) Submit the booking request.",
+      "4) Wait for consultant confirmation.",
+      "5) Complete payment when the booking reaches Pending Payment."
+    ].join("\n");
+  }
+
+  if (/\b(payment|pay|card|paypal|bank transfer|method)\b/.test(prompt)) {
+    return [
+      "Accepted payment methods:",
+      "- Credit Card",
+      "- Debit Card",
+      "- PayPal",
+      "- Bank Transfer"
+    ].join("\n");
+  }
+
+  if (/\b(cancel|cancellation|refund)\b/.test(prompt)) {
+    return [
+      `Cancellation window: at least ${cancellationHours} hours before the session.`,
+      `Refund policy: ${refundPolicy}`
+    ].join("\n");
+  }
+
+  if (/\b(service|services|available|offer|category|categories|expertise)\b/.test(prompt)) {
+    const servicesText = expertiseList.map((item) => `- ${item}`).join("\n");
+    return `Available consulting services:\n${servicesText}`;
+  }
+
+  if (/\b(status|state|lifecycle|progress)\b/.test(prompt)) {
+    return "Booking lifecycle: Requested -> Confirmed -> Pending Payment -> Paid -> Completed. It can also be Rejected or Cancelled.";
+  }
+
+  return [
+    "I can help with:",
+    "- how to book a consulting session",
+    "- accepted payment methods",
+    "- cancellation and refund rules",
+    "- available consulting services"
+  ].join("\n");
+}
+
 function validatePaymentMethodPayload(input) {
   const payload = input || {};
   const type = sanitizeText(payload.type, 40);
@@ -531,9 +990,9 @@ function mapBookingRow(row) {
   return {
     id: row.id,
     bookingRef:
-      buildCanonicalBookingRef(normalizedBookingId) || row.booking_ref || null,
+      row.booking_ref || buildCanonicalBookingRef(normalizedBookingId) || null,
     customerId:
-      buildCanonicalCustomerId(normalizedBookingId) || row.customer_id || null,
+      row.customer_id || buildCanonicalCustomerId(normalizedBookingId) || null,
     service: row.service,
     price: row.price,
     clientName: row.client_name,
@@ -600,6 +1059,64 @@ async function ensureSchema() {
   await pool.query(`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS refund_processed_at TIMESTAMPTZ`);
 
   await pool.query(
+    `CREATE TABLE IF NOT EXISTS customers (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`
+  );
+
+  await pool.query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_email_unique
+     ON customers(LOWER(email))`
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS payment_methods (
+      id TEXT PRIMARY KEY,
+      customer_id TEXT NOT NULL,
+      type TEXT NOT NULL,
+      label TEXT NOT NULL,
+      details JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ
+    )`
+  );
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_payment_methods_customer_id
+     ON payment_methods(customer_id)`
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS payments (
+      id SERIAL PRIMARY KEY,
+      booking_id INTEGER NOT NULL,
+      customer_id TEXT,
+      payment_method_id TEXT,
+      kind TEXT NOT NULL,
+      status TEXT NOT NULL,
+      amount TEXT NOT NULL,
+      transaction_id TEXT NOT NULL,
+      metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      processed_at TIMESTAMPTZ
+    )`
+  );
+
+  await pool.query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_payments_transaction_unique
+     ON payments(transaction_id)`
+  );
+
+  await pool.query(
+    `CREATE INDEX IF NOT EXISTS idx_payments_booking_id
+     ON payments(booking_id)`
+  );
+
+  await pool.query(
     `UPDATE bookings
      SET booking_ref = 'bk_' || id,
          customer_id = 'cu_' || id
@@ -629,6 +1146,9 @@ async function ensureSchema() {
        AND refund_transaction_id IS DISTINCT FROM ('RF-' || LPAD(id::text, 6, '0'))`
   );
 
+  await seedDefaultCustomer();
+  await syncCustomersFromBookings();
+
   await pool.query(
     `CREATE TABLE IF NOT EXISTS availability_slots (
       id SERIAL PRIMARY KEY,
@@ -644,6 +1164,51 @@ async function ensureSchema() {
   await pool.query(
     `CREATE UNIQUE INDEX IF NOT EXISTS idx_availability_unique
      ON availability_slots(consultant_name, slot_date, slot_time)`
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS consultants (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL DEFAULT '',
+      expertise TEXT NOT NULL DEFAULT 'general',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`
+  );
+
+  await pool.query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_consultants_name_unique
+     ON consultants(LOWER(name))`
+  );
+
+  await pool.query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_consultants_email_unique
+     ON consultants(LOWER(email))
+     WHERE email <> ''`
+  );
+
+  await pool.query(
+    `UPDATE consultants
+     SET expertise = CASE
+       WHEN LOWER(expertise) = 'software architecture' THEN 'Software Architecture Review'
+       WHEN LOWER(expertise) = 'technical interviews' THEN 'Technical Interview Prep'
+       WHEN LOWER(expertise) = 'career coaching' THEN 'Career Path Consulting'
+       WHEN LOWER(expertise) = 'cloud migration' THEN 'Cloud Migration Consulting'
+       ELSE expertise
+     END`
+  );
+
+  await pool.query(
+    `CREATE TABLE IF NOT EXISTS expertise_options (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )`
+  );
+
+  await pool.query(
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_expertise_options_name_unique
+     ON expertise_options(LOWER(name))`
   );
 
   await pool.query(
@@ -888,6 +1453,46 @@ app.post("/api/bookings", async (request, response) => {
       [canonicalBookingRef, canonicalCustomerId, insertedBookingId]
     );
 
+    const persistedCustomer = await upsertCustomer({
+      customerId: canonicalCustomerId,
+      name: actors.client.name,
+      email: actors.client.email
+    });
+
+    let bookingRow = result.rows[0];
+    if (persistedCustomer?.id && persistedCustomer.id !== canonicalCustomerId) {
+      const bookingSyncResult = await pool.query(
+        `UPDATE bookings
+         SET customer_id = $1
+         WHERE id = $2
+         RETURNING
+           id,
+           booking_ref,
+           customer_id,
+           service,
+           price,
+           client_name,
+           client_email,
+           consultant_name,
+           booking_date::text AS booking_date,
+           booking_time,
+           status,
+           payment_status,
+           payment_transaction_id,
+           payment_processed_at,
+           refund_transaction_id,
+           refund_processed_at,
+           created_at,
+           updated_at,
+           updated_by`,
+        [persistedCustomer.id, insertedBookingId]
+      );
+
+      if (bookingSyncResult.rows.length) {
+        bookingRow = bookingSyncResult.rows[0];
+      }
+    }
+
     await pool.query(
       `UPDATE availability_slots
        SET is_available = FALSE,
@@ -926,6 +1531,7 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
       `SELECT
          status,
          price,
+         customer_id,
          consultant_name,
          booking_date::text AS booking_date,
          booking_time,
@@ -1002,7 +1608,7 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
         return;
       }
 
-      const savedMethod = findPaymentMethodById(paymentMethodId);
+      const savedMethod = await findPaymentMethodById(paymentMethodId);
       if (!savedMethod) {
         response.status(400).json({ error: "Selected payment method was not found." });
         return;
@@ -1135,7 +1741,95 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
       );
     }
 
-    const booking = mapBookingRow(result.rows[0]);
+    const booking = mapBookingRow(bookingRow);
+
+    if (paymentReceipt) {
+      await pool.query(
+        `INSERT INTO payments (
+           booking_id,
+           customer_id,
+           payment_method_id,
+           kind,
+           status,
+           amount,
+           transaction_id,
+           metadata,
+           processed_at
+         )
+         VALUES (
+           $1,
+           $2,
+           $3,
+           'payment',
+           'Success',
+           $4,
+           $5,
+           $6::jsonb,
+           $7::timestamptz
+         )
+         ON CONFLICT (transaction_id) DO UPDATE
+         SET
+           status = EXCLUDED.status,
+           amount = EXCLUDED.amount,
+           metadata = EXCLUDED.metadata,
+           processed_at = EXCLUDED.processed_at`,
+        [
+          bookingId,
+          current.customer_id || booking.customerId || null,
+          paymentMethodId,
+          parsePriceAmount(current.price),
+          paymentReceipt.transactionId,
+          JSON.stringify({
+            methodType: paymentReceipt.methodType,
+            methodLabel: paymentReceipt.methodLabel
+          }),
+          paymentReceipt.processedAt
+        ]
+      );
+    }
+
+    if (refundReceipt) {
+      await pool.query(
+        `INSERT INTO payments (
+           booking_id,
+           customer_id,
+           payment_method_id,
+           kind,
+           status,
+           amount,
+           transaction_id,
+           metadata,
+           processed_at
+         )
+         VALUES (
+           $1,
+           $2,
+           NULL,
+           'refund',
+           'Refunded',
+           $3,
+           $4,
+           $5::jsonb,
+           $6::timestamptz
+         )
+         ON CONFLICT (transaction_id) DO UPDATE
+         SET
+           status = EXCLUDED.status,
+           amount = EXCLUDED.amount,
+           metadata = EXCLUDED.metadata,
+           processed_at = EXCLUDED.processed_at`,
+        [
+          bookingId,
+          current.customer_id || booking.customerId || null,
+          parsePriceAmount(current.price),
+          refundReceipt.refundTransactionId,
+          JSON.stringify({
+            sourcePaymentTransactionId: nextPaymentTransactionId || null
+          }),
+          refundReceipt.refundedAt
+        ]
+      );
+    }
 
     const metadataPayload = {};
     if (paymentReceipt) {
@@ -1166,21 +1860,93 @@ app.patch("/api/bookings/:id/status", async (request, response) => {
   }
 });
 
-app.get("/api/payment-methods", (_request, response) => {
-  const methods = readPaymentMethods().map(toPublicPaymentMethod);
-  response.json(methods);
+app.get("/api/customers", async (_request, response) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         id,
+         name,
+         email,
+         created_at,
+         updated_at
+       FROM customers
+       ORDER BY created_at ASC, id ASC`
+    );
+
+    response.json(result.rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at
+    })));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to load customers", error);
+    response.status(500).json({ error: "Failed to load customers." });
+  }
 });
 
-app.post("/api/payment-methods", (request, response) => {
+app.get("/api/payments", async (_request, response) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+         id,
+         booking_id,
+         customer_id,
+         payment_method_id,
+         kind,
+         status,
+         amount,
+         transaction_id,
+         metadata,
+         created_at,
+         processed_at
+       FROM payments
+       ORDER BY id DESC`
+    );
+
+    response.json(result.rows.map((row) => ({
+      id: row.id,
+      bookingId: row.booking_id,
+      customerId: row.customer_id,
+      paymentMethodId: row.payment_method_id,
+      kind: row.kind,
+      status: row.status,
+      amount: row.amount,
+      transactionId: row.transaction_id,
+      metadata: row.metadata || {},
+      createdAt: row.created_at,
+      processedAt: row.processed_at
+    })));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to load payments", error);
+    response.status(500).json({ error: "Failed to load payments." });
+  }
+});
+
+app.get("/api/payment-methods", async (_request, response) => {
+  try {
+    const methods = await listPaymentMethodsFromDb();
+    response.json(methods.map(toPublicPaymentMethod));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to load payment methods", error);
+    response.status(500).json({ error: "Failed to load payment methods." });
+  }
+});
+
+app.post("/api/payment-methods", async (request, response) => {
   const normalized = validatePaymentMethodPayload(request.body);
   if (normalized.error) {
     response.status(400).json({ error: normalized.error });
     return;
   }
 
-  const methods = readPaymentMethods();
   const newMethod = {
     id: `pm_${Date.now()}`,
+    customerId: sanitizeText(request.body?.customerId, 80) || "cu_demo",
     type: normalized.type,
     label: normalized.label,
     details: normalized.details,
@@ -1188,92 +1954,164 @@ app.post("/api/payment-methods", (request, response) => {
     updatedAt: null
   };
 
-  methods.push(newMethod);
-  writePaymentMethods(methods);
-  response.status(201).json(toPublicPaymentMethod(newMethod));
+  try {
+    await upsertCustomer({
+      customerId: newMethod.customerId,
+      name: "Demo Client",
+      email: "client@synergy.local"
+    });
+
+    await pool.query(
+      `INSERT INTO payment_methods (
+         id,
+         customer_id,
+         type,
+         label,
+         details,
+         created_at,
+         updated_at
+       )
+       VALUES ($1, $2, $3, $4, $5::jsonb, $6::timestamptz, NULL)`,
+      [
+        newMethod.id,
+        newMethod.customerId,
+        newMethod.type,
+        newMethod.label,
+        JSON.stringify(newMethod.details || {}),
+        newMethod.createdAt
+      ]
+    );
+
+    response.status(201).json(toPublicPaymentMethod(newMethod));
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to save payment method", error);
+    response.status(500).json({ error: "Failed to save payment method." });
+  }
 });
 
-app.patch("/api/payment-methods/:id", (request, response) => {
+app.patch("/api/payment-methods/:id", async (request, response) => {
   const { id } = request.params;
-  const methods = readPaymentMethods();
-  const index = methods.findIndex((method) => method.id === id);
-
-  if (index === -1) {
-    response.status(404).json({ error: "Payment method not found." });
-    return;
-  }
-
-  const currentMethod = methods[index];
-  const incoming = request.body || {};
-
-  const isLabelOnlyUpdate =
-    Object.prototype.hasOwnProperty.call(incoming, "label") &&
-    !Object.prototype.hasOwnProperty.call(incoming, "type") &&
-    !Object.prototype.hasOwnProperty.call(incoming, "details");
-
-  if (isLabelOnlyUpdate) {
-    currentMethod.label = sanitizeText(incoming.label, 80) || currentMethod.label;
-    currentMethod.updatedAt = new Date().toISOString();
-    methods[index] = currentMethod;
-    writePaymentMethods(methods);
-    response.json(toPublicPaymentMethod(currentMethod));
-    return;
-  }
-
-  const mergedPayload = {
-    type: incoming.type || currentMethod.type,
-    label: Object.prototype.hasOwnProperty.call(incoming, "label")
-      ? incoming.label
-      : currentMethod.label,
-    details: {
-      ...(currentMethod.details || {}),
-      ...((incoming.details && typeof incoming.details === "object") ? incoming.details : {})
+  try {
+    const currentMethod = await findPaymentMethodById(id);
+    if (!currentMethod) {
+      response.status(404).json({ error: "Payment method not found." });
+      return;
     }
-  };
 
-  const normalized = validatePaymentMethodPayload(mergedPayload);
-  if (normalized.error) {
-    response.status(400).json({ error: normalized.error });
-    return;
+    const incoming = request.body || {};
+
+    const isLabelOnlyUpdate =
+      Object.prototype.hasOwnProperty.call(incoming, "label") &&
+      !Object.prototype.hasOwnProperty.call(incoming, "type") &&
+      !Object.prototype.hasOwnProperty.call(incoming, "details");
+
+    if (isLabelOnlyUpdate) {
+      const nextLabel = sanitizeText(incoming.label, 80) || currentMethod.label;
+      const updatedAt = new Date().toISOString();
+      await pool.query(
+        `UPDATE payment_methods
+         SET label = $1,
+             updated_at = $2::timestamptz
+         WHERE id = $3`,
+        [nextLabel, updatedAt, id]
+      );
+      response.json(
+        toPublicPaymentMethod({
+          ...currentMethod,
+          label: nextLabel,
+          updatedAt
+        })
+      );
+      return;
+    }
+
+    const mergedPayload = {
+      type: incoming.type || currentMethod.type,
+      label: Object.prototype.hasOwnProperty.call(incoming, "label")
+        ? incoming.label
+        : currentMethod.label,
+      details: {
+        ...(currentMethod.details || {}),
+        ...((incoming.details && typeof incoming.details === "object") ? incoming.details : {})
+      }
+    };
+
+    const normalized = validatePaymentMethodPayload(mergedPayload);
+    if (normalized.error) {
+      response.status(400).json({ error: normalized.error });
+      return;
+    }
+
+    const updatedAt = new Date().toISOString();
+    await pool.query(
+      `UPDATE payment_methods
+       SET
+         type = $1,
+         label = $2,
+         details = $3::jsonb,
+         updated_at = $4::timestamptz
+       WHERE id = $5`,
+      [
+        normalized.type,
+        normalized.label,
+        JSON.stringify(normalized.details || {}),
+        updatedAt,
+        id
+      ]
+    );
+
+    response.json(
+      toPublicPaymentMethod({
+        ...currentMethod,
+        type: normalized.type,
+        label: normalized.label,
+        details: normalized.details,
+        updatedAt
+      })
+    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to update payment method", error);
+    response.status(500).json({ error: "Failed to update payment method." });
   }
-
-  methods[index] = {
-    ...currentMethod,
-    type: normalized.type,
-    label: normalized.label,
-    details: normalized.details,
-    updatedAt: new Date().toISOString()
-  };
-
-  writePaymentMethods(methods);
-  response.json(toPublicPaymentMethod(methods[index]));
 });
 
-app.delete("/api/payment-methods/:id", (request, response) => {
+app.delete("/api/payment-methods/:id", async (request, response) => {
   const { id } = request.params;
-  const methods = readPaymentMethods();
-  const idx = methods.findIndex((method) => method.id === id);
+  try {
+    const result = await pool.query(
+      `DELETE FROM payment_methods
+       WHERE id = $1
+       RETURNING id`,
+      [id]
+    );
 
-  if (idx === -1) {
-    response.status(404).json({ error: "Payment method not found." });
-    return;
+    if (!result.rows.length) {
+      response.status(404).json({ error: "Payment method not found." });
+      return;
+    }
+
+    response.status(204).end();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to delete payment method", error);
+    response.status(500).json({ error: "Failed to delete payment method." });
   }
-
-  methods.splice(idx, 1);
-  writePaymentMethods(methods);
-  response.status(204).end();
 });
 
-app.get("/api/consultants", (_request, response) => {
-  const consultants = readConsultants()
-    .map(toPublicConsultant)
-    .filter(Boolean)
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  response.json(consultants);
+app.get("/api/consultants", async (_request, response) => {
+  try {
+    const consultants = await listConsultantsFromDb();
+    response.json(consultants);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to load consultants", error);
+    response.status(500).json({ error: "Failed to load consultants." });
+  }
 });
 
-app.post("/api/consultants", (request, response) => {
+app.post("/api/consultants", async (request, response) => {
   const actor = sanitizeActor(request.body?.actor);
   if (actor !== "admin") {
     response.status(403).json({ error: "Only admin can add consultants." });
@@ -1281,7 +2119,7 @@ app.post("/api/consultants", (request, response) => {
   }
 
   const name = sanitizeText(request.body?.name, 80);
-  const expertise = sanitizeText(request.body?.expertise, 120) || "general";
+  const expertise = normalizeExpertiseValue(request.body?.expertise);
   const email = sanitizeText(request.body?.email, 120).toLowerCase();
 
   if (!name) {
@@ -1294,37 +2132,51 @@ app.post("/api/consultants", (request, response) => {
     return;
   }
 
-  const consultants = readConsultants();
-  const nameKey = name.toLowerCase();
-  const emailKey = email.toLowerCase();
-  const duplicate = consultants.find((consultant) => {
-    const consultantName = String(consultant.name || "").trim().toLowerCase();
-    const consultantEmail = String(consultant.email || "").trim().toLowerCase();
-    if (consultantName && consultantName === nameKey) {
-      return true;
-    }
-    if (emailKey && consultantEmail && consultantEmail === emailKey) {
-      return true;
-    }
-    return false;
-  });
-
-  if (duplicate) {
-    response.status(409).json({ error: "Consultant already exists." });
+  if (!expertise) {
+    response.status(400).json({
+      error: `Expertise must match one of: ${DEFAULT_EXPERTISE_OPTIONS.join(", ")}.`
+    });
     return;
   }
 
-  const consultant = {
-    id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    name,
-    email,
-    expertise,
-    createdAt: new Date().toISOString()
-  };
+  try {
+    const consultantId = await buildNextConsultantId();
+    const createdAt = new Date().toISOString();
 
-  consultants.push(consultant);
-  writeConsultants(consultants);
-  response.status(201).json(toPublicConsultant(consultant));
+    const result = await pool.query(
+      `INSERT INTO consultants (id, name, email, expertise, created_at)
+       VALUES ($1, $2, $3, $4, $5::timestamptz)
+       RETURNING id, name, email, expertise, created_at`,
+      [consultantId, name, email, expertise, createdAt]
+    );
+
+    response.status(201).json(toPublicConsultant(result.rows[0]));
+  } catch (error) {
+    if (error && error.code === "23505") {
+      response.status(409).json({ error: "Consultant already exists." });
+      return;
+    }
+    // eslint-disable-next-line no-console
+    console.error("Failed to create consultant", error);
+    response.status(500).json({ error: "Failed to create consultant." });
+  }
+});
+
+app.get("/api/policies/expertise-options", async (_request, response) => {
+  try {
+    const options = await listExpertiseOptionsFromDb();
+    response.json(options);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to load expertise options", error);
+    response.status(500).json({ error: "Failed to load expertise options." });
+  }
+});
+
+app.post("/api/policies/expertise-options", async (_request, response) => {
+  response.status(405).json({
+    error: "Expertise options are fixed to the platform service catalog and cannot be modified."
+  });
 });
 
 app.get("/api/availability", async (request, response) => {
@@ -1512,7 +2364,7 @@ app.post("/api/consultants/registrations", (request, response) => {
   response.status(201).json(registration);
 });
 
-app.patch("/api/consultants/registrations/:id", (request, response) => {
+app.patch("/api/consultants/registrations/:id", async (request, response) => {
   const { id } = request.params;
   const status = sanitizeRegistrationStatus(request.body?.status);
   const actor = sanitizeActor(request.body?.actor);
@@ -1540,42 +2392,62 @@ app.patch("/api/consultants/registrations/:id", (request, response) => {
     reviewedBy: actor
   };
 
-  writeConsultantRegistrations(registrations);
-
   if (status === "Approved") {
     const approvedRegistration = registrations[index];
-    const consultants = readConsultants();
     const approvedName = String(approvedRegistration.name || "").trim().toLowerCase();
     const approvedEmail = String(approvedRegistration.email || "").trim().toLowerCase();
-    const alreadyExists = consultants.some((consultant) => {
-      const consultantName = String(consultant.name || "").trim().toLowerCase();
-      const consultantEmail = String(consultant.email || "").trim().toLowerCase();
-      if (approvedName && consultantName === approvedName) {
-        return true;
-      }
-      if (approvedEmail && consultantEmail && consultantEmail === approvedEmail) {
-        return true;
-      }
-      return false;
-    });
+    const approvedExpertise =
+      normalizeExpertiseValue(approvedRegistration.expertise) || DEFAULT_EXPERTISE_OPTIONS[0];
 
-    if (!alreadyExists) {
-      consultants.push({
-        id: `con_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: approvedRegistration.name,
-        email: approvedRegistration.email,
-        expertise: approvedRegistration.expertise || "general",
-        createdAt: new Date().toISOString()
-      });
-      writeConsultants(consultants);
+    try {
+      const alreadyExistsQuery = await pool.query(
+        `SELECT id
+         FROM consultants
+         WHERE LOWER(name) = $1
+            OR ($2 <> '' AND LOWER(email) = $2)
+         LIMIT 1`,
+        [approvedName, approvedEmail]
+      );
+
+      if (!alreadyExistsQuery.rows.length) {
+        const consultantId = await buildNextConsultantId();
+        await pool.query(
+          `INSERT INTO consultants (id, name, email, expertise, created_at)
+           VALUES ($1, $2, $3, $4, NOW())`,
+          [
+            consultantId,
+            sanitizeText(approvedRegistration.name, 80),
+            sanitizeText(approvedRegistration.email, 120).toLowerCase(),
+            approvedExpertise
+          ]
+        );
+      }
+
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to approve consultant registration into DB", error);
+      response.status(500).json({ error: "Failed to finalize consultant approval." });
+      return;
     }
   }
 
+  writeConsultantRegistrations(registrations);
   response.json(registrations[index]);
 });
 
-app.get("/api/policies", (_request, response) => {
-  response.json(readSystemPolicies());
+app.get("/api/policies", async (_request, response) => {
+  try {
+    const policies = readSystemPolicies();
+    const expertiseOptions = await listExpertiseOptionsFromDb();
+    response.json({
+      ...policies,
+      expertiseOptions: expertiseOptions.map((item) => item.name)
+    });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Failed to load policies", error);
+    response.status(500).json({ error: "Failed to load policies." });
+  }
 });
 
 app.put("/api/policies", (request, response) => {
@@ -1610,15 +2482,21 @@ app.post("/api/chat", async (request, response) => {
     return response.status(400).json({ error: "message is required" });
   }
 
-  if (!GEMINI_API_KEY) {
-    return response
-      .status(503)
-      .json({ error: "AI assistant is not configured (missing API key)" });
+  // Build public platform context from safe/public sources only.
+  let consultants = [];
+  try {
+    consultants = await listConsultantsFromDb();
+  } catch {
+    consultants = readConsultants().map(toPublicConsultant).filter(Boolean);
   }
-
-  // Build public platform context — read from JSON files, never from the DB
-  const consultants = readConsultants();
   const policies = readSystemPolicies();
+
+  if (!OPENROUTER_API_KEY) {
+    return response.json({
+      reply: buildFallbackChatReply(message, consultants, policies),
+      mode: "fallback"
+    });
+  }
 
   const consultantList = consultants
     .map((c) => `  • ${c.name} — ${c.expertise}`)
@@ -1661,40 +2539,45 @@ IMPORTANT RULES FOR YOUR RESPONSES:
 - Keep answers concise and helpful.`;
 
   try {
-    const geminiUrl =
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${GEMINI_API_KEY}`;
-
-    const geminiResponse = await fetch(geminiUrl, {
+    const orResponse = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`
+      },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: "user", parts: [{ text: message.trim() }] }],
-        generationConfig: { maxOutputTokens: 512 }
+        model: "qwen/qwen3.6-plus:free",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: message.trim() }
+        ],
+        max_tokens: 512
       })
     });
 
-    if (!geminiResponse.ok) {
-      const errBody = await geminiResponse.text();
+    if (!orResponse.ok) {
+      const errBody = await orResponse.text();
       // eslint-disable-next-line no-console
-      console.error("Gemini API error:", geminiResponse.status, errBody);
-      return response
-        .status(502)
-        .json({ error: "AI assistant encountered an error. Please try again." });
+      console.error("OpenRouter API error:", orResponse.status, errBody);
+      return response.json({
+        reply: buildFallbackChatReply(message, consultants, policies),
+        mode: "fallback"
+      });
     }
 
-    const data = await geminiResponse.json();
+    const data = await orResponse.json();
     const reply =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data.choices?.[0]?.message?.content ||
       "I'm sorry, I could not generate a response. Please try again.";
 
     return response.json({ reply });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("AI chat error:", error.message);
-    return response
-      .status(502)
-      .json({ error: "AI assistant encountered an error. Please try again." });
+    return response.json({
+      reply: buildFallbackChatReply(message, consultants, policies),
+      mode: "fallback"
+    });
   }
 });
 
@@ -1713,6 +2596,10 @@ async function startServer() {
   });
 
   await ensureSchema();
+  await migrateConsultantsJsonToDb();
+  await migratePaymentMethodsJsonToDb();
+  await syncCustomersFromBookings();
+  await syncPaymentsFromBookings();
 
   app.listen(PORT, () => {
     // eslint-disable-next-line no-console

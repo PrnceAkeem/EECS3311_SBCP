@@ -26,9 +26,19 @@ document.addEventListener("DOMContentLoaded", () => {
     "Completed"
   ];
 
+  const HARDCODED_EXPERTISE_OPTIONS = [
+    "Software Architecture Review",
+    "Cloud Migration Consulting",
+    "Career Path Consulting",
+    "Technical Interview Prep",
+    "Startup Strategy Session",
+    "Code Review & Mentorship"
+  ];
+
   let unsubscribe = null;
   let isRendering = false;
   let toastTimer = null;
+  let expertiseOptions = [];
 
   if (!tableBody || !window.BookingStore) {
     return;
@@ -48,6 +58,30 @@ document.addEventListener("DOMContentLoaded", () => {
       .replace(/>/g, "&gt;")
       .replace(/\"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  function renderExpertiseSelects() {
+    const optionsMarkup = expertiseOptions.length
+      ? expertiseOptions.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join("")
+      : '<option value="" selected disabled>No expertise options available</option>';
+
+    if (consultantExpertiseInput) {
+      const previousValue = consultantExpertiseInput.value;
+      consultantExpertiseInput.innerHTML = expertiseOptions.length
+        ? `<option value="" disabled>Select expertise</option>${optionsMarkup}`
+        : optionsMarkup;
+
+      if (expertiseOptions.includes(previousValue)) {
+        consultantExpertiseInput.value = previousValue;
+      } else if (expertiseOptions.length) {
+        consultantExpertiseInput.value = expertiseOptions[0];
+      }
+    }
+  }
+
+  function loadExpertiseOptions() {
+    expertiseOptions = [...HARDCODED_EXPERTISE_OPTIONS];
+    renderExpertiseSelects();
   }
 
   function formatRef(prefix, rawId) {
@@ -155,10 +189,14 @@ document.addEventListener("DOMContentLoaded", () => {
   async function addConsultant() {
     const name = consultantNameInput.value.trim();
     const email = consultantEmailInput.value.trim();
-    const expertise = consultantExpertiseInput.value.trim();
+    const expertise = String(consultantExpertiseInput.value || "").trim();
 
     if (!name) {
       showToast("Consultant name is required.");
+      return;
+    }
+    if (!expertise) {
+      showToast("Please select expertise.");
       return;
     }
 
@@ -184,7 +222,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       consultantNameInput.value = "";
       consultantEmailInput.value = "";
-      consultantExpertiseInput.value = "";
+      if (expertiseOptions.length) {
+        consultantExpertiseInput.value = expertiseOptions[0];
+      }
       showToast("Consultant added.");
       await loadConsultants();
     } catch (error) {
@@ -276,6 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
       policyPricingMultiplier.value = policies.pricingMultiplier;
       policyNotificationsEnabled.value = String(Boolean(policies.notificationsEnabled));
       policyRefundPolicy.value = policies.refundPolicy || "";
+
     } catch (error) {
       showToast(error.message || "Could not load system policies.");
     }
@@ -367,4 +408,5 @@ document.addEventListener("DOMContentLoaded", () => {
   loadConsultants();
   loadRegistrations();
   loadPolicies();
+  loadExpertiseOptions();
 });

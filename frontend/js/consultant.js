@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const availabilityTime = document.getElementById("availabilityTime");
   const addAvailabilityBtn = document.getElementById("addAvailabilityBtn");
   const availabilityTableBody = document.getElementById("availabilityTableBody");
+  const registrationNameInput = document.getElementById("registrationNameInput");
+  const registrationEmailInput = document.getElementById("registrationEmailInput");
+  const registrationExpertiseInput = document.getElementById("registrationExpertiseInput");
+  const submitRegistrationBtn = document.getElementById("submitRegistrationBtn");
 
   const STATUS_OPTIONS = [
     "Requested",
@@ -16,6 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
     "Cancelled",
     "Paid",
     "Completed"
+  ];
+
+  const HARDCODED_EXPERTISE_OPTIONS = [
+    "Software Architecture Review",
+    "Cloud Migration Consulting",
+    "Career Path Consulting",
+    "Technical Interview Prep",
+    "Startup Strategy Session",
+    "Code Review & Mentorship"
   ];
 
   let unsubscribe = null;
@@ -61,6 +74,10 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${hour}:${match[2]} ${match[3]}`;
   }
 
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+  }
+
   function formatRef(prefix, rawId) {
     const n = Number(rawId);
     return Number.isInteger(n)
@@ -103,6 +120,48 @@ document.addEventListener("DOMContentLoaded", () => {
       availabilityConsultantName.innerHTML =
         '<option value="" selected disabled>Unable to load consultants</option>';
       showToast(error.message || "Could not load consultants.");
+    }
+  }
+
+  async function loadRegistrationExpertiseOptions() {
+    if (!registrationExpertiseInput) {
+      return;
+    }
+
+    registrationExpertiseInput.innerHTML =
+      '<option value="" selected disabled>Loading expertise...</option>';
+
+    try {
+      const response = await fetch("/api/policies/expertise-options");
+      if (!response.ok) {
+        throw new Error("Failed to load expertise options.");
+      }
+
+      const options = await response.json();
+      const expertiseValues = options
+        .map((item) => String(item?.name || "").trim())
+        .filter(Boolean);
+
+      if (!expertiseValues.length) {
+        throw new Error("No expertise options found.");
+      }
+
+      registrationExpertiseInput.innerHTML = [
+        '<option value="" disabled>Select expertise</option>',
+        ...expertiseValues.map((name) => (
+          `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
+        ))
+      ].join("");
+      registrationExpertiseInput.value = expertiseValues[0];
+    } catch (error) {
+      registrationExpertiseInput.innerHTML = [
+        '<option value="" disabled>Select expertise</option>',
+        ...HARDCODED_EXPERTISE_OPTIONS.map((name) => (
+          `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`
+        ))
+      ].join("");
+      registrationExpertiseInput.value = HARDCODED_EXPERTISE_OPTIONS[0];
+      showToast(error.message || "Using default expertise options.");
     }
   }
 
@@ -273,7 +332,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function submitRegistration() {
+    const name = String(registrationNameInput?.value || "").trim();
+    const email = String(registrationEmailInput?.value || "").trim().toLowerCase();
+    const expertise = String(registrationExpertiseInput?.value || "").trim();
+
+    if (!name || !email || !expertise) {
+      showToast("Name, email, and expertise are required.");
+      return;
+    }
+    if (!isValidEmail(email)) {
+      showToast("Email format is invalid.");
+      return;
+    }
+
+    submitRegistrationBtn.disabled = true;
+    try {
+      const response = await fetch("/api/consultants/registrations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          expertise
+        })
+      });
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.error || "Failed to submit registration.");
+      }
+
+      registrationNameInput.value = "";
+      registrationEmailInput.value = "";
+      showToast("Registration submitted. Wait for admin approval.");
+    } catch (error) {
+      showToast(error.message || "Could not submit registration.");
+    } finally {
+      submitRegistrationBtn.disabled = false;
+    }
+  }
+
   addAvailabilityBtn.addEventListener("click", addAvailability);
+  if (submitRegistrationBtn) {
+    submitRegistrationBtn.addEventListener("click", submitRegistration);
+  }
   availabilityConsultantName.addEventListener("change", () => {
     loadAvailability();
   });
@@ -330,6 +435,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderBookings();
+  loadRegistrationExpertiseOptions();
   loadConsultants().then(() => {
     loadAvailability();
   });
