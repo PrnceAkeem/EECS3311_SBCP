@@ -10,14 +10,14 @@ The Synergy platform includes an AI-powered Customer Assistant that clients can 
 
 | Property | Value |
 |---|---|
-| Provider | Google AI (Gemini) |
-| Model | `gemini-flash-lite-latest` |
-| API Version | `v1beta` |
-| API Endpoint | `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent` |
+| Provider | Openrouter |
+| Model | `Qwen3.6-Plus:free` |
+| API Version | `v1` |
+| API Endpoint | ` https://openrouter.ai/api/v1/chat/completions` |
 | Max Output Tokens | 512 |
-| Authentication | API key via `GEMINI_API_KEY` environment variable |
+| Authentication | API key via `OPENROUTER_API_KEY` environment variable, passed as Authorization: Bearer header |
 
-The Gemini API is called directly using the Node.js built-in `fetch` — no additional npm package is required.
+The Openrouter API is called directly using the Node.js built-in `fetch` — no additional npm package is required.
 
 ---
 
@@ -50,10 +50,10 @@ nginx (synergy-frontend container)
     ▼
 Express API (synergy-backend container)
     │  Builds system prompt from public JSON files
-    │  POST https://generativelanguage.googleapis.com/...
+    │  POST https://openrouter.ai/api/v1/chat/completions
     ▼
-Google Gemini API
-    │  { candidates[0].content.parts[0].text }
+OpenRouter API key (OpenRouter Qwen3.6-plus:free)
+    │  { choices[0].message.content }
     ▼
 Express API  →  { reply: "..." }
     ▼
@@ -78,8 +78,8 @@ Browser renders reply in chat window
 | HTTP Status | Meaning |
 |---|---|
 | 400 | Message field missing or empty |
-| 503 | `GEMINI_API_KEY` is not configured |
-| 502 | Gemini API returned an error |
+| 503 | `OPENROUTER_API_KEY` is not configured |
+| 502 | OpenRouter API returned an error |
 
 ---
 
