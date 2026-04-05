@@ -89,10 +89,10 @@ The system runs with **three containers**:
 
 ### Setup
 
-1. Copy the environment template and add your Gemini API key:
+1. Copy the environment template and add your Openrouter key:
 ```bash
 cp .env.example .env
-# Then open .env and set GEMINI_API_KEY=your_key_here
+# Then open .env and set OPENROUTER_API_KEY=your_key_here
 ```
 
 2. Start all containers:
@@ -117,7 +117,7 @@ docker compose down -v
 
 ### AI Customer Assistant
 
-The AI chatbot is available to clients on the Browse Services page. Click the 💬 bubble in the bottom-right corner to open it. It is powered by the Google Gemini API (`gemini-flash-lite-latest`) and answers questions about the platform, booking process, payment methods, and policies.
+The AI chatbot is available to clients on the Browse Services page. Click the 💬 bubble in the bottom-right corner to open it. It is powered by the OpenRouter Qwen3.6 Pro Free API (`Qwen3.6-Pro-free`) and answers questions about the platform, booking process, payment methods, and policies.
 
 See `CHATBOT-DOC.md` for full documentation.
 
@@ -137,7 +137,7 @@ All four patterns are implemented in `backend/src/patterns/` and wired in `backe
 - Completed frontend for all client, consultant, and admin workflows
 - Client refund flow: "Cancel & Refund" button on paid bookings — backend auto-generates a refund transaction ID
 - Three-container Docker deployment (db + backend + frontend/nginx)
-- AI Customer Assistant chatbot (Google Gemini) embedded in the client interface
+- AI Customer Assistant chatbot (Openrouter Qwen3.6) embedded in the client interface
 - See `PHASE2.md` for a full breakdown and `CHATBOT-DOC.md` for chatbot documentation
 
 ## Phase 1 Scope Note
