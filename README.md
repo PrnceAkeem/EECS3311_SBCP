@@ -117,7 +117,7 @@ docker compose down -v
 
 ### AI Customer Assistant
 
-The AI chatbot is available to clients on the Browse Services page. Click the 💬 bubble in the bottom-right corner to open it. It is powered by the OpenRouter Qwen3.6 Pro Free API (`Qwen3.6-Pro-free`) and answers questions about the platform, booking process, payment methods, and policies.
+The AI chatbot is available to clients on the Browse Services page. Click the 💬 bubble in the bottom-right corner to open it. It is powered by the OpenRouter Qwen3.6 Pro Free API (`Qwen3.6-Plus-free`) and answers questions about the platform, booking process, payment methods, and policies.
 
 See `CHATBOT-DOC.md` for full documentation.
 
