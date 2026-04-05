@@ -27,7 +27,7 @@ Not a class — a route handler registered on the Express `app` instance.
 
 | Name | Type | Value |
 |---|---|---|
-| `GEMINI_API_KEY` | `string` | `process.env.GEMINI_API_KEY \|\| ""` |
+| `OPENROUTER_API_KEY` | `string` | `process.env.OPENROUTER_API_KEY \|\| ""` |
 
 **Handler variables (local to request scope):**
 
@@ -37,11 +37,11 @@ Not a class — a route handler registered on the Express `app` instance.
 | `consultants` | `Array<{name, expertise}>` | Public consultant list from JSON file |
 | `policies` | `{cancellationWindowHours, refundPolicy, ...}` | System policies from JSON file |
 | `consultantList` | `string` | Formatted bullet list of consultants |
-| `systemPrompt` | `string` | Full system context injected into Gemini request |
-| `geminiUrl` | `string` | Gemini REST endpoint URL with API key |
-| `geminiResponse` | `Response` | Raw HTTP response from Gemini API |
-| `data` | `object` | Parsed JSON body from Gemini |
-| `reply` | `string` | Extracted text from `data.candidates[0].content.parts[0].text` |
+| `systemPrompt` | `string` | Full system context injected into Openrouter request |
+| `OpenrouterUrl` | `string` | Openrouter REST endpoint URL with API key |
+| `OpenrouterResponse` | `Response` | Raw HTTP response from Openrouter API |
+| `data` | `object` | Parsed JSON body from Openrouter |
+| `reply` | `string` | Extracted text from `data.choices[0].message.content` |
 
 **Request body:** `{ message: string }`
 
@@ -52,14 +52,14 @@ Not a class — a route handler registered on the Express `app` instance.
 | HTTP Status | Condition |
 |---|---|
 | `400` | `message` missing or empty |
-| `503` | `GEMINI_API_KEY` not set |
-| `502` | Gemini API returned non-OK or threw |
+| `503` | `OPENROUTER_API_KEY` not set |
+| `502` | Openrouter API returned non-OK or threw |
 
-**External dependency:** Google Gemini REST API
-- Model: `gemini-flash-lite-latest`
-- Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent`
-- Auth: query param `?key=GEMINI_API_KEY`
-- Request shape: `{ system_instruction, contents, generationConfig: { maxOutputTokens: 512 } }`
+**External dependency:** Openrouter REST API
+ - Model: `qwen/qwen3.6-plus:free`
+ - Endpoint: `https://openrouter.ai/api/v1/chat/completions`
+ - Auth: `Authorization: Bearer <OPENROUTER_API_KEY>` header
+ - Request shape: `{ model, messages: [{ role, content }] }`
 
 ---
 
