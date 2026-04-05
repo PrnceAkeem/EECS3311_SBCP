@@ -2,7 +2,7 @@
 
 ## Overview
 
-Phase 2 extends the Phase 1 backend with a fully functional frontend, a three-container Docker deployment, and an AI-powered Customer Assistant chatbot using the Openrouter Qwen3.6-pro-free API.
+Phase 2 extends the Phase 1 backend with a fully functional frontend, a three-container Docker deployment, and an AI-powered Customer Assistant chatbot using the Openrouter Qwen3.6-Plus-free API.
 
 ---
 
@@ -97,7 +97,7 @@ OPENROUTER_API_KEY=your_openrouter_api_key_here
 
 ## 3. AI-Based Customer Assistant
 
-A floating chat widget is embedded in the client interface (`client.html`) and backed by a dedicated backend endpoint (`POST /api/chat`) that calls the Openrouter Qwen3.6-Pro-free API.
+A floating chat widget is embedded in the client interface (`client.html`) and backed by a dedicated backend endpoint (`POST /api/chat`) that calls the Openrouter Qwen3.6-Plus-free API.
 
 See **CHATBOT-DOC.md** for full documentation.
 
